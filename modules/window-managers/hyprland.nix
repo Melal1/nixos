@@ -1,17 +1,19 @@
-{pkgs,...}:{
+{ pkgs, ... }: {
 
 
 
-programs.hyprland = {
-enable = true ;
-xwayland.enable = true ;
-};
+  programs.hyprland = {
+    enable = true;
+    xwayland.enable = true;
+  };
 
-environment.systemPackages = with pkgs; [
-swww
-wl-clipboard
-neofetch
-];
+  environment.systemPackages = with pkgs; [
+    swww
+    wl-clipboard
+    neofetch
+    rofi-wayland
+    waybar
+  ];
 
 
 
