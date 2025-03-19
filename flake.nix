@@ -8,51 +8,45 @@
     home-manager = {
       url = "github:nix-community/home-manager/release-24.11";
       inputs.nixpkgs.follows = "nixpkgs";
-
     };
   };
 
-  #outputs = { self, nixpkgs, home-manager,nixpkgs-unstable }@inputs: {
   outputs = { self, nixpkgs, home-manager, ghostty, zen-browser }@inputs:
-
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
     in
     {
-      nixosConfigurations =
-        {
-          alpha = nixpkgs.lib.nixosSystem {
-            specialArgs = { inherit inputs; };
-            inherit system;
-            modules = [
-              ./configuration.nix
-              ./hosts/desktop
-            ];
-          };
-          zeta = nixpkgs.lib.nixosSystem {
-            specialArgs = { inherit inputs; };
-            inherit system;
-            modules = [
-              ./configuration.nix
-              ./hosts/laptop
-              ({ pkgs, ... }: {
-                environment.systemPackages = [
-                  ghostty.packages.${system}.default # Install Ghostty
-                  zen-browser.packages.${system}.default
-                ];
-              })
-
-            ];
-          };
-
+      nixosConfigurations = {
+        alpha = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          inherit system;
+          modules = [
+            ./configuration.nix
+            ./hosts/desktop
+          ];
         };
+        zeta = nixpkgs.lib.nixosSystem {
+          specialArgs = { inherit inputs; };
+          inherit system;
+          modules = [
+            ./configuration.nix
+            ./hosts/laptop
+            ({ pkgs, ... }: {
+              environment.systemPackages = [
+                ghostty.packages.${system}.default # Install Ghostty
+                zen-browser.packages.${system}.default
+              ];
+            })
+          ];
+        };
+      };
+
       homeConfigurations = {
         melal = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
-          modules = [ ./modules/home.nix ];
+          modules = [ ./modules/home ];
         };
-
       };
     };
 }

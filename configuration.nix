@@ -9,14 +9,36 @@
 
   # services.libinput.enable = true;
   environment.systemPackages = with pkgs; [
-    #kitty
+    kitty
     #firefox
-    go
-    gcc
+    # neovim 
     cargo
     python3
     nodejs
+    go
+    unzip
+    ripgrep
+    fd
+
+    # Lsp
+    clang
+    clang-tools
+    shellcheck
+    shfmt
+    nil
+    nixpkgs-fmt
+    lua-language-server
+    stylua
+    bash-language-server
+
+
+
+    brightnessctl
+    linux-wifi-hotspot
+    vim
+    iw
     acpi
+    hyprpaper
     fish
     starship
     yazi
@@ -27,13 +49,11 @@
     home-manager
     dunst
     pavucontrol
+    openvpn
+    lazygit
+    zoxide
 
-    unzip # Nvim
-    ripgrep # Nvim
-    fd # Nvim
     tree
-    #tailscale restricted on my fking country 
-    #wireguard 
   ];
 
 }
