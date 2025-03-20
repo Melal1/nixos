@@ -11,10 +11,12 @@
         bind \cE edit_command_buffer
         bind -M insert -m default jk cancel repaint-mode
         set -g fish_sequence_key_delay_ms 30
+        zoxide init fish | source
       '';
       preferAbbrs = true;
       shellAbbrs = {
         vnx = "nvim ~/.dotfiles/nixos/";
+        vhm = "nvim ~/.dotfiles/nixos/modules/home/";
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
         h-r = "home-manager switch --flake ~/.dotfiles/nixos/.";
 
@@ -22,8 +24,6 @@
       shellAliases = {
 
         nvi = "nvim $(fzf --preview 'bat --color=always {}')";
-        z = "zoxide";
-        zi = "zoxide $(fzf)";
 
       };
 

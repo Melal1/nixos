@@ -6,7 +6,9 @@
   imports = [
     ./kitty.nix
     ./git.nix
-    ./fish.nix
+    ./shell/fish.nix
+    ./shell/fetch.nix
+    ./shell/starship.nix
   ];
 
 

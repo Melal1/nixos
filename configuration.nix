@@ -54,7 +54,7 @@
     fzf
     fastfetch
     bat
-    exa
+    eza
 
     tree
   ];
