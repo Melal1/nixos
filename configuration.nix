@@ -4,7 +4,6 @@
 {
 
 
-
   # Enable CUPS to print documents.
 
   # services.libinput.enable = true;
@@ -52,6 +51,10 @@
     openvpn
     lazygit
     zoxide
+    fzf
+    fastfetch
+    bat
+    exa
 
     tree
   ];

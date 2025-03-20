@@ -4,8 +4,9 @@
   home.homeDirectory = "/home/melal/";
   programs.home-manager.enable = true;
   imports = [
-  ./kitty.nix
-  ./git.nix
+    ./kitty.nix
+    ./git.nix
+    ./fish.nix
   ];
 
 

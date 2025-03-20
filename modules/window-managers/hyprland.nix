@@ -10,7 +10,6 @@
   environment.systemPackages = with pkgs; [
     swww
     wl-clipboard
-    neofetch
     rofi-wayland
     waybar
   ];
