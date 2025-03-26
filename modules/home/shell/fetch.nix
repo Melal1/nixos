@@ -36,8 +36,8 @@
         }
         {
           type = "shell";
-          format = "   fish~";
-          key = "SH ";
+          format = "  fish~";
+          key = "SH  ";
           keyColor = "34";
         }
         {
@@ -47,8 +47,8 @@
         }
         {
           type = "wm";
-          format = " {} ";
-          key = "WM ";
+          format = "{} ";
+          key = "WM  ";
           keyColor = "36";
         }
         "break"

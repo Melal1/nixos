@@ -3,7 +3,7 @@
     enable = true;
     font = {
       name = "CaskaydiaCove Nerd Font";
-      size = 12;
+      size = 15;
     };
     settings = {
       bold_font = "auto";
@@ -17,13 +17,13 @@
 
       disable_ligatures = "cursor";
       undercurl_style = "thin-dense";
-      scrollback_indicator_opacity = "0.2";
+      scrollback_indicator_opacity = "0.5";
       mouse_hide_wait = "-1.0";
       url_color = "#FFFFFF";
       url_style = "curly";
       show_hyperlink_targets = "yes";
       active_border_color = "none";
-      background_opacity = "0.7";
+      background_opacity = "1";
 
       shell_integration = "no-cursor";
       cursor_shape = "block";
@@ -35,6 +35,7 @@
       cursor_trail_start_threshold = "0";
       cursor_trail_decay = "0.01 0.15";
       cursor_blink = "true";
+      window_padding_width = "1";
 
       wheel_scroll_multiplier = "10.0";
       open_url_with = "$BROWSER";

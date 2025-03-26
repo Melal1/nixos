@@ -9,8 +9,6 @@
   # services.libinput.enable = true;
   environment.systemPackages = with pkgs; [
     kitty
-    #firefox
-    # neovim 
     cargo
     python3
     nodejs
@@ -30,9 +28,15 @@
     stylua
     bash-language-server
 
+    # Compilers
+    gcc
 
 
+
+    tmux
     brightnessctl
+    grim
+    slurp
     linux-wifi-hotspot
     vim
     iw

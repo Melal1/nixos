@@ -1,7 +1,7 @@
 {
   programs.starship = {
     enable = true;
-    enableTransience = true ;
+    enableTransience = true;
     settings = {
       format =
         "$os"
@@ -13,17 +13,20 @@
         + "$git_state"
         + "$nix_shell"
         + "$docker_context"
+        + "$fill"
+        + "$git_metrics"
+        + "$git_status"
         + "$line_break"
         + "$jobs"
         + "$container"
         + "$character";
 
-      right_format =
-        "$git_metrics"
-        + "$git_status";
+      right_format = ""; # Disable the right_format since we're using fill
 
-      add_newline = true;
-
+      add_newline = false;
+      fill = {
+        symbol = " ";
+      };
       os = {
         format = "[$symbol]($style) ";
         disabled = false;
@@ -31,7 +34,6 @@
           NixOS = "󱄅 ";
         };
       };
-
 
       nix_shell = {
         format = "[󱄅 $name]($style) ";
@@ -44,15 +46,11 @@
       git_branch = {
         format = "[$symbol($branch)]($style) ";
         symbol = "  ";
-
       };
+
       git_status = {
-      renamed = "󰑎 ";
+        renamed = "󰑎 ";
       };
-
-
-
-
 
       git_metrics = {
         added_style = "bright-green bold";
