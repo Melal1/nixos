@@ -1,8 +1,8 @@
 {
-imports = [
-./hardware-configuration.nix
-./user.nix
-./structure.nix
-];
-networking.hostName = "alpha"; 
+  imports = [
+    ./hardware/configuration.nix
+    ./users/melal.nix
+    ./structure.nix
+  ];
+  networking.hostName = "alpha";
 }

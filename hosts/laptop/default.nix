@@ -1,9 +1,9 @@
 {
 imports = [ 
 
-./hardware-configuration.nix
+./hardware/configuration.nix
+./users/melal.nix
 ./structure.nix
-./user.nix
 
 
 

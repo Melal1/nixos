@@ -4,11 +4,10 @@
   home.homeDirectory = "/home/melal/";
   programs.home-manager.enable = true;
   imports = [
-    ./kitty.nix
+    ./programs/terminals/kitty.nix
     ./git.nix
-    ./shell/fish.nix
-    ./shell/fetch.nix
-    ./shell/starship.nix
+    ./shell
+    ./programs/bars/waybar.nix
   ];
 
 

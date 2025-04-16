@@ -22,7 +22,6 @@
           specialArgs = { inherit inputs; };
           inherit system;
           modules = [
-            ./configuration.nix
             ./hosts/desktop
           ];
         };
@@ -30,7 +29,6 @@
           specialArgs = { inherit inputs; };
           inherit system;
           modules = [
-            ./configuration.nix
             ./hosts/laptop
             ({ pkgs, ... }: {
               environment.systemPackages = [

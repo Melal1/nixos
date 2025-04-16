@@ -14,6 +14,12 @@
       modify_font_underline_thickness = "150%";
       modify_font_strikethrough_position = "2px";
       allow_remote_control = "yes";
+      linux_disable_bracketed_paste = "yes"; # Fixes paste delay
+
+
+
+      input_delay = "0"; # Reduces input buffering
+      sync_to_monitor = "no"; # Prevents vsync-induced input lag
 
       disable_ligatures = "cursor";
       undercurl_style = "thin-dense";
@@ -42,8 +48,8 @@
       copy_on_select = "no";
       paste_actions = "no-op";
       strip_trailing_spaces = "smart";
-      input_delay = "1";
-      sync_to_monitor = "yes";
+      # input_delay = "1";
+      # sync_to_monitor = "yes";
       enable_audio_bell = "no";
     };
     keybindings = {
