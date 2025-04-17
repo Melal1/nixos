@@ -5,8 +5,7 @@
   imports = [
 
 
-  ./fish.nix
-  ./prompts/starship.nix
-  ./utilities/fetch.nix
+    ./fish.nix
+    ./prompts/starship.nix
   ];
 }

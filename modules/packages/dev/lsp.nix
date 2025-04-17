@@ -1,14 +1,16 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
-    shellcheck # Shell script linter
-    shfmt # Shell script formatter
-    stylua # Lua code formatter
-    lua-language-server # Lua LSP
-    bash-language-server # Bash LSP
-    nil # Nix language LSP
-    nixpkgs-fmt # Formatter for Nix expressions
-    tailwindcss-language-server # Tailwind CSS LSP
-    vscode-langservers-extracted # HTML, CSS, JSON, etc. LSPs
-    clang-tools # Tools like clangd (C/C++ LSP)
+    shellcheck                          # Shell script linter
+    shfmt                               # Shell script formatter
+    stylua                              # Lua code formatter
+    lua-language-server                 # Lua LSP
+    bash-language-server                # Bash LSP
+    nil                                 # Nix language LSP
+    nixpkgs-fmt                         # Formatter for Nix expressions
+    tailwindcss-language-server         # Tailwind CSS LSP
+    vscode-langservers-extracted        # HTML, CSS, JSON, etc. LSPs
+    clang-tools                         # Tools like clangd (C/C++ LSP)
   ];
 }
+
+

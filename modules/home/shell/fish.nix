@@ -9,7 +9,7 @@
             set -q argv[1]; or set argv fish
 
             if test "$argv[1]" = "fish"
-                echo (prompt_pwd)
+                echo (prompt_pwd --dir-length=0)
             else
                 echo "$argv[1]"
             end

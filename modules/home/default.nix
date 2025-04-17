@@ -5,9 +5,10 @@
   programs.home-manager.enable = true;
   imports = [
     ./programs/terminals/kitty.nix
-    ./git.nix
     ./shell
-    ./programs/bars/waybar.nix
+    ./programs/bars
+    ./programs/utilities/git.nix
+    ./programs/utilities/fetch.nix
   ];
 
 
