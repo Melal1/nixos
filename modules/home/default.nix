@@ -7,6 +7,7 @@
     ./programs/terminals/kitty.nix
     ./shell
     ./programs/bars
+    ./dev/headers.nix
     ./programs/utilities/git.nix
     ./programs/utilities/fetch.nix
   ];

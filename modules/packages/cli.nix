@@ -5,6 +5,7 @@
     ###  CLI Utilities
     ### ──────────────────────
     tmux            # Terminal multiplexer
+    vim             #
     unzip           # Extract .zip files
     ripgrep         # Fast grep alternative
     fd              # Simple, fast alternative to find
@@ -21,6 +22,10 @@
     fish            # Friendly interactive shell
     starship        # Fast, customizable shell prompt
     neovim          # Best Editor 
+    moreutils
+    yarn
+    lsof
+    lsd
 
 
     ### ──────────────────────
@@ -34,6 +39,7 @@
     hyprpaper       # Wallpaper manager for Hyprland
     ncmpcpp         # MPD client in the terminal
     zathura         # Pdf viewer
+    dolphin
 
 
 

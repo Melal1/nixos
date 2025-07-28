@@ -1,8 +1,5 @@
 {
-  programs = {
-
-    fish = {
-      enable = true;
+  programs = { fish = { enable = true;
 
       shellInit = ''
         function fish_title
@@ -33,6 +30,7 @@
         set -g fish_sequence_key_delay_ms 60
         bind --erase \cr
         bind --erase \ct
+        bind --erase \ef
         bind --erase \ec
         bind --erase -M insert \cr
         bind --erase -M insert \ct
@@ -40,9 +38,16 @@
         bind \cx fzf-history-widget
         bind \cs fzf-file-widget
         bind \ec fzf-cd-widget
+        bind \ef ~/fzfpro.sh
         bind -M insert \cx fzf-history-widget
         bind -M insert \cs fzf-file-widget
         bind -M insert \ec fzf-cd-widget
+        bind -M insert \ef ~/fzfpro.sh
+
+        set -x FZF_ALT_C_OPTS "--preview 'test -d {} && lsd --tree --depth=1 --icon=always --color=always {} || echo {} is not a directory'"
+
+        set -x FZF_DEFAULT_OPTS '--height 70% --tmux bottom,40% --layout reverse --border top'
+
         zoxide init fish | source
 
 
@@ -55,6 +60,7 @@
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
         h-r = "home-manager switch --flake ~/.dotfiles/nixos/.";
         v = "nvim";
+        qa = "exit" ;
         # vim = "nvim";
 
 

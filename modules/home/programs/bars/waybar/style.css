@@ -1,132 +1,186 @@
-      @import "colors.css";
-      * {
-          font-family: 'Radio Canada Big', sans-serif;
-          font-weight: bold;
-          border-radius: 8px;
-          min-height: 25px;
-      }
-      /* Waybar Window Styles */
-      window#waybar {
-          background: @background;
-          color: @on_surface;
-          padding: 0;
-          border-radius: 0px 0px 17px 17px;
-          transition-duration: 0.5s;
-          border-bottom: 0.7px solid @surface_container_high;
-      }
-      /* Module Layout */
-      .modules-left {
-          margin-left: 12px;
-      }
-      .modules-right {
-          margin-right: 12px;
-      }
-      /* Workspaces Module */
-      #workspaces {
-          background: transparent;
-          margin: 0 0 5px 0;
-          font-size: 15px;
-          padding: 3px 2px 3px 1px;
-          border-radius: 16px;
-          color: @on_background;
-      }
-      #workspaces button {
-          font-weight: bold;
-          padding: 0px 5px;
-          font-size: 15px;
-          margin: 0px 3px;
-          border-radius: 16px;
-          color: @outline_variant;
-          background: @surface_bright;
-          transition: all 0.3s ease-in-out;
-      }
-      #workspaces button.active {
-          font-size: 15px;
-          font-weight: bold;
-          background-color: @primary;
-          color: @on_primary;
-          border-radius: 16px;
-          min-width: 50px;
-          transition: all 0.4s ease-in-out;
-      }
-      #workspaces button:hover {
-          font-weight: bold;
-          font-size: 15px;
-          background-color: @surface_container;
-          color: @on_surface;
-          border-radius: 16px;
-          min-width: 35px;
-      }
-      #workspaces button.urgent {
-          font-weight: bold;
-          background-color: @error;
-          color: @on_error;
-          border-radius: 16px;
-          min-width: 40px;
-          transition: all 0.3s ease-in-out;
-          font-size: 15px;
-      }
-      /* CAVA (Audio Visualizer) Module */
-      #cava {
-          color: @on_primary_container;
-          background-color: transparent;
-          font-size: 15px;
-          margin: 4px 0 5px 20px;
-      }
-      /* Window Title Module */
-      #window {
-          color: @inverse_surface;
-          background-color: transparent;
-          font-size: 17px;
-          margin: 4px 0 7px 0;
-      }
-      /* Clock Module */
-      #clock {
-          color: @background;
-          background-color: @inverse_surface;
-          padding: 0 15px 0 15px;
-          font-size: 15px;
-          margin: 5px 0 7px 15px;
-      }
-      /* Battery Module */
-      #battery {
-          color: @inverse_surface;
-          font-size: 15px;
-          background-color: transparent;
-          margin: 0 0 5px 27px;
-      }
-      /* Bluetooth Module */
-      #bluetooth {
-          color: @on_secondary_container;
-          background: transparent;
-          font-size: 15px;
-          margin: 0px 0 0px 0;
-      }
-      /* Network Module */
-      #user {
-        margin: 0 10px 3px 0;
-        color: @outline;
-      }
-      #network {
-          color: @on_secondary_container;
-          font-size: 15px;
-          background: transparent;
-          margin: 0 0 0px 10px;
-      }
-      /* Wireless Module */
-      #wireless {
-          background-color: @surface_variant;
-          font-size: 15px;
-          padding: 0 7px 0 7px;
-          border-radius: 20px;
-          margin: 4px 0 7px 15px;
-      }
-      /* Empty Window Style */
-      window#waybar.empty #window {
-          background-color: transparent;
-      }
-#tray{
-          margin: 0 0 5px 8px;
-}
-      
+@import "colors.css";
 
+* {
+  font-family: "Radio Canada Big", sans-serif;
+  font-weight: bold;
+  border-radius: 8px;
+  min-height: 25px;
+}
+
+/* Waybar Window Styles */
+window#waybar {
+  background: @background;
+  color: @on_surface;
+  padding: 0;
+  border-radius: 0px 0px 17px 17px;
+  transition-duration: 0.5s;
+  border-bottom: 0.7px solid @surface_container_high;
+}
+
+/* Module Layout */
+.modules-left {
+  margin-left: 12px;
+}
+
+.modules-right {
+  margin-right: 12px;
+}
+
+/* Workspaces Module */
+#workspaces {
+  background: transparent;
+  margin: 0 0 5px 0;
+  font-size: 15px;
+  padding: 3px 2px 3px 1px;
+  border-radius: 16px;
+  color: @on_background;
+}
+
+#workspaces button {
+  font-weight: bold;
+  padding: 0px 5px;
+  font-size: 15px;
+  margin: 0px 3px;
+  border-radius: 16px;
+  color: @outline_variant;
+  background: @surface_bright;
+  transition: all 0.3s ease-in-out;
+}
+
+#workspaces button.active {
+  font-size: 15px;
+  font-weight: bold;
+  background-color: @primary;
+  color: @on_primary;
+  border-radius: 16px;
+  min-width: 50px;
+  transition: all 0.4s ease-in-out;
+}
+
+#workspaces button:hover {
+  font-weight: bold;
+  font-size: 15px;
+  background-color: @surface_container;
+  color: @on_surface;
+  border-radius: 16px;
+  min-width: 35px;
+}
+
+#workspaces button.urgent {
+  font-weight: bold;
+  background-color: @error;
+  color: @on_error;
+  border-radius: 16px;
+  min-width: 40px;
+  transition: all 0.3s ease-in-out;
+  font-size: 15px;
+}
+
+/* CAVA (Audio Visualizer) Module */
+#cava {
+  color: @on_primary_container;
+  background-color: transparent;
+  font-size: 15px;
+  margin: 4px 0 5px 20px;
+}
+
+/* Window Title Module */
+#window {
+  color: @inverse_surface;
+  background-color: transparent;
+  font-size: 17px;
+  margin: 4px 0 7px 0;
+}
+
+/* Clock Module */
+#clock {
+  color: @background;
+  background-color: @inverse_surface;
+  padding: 0 15px 0 15px;
+  font-size: 15px;
+  margin: 5px 0 7px 15px;
+}
+
+/* Battery Module */
+#battery {
+  color: @inverse_surface;
+  font-size: 15px;
+  background-color: transparent;
+  margin: 0 0 5px 27px;
+}
+
+/* Bluetooth Module */
+#bluetooth {
+  color: @primary;
+  background: transparent;
+  font-size: 15px;
+  margin: 0px 0 0px 0;
+}
+
+#bluetooth.disabled {
+  color: @error;
+}
+
+#bluetooth.off {
+  color: @error;
+}
+
+/* Network Module */
+#user {
+  margin: 0 10px 3px 0;
+  color: @outline;
+}
+
+#network {
+  color: @on_secondary_container;
+  font-size: 15px;
+  background: transparent;
+  margin: 0 0 0px 10px;
+}
+
+/* Wireless Module */
+#wireless {
+  background-color: @surface_variant;
+  font-size: 15px;
+  padding: 0 7px 0 7px;
+  border-radius: 20px;
+  margin: 4px 0 7px 15px;
+}
+
+/* Empty Window Style */
+window#waybar.empty #window {
+  background-color: transparent;
+}
+
+#tray {
+  margin: 0 0 5px 8px;
+}
+
+#pulseaudio-slider {
+  margin: 0 0 0 0;
+  padding: 0;
+}
+
+#pulseaudio-slider slider {
+  min-height: 1px;
+  min-width: 1px;
+  opacity: 0;
+  background-image: none;
+  border: @error;
+  box-shadow: none;
+}
+
+#pulseaudio-slider trough {
+  min-height: 1px;
+  min-width: 100px;
+  border-radius: 9px;
+  background-color: @inverse_surface;
+}
+
+#pulseaudio-slider highlight {
+  min-width: 5px;
+  min-height: 15px;
+  border-radius: 10px;
+  border:black ;
+  background-color: @primary;
+}
