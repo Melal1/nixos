@@ -1,15 +1,15 @@
 {
-
   home.username = "melal";
   home.homeDirectory = "/home/melal/";
   programs.home-manager.enable = true;
   imports = [
-    ./programs/terminals/kitty.nix
+    ./programs/terminals
     ./shell
     ./programs/bars
-    ./dev/headers.nix
-    ./programs/utilities/git.nix
-    ./programs/utilities/fetch.nix
+    ./dev
+    ./scripts
+    ./programs/utilities
+    ./programs/utilities
   ];
 
 

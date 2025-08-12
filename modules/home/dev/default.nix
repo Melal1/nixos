@@ -1,3 +1,7 @@
-
-{ imports = [ ./headers.nix
-./editorconfig.nix]; }
+{
+  imports = [
+    ./headers.nix
+    ./editorconfig.nix
+    ./clangFormat.nix
+  ];
+}

@@ -35,7 +35,8 @@
       twitter-color-emoji
       sarasa-gothic
       noto-fonts-cjk-sans
-      nerdfonts
+      nerd-fonts.iosevka
+      nerd-fonts.caskaydia-cove
       (google-fonts.override { fonts = [ "Radio Canada Big" ]; })
     ];
 

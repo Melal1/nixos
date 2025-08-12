@@ -36,13 +36,11 @@
         bind --erase -M insert \ct
         bind --erase -M insert \ec
         bind \cx fzf-history-widget
-        bind \cs fzf-file-widget
+        bind \cs nvi
         bind \ec fzf-cd-widget
-        bind \ef ~/fzfpro.sh
         bind -M insert \cx fzf-history-widget
-        bind -M insert \cs fzf-file-widget
+        bind -M insert \cs nvi
         bind -M insert \ec fzf-cd-widget
-        bind -M insert \ef ~/fzfpro.sh
 
         set -x FZF_ALT_C_OPTS "--preview 'test -d {} && lsd --tree --depth=1 --icon=always --color=always {} || echo {} is not a directory'"
 

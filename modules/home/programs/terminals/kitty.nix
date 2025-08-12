@@ -14,7 +14,7 @@
       modify_font_underline_position = "-2";
       modify_font_underline_thickness = "150%";
       modify_font_strikethrough_position = "2px";
-      allow_remote_control = "yes";
+      # allow_remote_control = "yes";
       linux_disable_bracketed_paste = "yes"; # Fixes paste delay
 
 
@@ -51,7 +51,9 @@
       strip_trailing_spaces = "smart";
       # input_delay = "1";
       # sync_to_monitor = "yes";
-      enable_audio_bell = "no";
+      allow_remote_control =  "socket-only";
+      listen_on  = "unix:/tmp/kitty";
+      enable_audio_bell = "yes";
     };
     keybindings = {
       "ctrl+shift+q" = "no_op";
