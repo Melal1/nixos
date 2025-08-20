@@ -9,6 +9,9 @@
     nodejs          # JavaScript runtime
     typescript      # Typescript
     go              # Go programming language
+    vscode-extensions.ms-vscode.cpptools
+    gdb 
+    lua
 
     ### ──────────────────────
     ### Compilers

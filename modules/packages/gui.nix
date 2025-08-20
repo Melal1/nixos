@@ -14,6 +14,8 @@
     apple-cursor
     bibata-cursors
     unoconv
+    kdePackages.dolphin
+    firefox
     # plasma5Packages.kdeconnect-kde
   ];
    programs.kdeconnect.enable = true;

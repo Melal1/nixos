@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     ghostty.url = "github:ghostty-org/ghostty";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
     home-manager = {
@@ -11,22 +12,29 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ghostty, zen-browser }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ghostty, zen-browser }@inputs:
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
+      unstable = import nixpkgs-unstable {inherit system; config.allowUnfree = true; };
     in
     {
       nixosConfigurations = {
         alpha = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
+          specialArgs = {
+            inherit inputs;
+            inherit unstable;
+          };
           inherit system;
           modules = [
             ./hosts/desktop
           ];
         };
         zeta = nixpkgs.lib.nixosSystem {
-          specialArgs = { inherit inputs; };
+          specialArgs = {
+            inherit inputs;
+            inherit unstable;
+          };
           inherit system;
           modules = [
             ./hosts/laptop

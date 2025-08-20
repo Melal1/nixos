@@ -1,5 +1,7 @@
-{
-  programs = { fish = { enable = true;
+{ pkgs, ... }: {
+  programs = {
+    fish = {
+      enable = true;
 
       shellInit = ''
         function fish_title
@@ -55,10 +57,8 @@
       shellAbbrs = {
         vnx = "nvim ~/.dotfiles/nixos/";
         vhm = "nvim ~/.dotfiles/nixos/modules/home/";
-        x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
-        h-r = "home-manager switch --flake ~/.dotfiles/nixos/.";
         v = "nvim";
-        qa = "exit" ;
+        qa = "exit";
         # vim = "nvim";
 
 
@@ -66,6 +66,8 @@
       shellAliases = {
 
         nvi = "nvim $(fzf --preview 'bat --color=always {}')";
+        x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
+        h-r = "home-manager switch --flake ~/.dotfiles/nixos/.";
 
       };
 
@@ -75,6 +77,8 @@
   home.sessionVariables = {
     BROWSER = "zen";
     EDITOR = "nvim";
+        CODELLDB_PATH =
+        "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
   };
 
 }

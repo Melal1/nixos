@@ -168,7 +168,7 @@
       ],
       "format-wifi": "{icon}",
       "max-length": 50,
-      "on-click": "hyprctl dispatch workspace 1 ; sleep 0.2 ;  kitty -e sudo nmtui",
+      "on-click": "hyprctl dispatch workspace 1 ; sleep 0.2 ;  kitty -e sudo impala",
       "on-click-right": "wihotspot",
       "tooltip-format-wifi": "{essid}   -   {ipaddr}"
     },
