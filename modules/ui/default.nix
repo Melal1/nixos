@@ -1,11 +1,3 @@
 {
-imports = [
-./fonts.nix
-./wm/hyprland.nix
-
-
-];
-
-
-
+  imports = [ ./wm ];
 }

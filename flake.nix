@@ -16,31 +16,31 @@
     let
       system = "x86_64-linux";
       pkgs = nixpkgs.legacyPackages.${system};
-      unstable = import nixpkgs-unstable {inherit system; config.allowUnfree = true; };
+      unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
+      windowManager = "hyprland";
     in
     {
       nixosConfigurations = {
         alpha = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit inputs;
-            inherit unstable;
+            inherit inputs unstable windowManager;
           };
           inherit system;
           modules = [
             ./hosts/desktop
           ];
         };
+
         zeta = nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit inputs;
-            inherit unstable;
+            inherit inputs unstable windowManager;
           };
           inherit system;
           modules = [
             ./hosts/laptop
             ({ pkgs, ... }: {
               environment.systemPackages = [
-                ghostty.packages.${system}.default # Install Ghostty
+                ghostty.packages.${system}.default
                 zen-browser.packages.${system}.default
               ];
             })
@@ -51,8 +51,13 @@
       homeConfigurations = {
         melal = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
+          extraSpecialArgs = {
+            inherit self windowManager;
+            hostname = "zeta";
+          };
           modules = [ ./modules/home ];
         };
       };
     };
 }
+

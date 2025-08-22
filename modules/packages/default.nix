@@ -6,6 +6,7 @@
     ./dev/lsp.nix
     ./dev/languages.nix
     ./dev/headers.nix
+    ./fonts.nix
 
   ];
 }

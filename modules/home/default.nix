@@ -10,6 +10,7 @@
     ./scripts
     ./programs/utilities
     ./programs/utilities
+    ./programs/wm
   ];
 
 
