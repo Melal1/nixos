@@ -28,6 +28,12 @@
           inherit system;
           modules = [
             ./hosts/desktop
+            ({ pkgs, ... }: {
+              environment.systemPackages = [
+                ghostty.packages.${system}.default
+                zen-browser.packages.${system}.default
+              ];
+            })
           ];
         };
 

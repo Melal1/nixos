@@ -30,6 +30,7 @@
     yt-dlp
     claude-code
     wireguard-tools
+    home-manager
 
 
     ### ──────────────────────

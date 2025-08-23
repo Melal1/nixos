@@ -1,8 +1,7 @@
-{ self, config, hostname, ... }:
+{ self, config, ... }:
 
 let
-  sDir = "${self}/modules/home/programs/wm/hyprland";
-  hostName = hostname;
+  sDir = "${self}/modules/home/programs/wm/hyprland"
 in
 {
   home.file.".config/hypr/hyprland.conf".source =
