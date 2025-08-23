@@ -28,4 +28,8 @@
     source = ./switcher.sh;
     executable = true;
   };
+  home.file.".local/bin/wallSet" = {
+    source = ./wallSet;
+    executable = true;
+  };
 }

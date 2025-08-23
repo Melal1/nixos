@@ -17,6 +17,7 @@
     kdePackages.dolphin
     firefox
     # plasma5Packages.kdeconnect-kde
+    nwg-displays # Handle displays 
   ];
    programs.kdeconnect.enable = true;
   nixpkgs.overlays = [

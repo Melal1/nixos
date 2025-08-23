@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-WALLFOLDER="$HOME/Picture/Wall/"
+WALLFOLDER="$HOME/Pictures/Wall"
 WALLFILE="$HOME/.cache/personal/wallpaper"
 
 echo "Step 1: Checking wallpaper folder..."
@@ -31,7 +31,8 @@ case "$1" in
 	fi
 
 	if [[ -f "$WALLFOLDER/$2" ]]; then
-		if matugen image "$WALLFOLDER/$2"; then
+		if swww img --transition-type center --transition-step 5 --transition-fps 60
+ "$WALLFOLDER/$2"; then
 			echo "$2" >"$WALLFILE"
 			dunstify -t 2000 "Wallpaper Changed" "$2"
 			echo "Step 3 completed: Wallpaper '$2' applied and saved."
