@@ -4,6 +4,7 @@
     ./users/melal.nix
     ./structure.nix
     ./kernel.nix
+    ./keyboard.nix
   ];
   networking.hostName = "alpha";
   systemd.services.fix-suspend = {

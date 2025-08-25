@@ -29,7 +29,7 @@
       };
       os = {
         format = "[$symbol]($style) ";
-        disabled = false;
+        disabled = true;
         symbols = {
           NixOS = "󱄅 ";
         };
@@ -40,7 +40,7 @@
       };
 
       directory = {
-        format = "($style)[$path]($style) [$read_only]($read_only_style)";
+        format = " ($style)[$path]($style) [$read_only]($read_only_style)";
       };
 
       git_branch = {

@@ -16,6 +16,7 @@
 
         set fish_greeting # Disable greeting
         
+        fastfetch # run at startup
 
 
 

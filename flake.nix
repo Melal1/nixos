@@ -59,7 +59,7 @@
           inherit pkgs;
           extraSpecialArgs = {
             inherit self windowManager;
-            hostname = "zeta";
+            hostname = "alpha";
           };
           modules = [ ./modules/home ];
         };

@@ -1,5 +1,5 @@
+{ config, ... }:
 {
-  #boot.loader.systemd-boot.enable = true ;
   boot =
     {
       kernelParams = [
@@ -12,7 +12,12 @@
           enable = true;
           device = "nodev";
           efiSupport = true;
-          useOSProber = true ; 
+          useOSProber = (
+            if config.networking.hostName == "alpha" then
+              true
+            else
+              false
+          );
         };
       };
     };
