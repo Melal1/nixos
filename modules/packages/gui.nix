@@ -11,7 +11,7 @@
     #   withVencord = true;
     # }) # Communication
     discord
- #   apple-cursor
+    apple-cursor
     bibata-cursors
     unoconv
     kdePackages.dolphin

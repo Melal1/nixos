@@ -2,12 +2,11 @@
 
 let
   waybarDir = "${self}/modules/home/programs/bars/waybar";
-  hostName = hostname;
 in
 {
   home.file.".config/waybar/config.jsonc".source =
     config.lib.file.mkOutOfStoreSymlink (
-      if hostName == "alpha" then
+      if hostname == "alpha" then
         "${waybarDir}/config-alpha"
       else
         "${waybarDir}/config-zeta"

@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
             std::string cmd = "bash \"" + CMD_FILE + "\"";
             system(cmd.c_str());
         } else {
-            system("dunstify 'Wallpaper' 'No previous wallpaper session found' -u normal -t 5000");
+            system("dunstify 'Wallpaper' 'No previous wallpaper session found.\nPlease run wallSet' -u normal -t 5000");
         }
         return 0;
     }

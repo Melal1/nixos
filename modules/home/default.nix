@@ -11,6 +11,7 @@
     ./programs/utilities
     ./programs/utilities
     ./programs/wm
+    ../ui/gtk.nix
   ];
 
 

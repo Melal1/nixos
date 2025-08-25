@@ -62,7 +62,7 @@
     (with unstable; [
       neovim
       tree-sitter
-      hellwal
+      swww
     ]);
 
 }

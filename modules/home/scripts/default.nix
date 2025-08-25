@@ -20,10 +20,6 @@
     source = ./audio.sh;
     executable = true;
   };
-  home.file.".local/bin/wallpaper" = {
-    source = ./wallpaper.sh;
-    executable = true;
-  };
   home.file.".local/bin/kittSwitch" = {
     source = ./switcher.sh;
     executable = true;

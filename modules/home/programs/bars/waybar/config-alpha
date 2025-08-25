@@ -1,5 +1,6 @@
 [
   {
+    "output": "DP-1",
     "modules-center": [
       "hyprland/workspaces"
     ],
@@ -117,9 +118,9 @@
         "home-manager switch --flake (.*)": "󱂵    Rebuilding Home Manager ...",
         "sudo nixos-rebuild switch --flake (.*)": "󱄅    Rebuilding System ..."
       },
-      "separate-outputs": true
     },
     "hyprland/workspaces": {
+      "all-outputs": true,
       "format": "{icon}",
       "format-icons": {
         "1": " ",
