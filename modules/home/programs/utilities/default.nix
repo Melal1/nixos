@@ -1,7 +1,9 @@
 {
   imports = [
-  ./git.nix
-  ./fetch.nix
+    ./git.nix
+    ./fetch.nix
+    ./mpd.nix
+    ./yazi.nix
   ];
 
   home.file.".config/tmux/tmux.conf" = {

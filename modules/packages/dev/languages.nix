@@ -1,5 +1,5 @@
-{ pkgs, ... }: {
-  environment.systemPackages = with pkgs; [
+{ pkgs,unstable, ... }: {
+  environment.systemPackages = (with pkgs; [
 
     ### ──────────────────────
     ### Programming Languages
@@ -17,7 +17,11 @@
     ### Compilers
     ### ──────────────────────
     gcc             # GNU C Compiler
+  ])
+  ++
+  (with unstable; [
     clang           # LLVM-based C/C++ compiler
-  ];
+  ]);
+
 }
 

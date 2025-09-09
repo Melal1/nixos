@@ -4,6 +4,7 @@
     {
       kernelParams = [
         "mitigations=off"
+        "quiet"
       ];
 
       loader = {

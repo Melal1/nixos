@@ -17,7 +17,6 @@
     fastfetch # System info fetcher
     clipse # Clipboard manager
     brightnessctl # Control screen brightness
-    mpd # Music Player Daemon
     matugen # Generate wallpapers based on material colors
     fish # Friendly interactive shell
     starship # Fast, customizable shell prompt
@@ -31,6 +30,8 @@
     claude-code
     wireguard-tools
     home-manager
+    todoist
+    vdhcoapp
 
 
     ### ──────────────────────

@@ -1,4 +1,4 @@
-{ pkgs, ... }: {
+{ pkgs, config, ... }: {
   programs = {
     fish = {
       enable = true;
@@ -15,10 +15,7 @@
         end
 
         set fish_greeting # Disable greeting
-        
         fastfetch # run at startup
-
-
 
         set -g fish_key_bindings fish_vi_key_bindings
         bind \cE edit_command_buffer
@@ -46,40 +43,44 @@
         bind -M insert \ec fzf-cd-widget
 
         set -x FZF_ALT_C_OPTS "--preview 'test -d {} && lsd --tree --depth=1 --icon=always --color=always {} || echo {} is not a directory'"
-
         set -x FZF_DEFAULT_OPTS '--height 70% --tmux bottom,40% --layout reverse --border top'
 
         zoxide init fish | source
-
-
-      '';
-
+      '' + (if config.programs.yazi.enable then ''
+        function y
+          set tmp (mktemp -t "yazi-cwd.XXXXXX")
+          yazi $argv --cwd-file="$tmp"
+          if read -z cwd < "$tmp"; and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+            builtin cd -- "$cwd"
+          end
+          rm -f -- "$tmp"
+        end
+      '' else "");
+      
       preferAbbrs = true;
       shellAbbrs = {
         vnx = "nvim ~/.dotfiles/nixos/";
+        xpkg = "nvim ~/.dotfiles/nixos/modules/packages/";
         vhm = "nvim ~/.dotfiles/nixos/modules/home/";
-        v = "nvim";
         qa = "exit";
-        # vim = "nvim";
-
-
-      };
-      shellAliases = {
-
-        nvi = "nvim $(fzf --preview 'bat --color=always {}')";
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
         h-r = "home-manager switch --flake ~/.dotfiles/nixos/.";
-
       };
 
+      shellAliases = {
+        nvi = "nvim $(fzf --preview 'bat --color=always {}')";
+        v = "nvim";
+        vim = "nvim";
+        vi = "nvim";  
+      };
     };
-    # fzf.enableFishIntegration = true;
   };
+
   home.sessionVariables = {
     BROWSER = "zen";
     EDITOR = "nvim";
-        CODELLDB_PATH =
-        "${pkgs.vscode-extensions.vadimcn.vscode-lldb}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
+    CODELLDB_PATH =
+      "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
   };
-
 }
+

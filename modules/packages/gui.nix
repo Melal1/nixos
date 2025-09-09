@@ -11,6 +11,7 @@
     #   withVencord = true;
     # }) # Communication
     discord
+    vesktop
     apple-cursor
     bibata-cursors
     unoconv
@@ -18,6 +19,10 @@
     firefox
     # plasma5Packages.kdeconnect-kde
     nwg-displays # Handle displays 
+    obs-studio
+    todoist-electron
+    vlc
+    mpv
   ];
    programs.kdeconnect.enable = true;
 }
