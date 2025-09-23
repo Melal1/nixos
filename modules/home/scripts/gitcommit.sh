@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-echo -e "Write me  andmake :
+echo -e "Write me  and make :
 
 1-commit title ( short brief )
 2- commit desc ( good for a git commit )

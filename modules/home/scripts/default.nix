@@ -28,4 +28,9 @@
     source = ./wallSet;
     executable = true;
   };
+  home.file.".local/bin/gengitcommit" = {
+    source = ./gitcommit.sh;
+    executable = true ;
+  };
+    
 }
