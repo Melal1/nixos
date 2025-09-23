@@ -2,6 +2,7 @@
   environment.systemPackages = with pkgs; [
     shellcheck                          # Shell script linter
     shfmt                               # Shell script formatter
+    harper                              # English
     stylua                              # Lua code formatter
     lua-language-server                 # Lua LSP
     bash-language-server                # Bash LSP

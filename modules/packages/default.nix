@@ -5,7 +5,7 @@
     ./gui.nix
     ./dev/lsp.nix
     ./dev/languages.nix
-    ./dev/headers.nix
+    ./dev/libs.nix
     ./fonts.nix
 
   ];

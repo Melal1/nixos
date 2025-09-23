@@ -26,12 +26,14 @@
     lsd
     cmake # Essintal for c/cpp projects and some nvim plugins build
     gnumake # Just in case
+    premake
     yt-dlp
     claude-code
     wireguard-tools
     home-manager
     todoist
     vdhcoapp
+    bear
 
 
     ### ──────────────────────
@@ -45,6 +47,8 @@
     hyprpaper # Wallpaper manager for Hyprland
     ncmpcpp # MPD client in the terminal
     zathura # Pdf viewer
+    sioyek
+
 
 
 

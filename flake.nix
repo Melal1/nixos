@@ -64,6 +64,7 @@
           modules = [ ./modules/home ];
         };
       };
+      devShells.${system} = import ./modules/packages/dev/nix-shell/default.nix { inherit pkgs; };
     };
 }
 
