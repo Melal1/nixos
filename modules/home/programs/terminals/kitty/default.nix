@@ -1,6 +1,7 @@
 {
   imports = [
     ./kitty.nix
+    ./ghostty.nix
   ];
 
   home.file.".config/kitty/themes" = {

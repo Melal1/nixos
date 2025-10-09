@@ -34,6 +34,8 @@
     todoist
     vdhcoapp
     bear
+    tealdeer
+    smassh
 
 
     ### ──────────────────────
@@ -45,7 +47,10 @@
     slurp # Select region on screen ( useful with grim)
     grim # Screenshot utility
     hyprpaper # Wallpaper manager for Hyprland
-    ncmpcpp # MPD client in the terminal
+       (ncmpcpp.override {
+          visualizerSupport = true;
+          clockSupport = true;
+        })
     zathura # Pdf viewer
     sioyek
 
@@ -64,11 +69,11 @@
 
   ])
   ++
-    (with unstable; [
-      neovim
-      tree-sitter
-      swww
-    ]);
+  (with unstable; [
+    neovim
+    tree-sitter
+    swww
+  ]);
 
 }
 
