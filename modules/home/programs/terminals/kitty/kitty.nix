@@ -1,5 +1,5 @@
+{ hostname, ... }:
 {
-
   programs.kitty = {
     enable = true;
     font = {
@@ -51,8 +51,8 @@
       strip_trailing_spaces = "smart";
       # input_delay = "1";
       # sync_to_monitor = "yes";
-      allow_remote_control =  "socket-only";
-      listen_on  = "unix:/tmp/kitty";
+      allow_remote_control = "socket-only";
+      listen_on = "unix:/tmp/kitty";
       enable_audio_bell = "yes";
     };
     keybindings = {

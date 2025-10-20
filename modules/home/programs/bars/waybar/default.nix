@@ -13,6 +13,11 @@ in
     );
 
   home.file.".config/waybar/style.css".source =
-    config.lib.file.mkOutOfStoreSymlink "${waybarDir}/style-alpha-v.css";
+    config.lib.file.mkOutOfStoreSymlink (
+      if hostname == "alpha" then
+    "${waybarDir}/style-alpha-v.css"
+      else
+    "${waybarDir}/style.css"
+    );
 }
 

@@ -50,6 +50,7 @@
               environment.systemPackages = [
                 ghostty.packages.${system}.default
                 zen-browser.packages.${system}.default
+                vicinae.packages.${system}.default
               ];
             })
           ];
@@ -61,7 +62,7 @@
           inherit pkgs;
           extraSpecialArgs = {
             inherit self windowManager;
-            hostname = "alpha";
+            hostname = "zeta";
           };
           modules = [
             vicinae.homeManagerModules.default
