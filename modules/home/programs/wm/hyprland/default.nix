@@ -3,7 +3,7 @@ let
   hyprConfDir = "${config.home.homeDirectory}/.dotfiles/nixos/modules/home/programs/wm/hyprland";
 in
 {
-  home.file.".config/hypr/source.conf".source =
+  home.file.".config/hypr/hyprland.conf".source =
     config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/source.conf";
 
   home.file.".config/hypr/autostart.conf".source =
