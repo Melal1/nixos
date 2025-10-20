@@ -1,6 +1,11 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
-  ncurses
+  #cpp 
+  ncurses 
+  dpp  #Discord
+
+
+
   ];
 }
 

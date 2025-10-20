@@ -16,9 +16,8 @@
   outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ghostty, zen-browser, vicinae }@inputs:
     let
       system = "x86_64-linux";
-      overlays = import ./modules/packages/overlays;
-      pkgs = import nixpkgs { inherit system overlays; };
-      unstable = import nixpkgs-unstable { inherit system overlays; config.allowUnfree = true; };
+      pkgs = import nixpkgs { inherit system; };
+      unstable = import nixpkgs-unstable { inherit system ; config.allowUnfree = true; };
       windowManager = "hyprland";
     in
     {
