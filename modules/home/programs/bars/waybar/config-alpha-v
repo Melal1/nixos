@@ -92,9 +92,9 @@
     "bluetooth": {
       "format-connected": " 󰂱 ",
       "format-disabled": " 󰂲 ",
-      "format-no-controller": " D ",
-      "format-off": " D ",
-      "format-on": "<b> 󰂯 </b>",
+      "format-no-controller": "",
+      "format-off": "",
+      "format-on": " 󰂯 ",
       "interval": 30,
       "on-click": "hyprctl dispatch workspace 1 ; sleep 0.2 ;kitty -e bluetui",
       "tooltip-format-connected": "{device_alias}"
