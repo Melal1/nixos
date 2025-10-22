@@ -58,7 +58,18 @@
       };
 
       homeConfigurations = {
-        melal = home-manager.lib.homeManagerConfiguration {
+        alpha = home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit self windowManager;
+            hostname = "alpha";
+          };
+          modules = [
+            vicinae.homeManagerModules.default
+            ./modules/home
+          ];
+        };
+        zeta = home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
             inherit self windowManager;

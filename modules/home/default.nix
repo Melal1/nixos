@@ -12,6 +12,7 @@
     ./programs/utilities
     ./programs/wm
     ../ui/gtk.nix
+    ./assests
   ];
 
 

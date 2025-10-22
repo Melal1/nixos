@@ -110,7 +110,7 @@ window#waybar {
   color: @secondary_light;
   background: transparent;
   font-size: 20;
-  margin: 5px -2px 5px -9px;
+  margin: 10px 0px 5px 0px;
 }
 
 #bluetooth.disabled, #bluetooth.off {
@@ -120,9 +120,9 @@ window#waybar {
 /* Network Module */
 #network {
   color: @secondary_light;
-  font-size: 18px;
+  font-size: 16px;
   background: transparent;
-  margin: 5px 0px 10px 0px;
+  margin: 5px 0px 10px 5px;
 }
 
 /* User Module */
@@ -134,8 +134,8 @@ window#waybar {
 /* Wireless Module */
 #wireless {
   background-color: @surface_variant;
-  font-size: 15px;
-  padding: 3px 5px 0px 10px;
+  font-size: 20px;
+  padding: 0px 0px 0px 0px;
   border-radius: 20px;
   margin: 20px 5px 70px 5px;
 }
