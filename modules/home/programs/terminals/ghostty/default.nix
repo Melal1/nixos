@@ -1,6 +1,5 @@
 {
   imports = [
-  ./kitty
-  ./ghostty
+    ./ghostty.nix
   ];
 }
