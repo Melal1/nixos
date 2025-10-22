@@ -62,7 +62,7 @@
           inherit pkgs;
           extraSpecialArgs = {
             inherit self windowManager;
-            hostname = "alpha";
+            hostname = "zeta";
           };
           modules = [
             vicinae.homeManagerModules.default
