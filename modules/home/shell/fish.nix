@@ -71,8 +71,8 @@
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
         h-r = (if hostname == "alpha" then
           "home-manager switch --flake ~/.dotfiles/nixos#alpha"
-        else if hostname == "beta" then
-          "home-manager switch --flake ~/.dotfiles/nixos#beta"
+        else if hostname == "zeta" then
+          "home-manager switch --flake ~/.dotfiles/nixos#zeta"
         else
           "home-manager switch --flake ~/.dotfiles/nixos/.#"
         );
