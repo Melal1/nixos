@@ -1,5 +1,11 @@
-{pkgs,...}:
+{ pkgs, ... }:
 {
+
+  home.file.".config/ncmpcpp/thumbnail" = {
+    source = ./thumbnail.sh;
+    executable = true;
+  };
+
   programs.ncmpcpp = {
 
     enable = true;
@@ -10,7 +16,7 @@
       mpd_connection_timeout = "5";
       mpd_crossfade_time = "5";
       lyrics_directory = "~/.config/ncmpcpp/lyrics";
-      execute_on_song_change = "~/Audio/tmp.sh";
+      execute_on_song_change = "~/.config/ncmpcpp/thumbnail";
       visualizer_data_source = "/tmp/mpd.fifo";
       visualizer_output_name = "my_fifo";
 

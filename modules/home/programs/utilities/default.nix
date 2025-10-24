@@ -5,7 +5,7 @@
     ./mpd.nix
     ./yazi.nix
     ./swaync
-    ./ncmpcpp.nix
+    ./ncmpcpp
   ];
 
   home.file.".config/tmux/tmux.conf" = {

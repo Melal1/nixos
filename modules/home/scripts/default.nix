@@ -30,7 +30,15 @@
   };
   home.file.".local/bin/gengitcommit" = {
     source = ./gitcommit.sh;
-    executable = true ;
+    executable = true;
   };
-    
+  home.file.".local/bin/wlogout-script" = {
+    source = ./wlogout.sh;
+    executable = true;
+  };
+  home.file.".local/bin/SCRIPT_MP3d" = {
+    source = ./SCRIPT-MP3D.sh;
+    executable = true;
+  };
+
 }
