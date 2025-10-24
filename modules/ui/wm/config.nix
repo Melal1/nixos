@@ -17,6 +17,7 @@ in
       wl-clipboard
       rofi-wayland
       waybar
+      swaynotificationcenter
     ];
   };
 }

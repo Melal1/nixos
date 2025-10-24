@@ -1,33 +1,55 @@
 #!/usr/bin/env sh
 
-# Function to send brightness change notification
-notification() {
-	# Get current brightness level using brightnessctl
+# ----------------------------- #
+# CONFIG
+# ----------------------------- #
+
+ICONDIR="$HOME/.config/swaync/icons"
+NOTIFY_FLAGS='-e -h string:x-canonical-private-synchronous:osd -u low'
+
+# ----------------------------- #
+# NOTIFICATION FUNCTION
+# ----------------------------- #
+
+brightness_noti() {
 	brightness=$(brightnessctl get)
 	max_brightness=$(brightnessctl max)
 	percentage=$((brightness * 100 / max_brightness))
 
-	# Send notification about the brightness change
-	dunstify -a "brightness" -u low -r "9999" -t 2000 -h int:value:"$percentage" -i "notification-display-brightness" "Brightness" "${percentage}%"
+	# Choose icon based on brightness percentage
+	if [ "$percentage" -gt 70 ]; then
+		icon="$ICONDIR/brightness-high.png"
+	elif [ "$percentage" -gt 40 ]; then
+		icon="$ICONDIR/brightness-medium.png"
+	else
+		icon="$ICONDIR/brightness-low.png"
+	fi
+
+	# Fallback if icons don’t exist
+	[ -f "$icon" ] || icon="display-brightness-symbolic"
+
+	# Unified transient OSD-style notification
+	notify-send $NOTIFY_FLAGS -a "brightness" -r 9999 -h int:value:"$percentage" \
+		-i "$icon" "Brightness" "${percentage}%"
 }
 
-# Main script logic
+# ----------------------------- #
+# MAIN SCRIPT
+# ----------------------------- #
+
 case $1 in
-up)
-	# Increase brightness by 10%
-	brightnessctl set 10%+
-	;;
-down)
-	# Decrease brightness by 10%
-	brightnessctl set 10%-
-	;;
-*)
-	echo "invalid cmd"
-	exit 1
-	;;
+	up)
+		brightnessctl set 10%+
+		;;
+	down)
+		brightnessctl set 10%-
+		;;
+	*)
+		echo "Usage: $0 {up|down}"
+		exit 1
+		;;
 esac
 
-# Send notification after adjusting brightness
-notification
+brightness_noti
 exit 0
 

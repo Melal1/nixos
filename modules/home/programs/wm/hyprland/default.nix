@@ -21,6 +21,8 @@ in
   home.file.".config/hypr/programs.conf".source =
     config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/programs.conf";
 
+  home.file.".config/hypr/windowrules.conf".source =
+    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/windowrules.conf";
 
   home.file.".config/hypr/keybinds/keybindings.conf".source =
     config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/keybinds/keybindings.conf";

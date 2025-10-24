@@ -4,7 +4,7 @@
     ./fetch.nix
     ./mpd.nix
     ./yazi.nix
-    # ./vicinae.nix
+    ./swaync
   ];
 
   home.file.".config/tmux/tmux.conf" = {

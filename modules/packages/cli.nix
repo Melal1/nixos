@@ -4,6 +4,7 @@
     ### ──────────────────────
     ###  CLI Utilities
     ### ──────────────────────
+    libnotify
     mpc
     playerctl
     tmux
