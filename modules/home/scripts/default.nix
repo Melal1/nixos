@@ -40,5 +40,9 @@
     source = ./SCRIPT-MP3D.sh;
     executable = true;
   };
+  home.file.".local/bin/open-github-tmux" = {
+    source = ./open-github.sh;
+    executable = true;
+  };
 
 }
