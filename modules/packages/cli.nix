@@ -46,9 +46,8 @@
     ffmpeg
     imagemagick
     cava
-    slurp
     grim
-    hyprpaper
+    hyprshot
     (ncmpcpp.override {
       visualizerSupport = true;
       clockSupport = true;
