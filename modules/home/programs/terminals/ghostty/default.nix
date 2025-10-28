@@ -23,7 +23,7 @@
 
       mouse-hide-while-typing = true;
       mouse-scroll-multiplier = 2;
-      cursor-style = "bar";
+      cursor-style = "block";
       window-vsync = false;
       background-opacity = 0.93;
       background-blur = 20;
