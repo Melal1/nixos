@@ -5,6 +5,7 @@
     ###  CLI Utilities
     ### ──────────────────────
     libnotify
+    jq
     mpc
     playerctl
     tmux

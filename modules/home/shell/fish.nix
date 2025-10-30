@@ -21,8 +21,10 @@
         end
 
 
-
         set -g fish_key_bindings fish_vi_key_bindings
+        bind -M visual y fish_clipboard_copy
+        bind -M normal yy fish_clipboard_copy
+        bind p fish_clipboard_paste
         bind \cE edit_command_buffer
         bind \cQ up-or-search
         bind \cA down-or-search
