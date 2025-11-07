@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     kitty # GPU-accelerated terminal emulator
+    puddletag
     waybar # Status bar for Wayland
     eww # Custom widgets for the desktop
     wlogout # Logout menu for Wayland

@@ -8,7 +8,7 @@ THUMB_DIR="$AUDIO_DIR/th"
 current_file="$(mpc --format '%file%' current)"
 
 # If no song is playing, exit
-[ -z "$current_file" ] && { exit 0; }
+[ -z "$current_file" ] && exit 0
 
 # Extract filename without extension
 base_name="$(basename "$current_file" | sed 's/\.[^.]*$//')"
@@ -19,10 +19,15 @@ cover="$THUMB_DIR/$base_name.jpg"
 # Get title and artist
 title_artist="$(mpc --format '%title% \n%artist%' current)"
 
-# Send notification
+# Send notification (transient)
 if [ -f "$cover" ]; then
-    dunstify --replace=27072 -i "$cover" "Playing..." "$title_artist"
+    notify-send "Playing..." "$title_artist" \
+        --icon="$cover" \
+        --hint=int:transient:1 \
+        --expire-time=5000
 else
-    dunstify --replace=27072 "Playing..." "$title_artist"
+    notify-send "Playing..." "$title_artist" \
+        --hint=int:transient:1 \
+        --expire-time=5000
 fi
 

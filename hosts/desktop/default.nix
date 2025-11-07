@@ -3,17 +3,12 @@
     ./hardware/configuration.nix
     ./users/melal.nix
     ./structure.nix
-    ./kernel.nix
+    # ./kernel.nix
     ./keyboard.nix
   ];
   networking.hostName = "alpha";
-  systemd.services.fix-suspend = {
-  description = "Fix for the suspend issue";
-  wantedBy = [ "multi-user.target" ];
-  serviceConfig = {
-    Type = "oneshot";
-    ExecStart = "/bin/sh -c 'echo GPP0 > /proc/acpi/wakeup'";
-  };
-};
+  services.udev.extraRules = ''
+    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
+  '';
 
 }
