@@ -25,7 +25,7 @@
       mouse-scroll-multiplier = 2;
       cursor-style = "block";
       window-vsync = false;
-      background-opacity = 0.93;
+      background-opacity = 0.83;
       background-blur = 20;
       background = "#141415";
       foreground = "#cdcdcd";

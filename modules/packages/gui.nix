@@ -23,6 +23,7 @@
     todoist-electron
     vlc
     mpv
+    gdbgui
   ];
    programs.kdeconnect.enable = true;
 }
