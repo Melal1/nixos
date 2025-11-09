@@ -1,6 +1,7 @@
 { pkgs, ... }: {
   environment.systemPackages = with pkgs; [
     kitty # GPU-accelerated terminal emulator
+    protonvpn-gui
     puddletag
     waybar # Status bar for Wayland
     eww # Custom widgets for the desktop
@@ -24,6 +25,8 @@
     vlc
     mpv
     gdbgui
+    obsidian
+    vscode
   ];
    programs.kdeconnect.enable = true;
 }
