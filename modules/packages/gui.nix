@@ -1,5 +1,5 @@
-{ pkgs, ... }: {
-  environment.systemPackages = with pkgs; [
+{ pkgs, unstable, ... }: {
+  environment.systemPackages = (with pkgs; [
     kitty # GPU-accelerated terminal emulator
     protonvpn-gui
     puddletag
@@ -27,6 +27,12 @@
     gdbgui
     obsidian
     vscode
-  ];
-   programs.kdeconnect.enable = true;
+  ])
+  ++
+  (with unstable; [
+    nmgui
+  ])
+
+  ;
+  programs.kdeconnect.enable = true;
 }

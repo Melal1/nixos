@@ -26,7 +26,7 @@
         "critical": 15
         },
         "format": "{icon} <b>{capacity}</b>%",
-        "format-charging": "󰂄 {capacity}%",
+        "format-charging": "󰌪  {capacity}%",
         "format-plugged": " {capacity}%",
         "format-icons": [" ", " ", " ", " ", " "]
     },
@@ -168,7 +168,7 @@
       ],
       "format-wifi": "{icon}",
       "max-length": 50,
-      "on-click": "hyprctl dispatch workspace 1 ; sleep 0.2 ;  kitty -e sudo impala",
+      "on-click": "nmgui",
       "on-click-right": "wihotspot",
       "tooltip-format-wifi": "{essid}   -   {ipaddr}"
     },
@@ -201,7 +201,7 @@
       "spacing": 10
     },
     "user": {
-      "avatar": "/home/melal/Pictures/Pfp/ready/A1.png",
+      "avatar": "/home/melal/Pictures/Pfp/RainUmp_circle.png",
       "format": "  |",
       "height": 30,
       "icon": true,

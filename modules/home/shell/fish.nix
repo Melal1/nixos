@@ -17,7 +17,7 @@
         set fish_greeting # Disable greeting
         # Only run fastfetch in interactive shells, but skip Neovim and tmux
         if status --is-interactive; and not set -q NVIM; and not set -q TMUX
-            fastfetch
+            # fastfetch
         end
 
 
