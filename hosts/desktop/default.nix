@@ -1,7 +1,7 @@
 {
   imports = [
     ./hardware/configuration.nix
-    ./users/melal.nix
+    ../../users
     ./structure.nix
     # ./kernel.nix
     ./keyboard.nix

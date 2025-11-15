@@ -2,7 +2,7 @@
 {
   virtualisation.waydroid.enable = (
     if config.networking.hostName == "alpha" then
-      true
+      false
     else
       false
 

@@ -10,5 +10,6 @@
     pulse.enable = true;
   };
 
+
   services.printing.enable = false;
 }

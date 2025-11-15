@@ -5,6 +5,8 @@
   # services.squid.proxyPort = 8080;
   # services.squid.proxyAddress = "192.168.243.195";
 
+  programs.adb.enable = true; 
+
   environment.systemPackages = with pkgs; [
     openvpn # VPN client
     iw # Manage wireless devices

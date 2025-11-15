@@ -5,7 +5,7 @@
     ### Programming Languages
     ### ──────────────────────
     cargo # Rust package manager and build tool
-    python3 # Python interpreter
+    python314 # Python interpreter
     nodejs # JavaScript runtime
     typescript # Typescript
     go # Go programming language
