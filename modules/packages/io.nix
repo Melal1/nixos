@@ -10,6 +10,7 @@
   environment.systemPackages = with pkgs; [
     openvpn # VPN client
     iw # Manage wireless devices
+    jmtpfs
     acpi # Show battery and thermal info
     linux-wifi-hotspot # Create Wi-Fi hotspots
     alsa-utils # ALSA, the Advanced Linux Sound Architecture utils

@@ -1,38 +1,44 @@
-{ pkgs, unstable, ... }: {
-  environment.systemPackages = (with pkgs; [
-    kitty # GPU-accelerated terminal emulator
-    protonvpn-gui
-    puddletag
-    waybar # Status bar for Wayland
-    eww # Custom widgets for the desktop
-    wlogout # Logout menu for Wayland
-    papirus-icon-theme
-    hyprpicker # Color picker for Wayland
-    # (discord.override {
-    #   withVencord = true;
-    # }) # Communication
-    discord
-    vesktop
-    apple-cursor
-    bibata-cursors
-    unoconv
-    kdePackages.dolphin
-    firefox
-    # plasma5Packages.kdeconnect-kde
-    nwg-displays # Handle displays 
-    obs-studio
-    todoist-electron
-    vlc
-    mpv
-    gdbgui
-    obsidian
-    vscode
-  ])
-  ++
-  (with unstable; [
-    nmgui
-  ])
+{ pkgs, unstable, config, ... }: {
+  environment.systemPackages =
+    (with pkgs; [
+      kitty
+      protonvpn-gui
+      filezilla
+      puddletag
+      waybar
+      eww
+      wlogout
+      papirus-icon-theme
+      hyprpicker
+      discord
+      vesktop
+      apple-cursor
+      bibata-cursors
+      unoconv
+      kdePackages.dolphin
+      firefox
+      nwg-displays
+      obs-studio
+      todoist-electron
+      vlc
+      mpv
+      gdbgui
+      obsidian
+      vscode
+    ])
+    ++
+    (with unstable; [
+      nmgui
+    ])
+    ++
+    (if config.networking.hostName == "zeta" then
+      (with pkgs; [
+        wineWowPackages.stable
+        winetricks
+      ])
+    else
+      [ ]);
 
-  ;
   programs.kdeconnect.enable = true;
 }
+
