@@ -34,6 +34,7 @@
       noto-fonts-cjk-sans
       nerd-fonts.iosevka
       nerd-fonts.caskaydia-cove
+      nerd-fonts.jetbrains-mono
       (google-fonts.override { fonts = [ "Radio Canada Big" ]; })
     ];
 
