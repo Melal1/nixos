@@ -30,7 +30,6 @@
       url_style = "curly";
       show_hyperlink_targets = "yes";
       active_border_color = "none";
-      background_opacity = "0.8";
 
       shell_integration = "no-cursor";
       cursor_shape = "block";

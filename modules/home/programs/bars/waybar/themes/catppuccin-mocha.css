@@ -1,0 +1,63 @@
+/* @background — used in:
+   window#waybar background
+   #clock text color
+*/
+@define-color background rgba(30, 30, 46, 0.8);
+
+/* @on_background — used in:
+   window#waybar text color
+   #workspaces text/icons
+   #workspaces button text
+   #workspaces button:hover text
+   #window text
+*/
+@define-color on_background #cdcdcd;
+
+/* @surface_variant — used in:
+   window#waybar border-left
+   #workspaces button background
+   #pulseaudio-slider trough background
+*/
+@define-color surface_variant #45475a;
+
+/* @primary — used in:
+   #workspaces button.active background
+*/
+@define-color primary #89b4fa;
+
+/* @tertiary — used in:
+   #workspaces button:hover background
+*/
+@define-color tertiary #f9e2af;
+
+/* @error — used in:
+   #workspaces button.urgent background
+   #bluetooth.disabled / #bluetooth.off color
+*/
+@define-color error #f38ba8;
+
+/* @outline — used in:
+   #user text
+   #workspaces button.urgent text
+*/
+@define-color outline #f9e2af;
+
+/* @secondary_container — used in:
+   #cava text color
+*/
+@define-color secondary_container #bac2de;
+
+/* @on_surface — used in:
+   #pulseaudio-slider highlight background
+*/
+@define-color on_surface #a7adc8;
+
+/* @secondary_light — used in:
+   #battery text
+
+   #bluetooth text (when enabled)
+
+   #network text
+   #wireless ? (background uses @surface_variant)
+*/
+@define-color secondary_light #cdcdcd; /* from your theme */

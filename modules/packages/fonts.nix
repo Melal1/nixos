@@ -35,6 +35,8 @@
       nerd-fonts.iosevka
       nerd-fonts.caskaydia-cove
       nerd-fonts.jetbrains-mono
+      nerd-fonts.agave
+      nerd-fonts.fira-code
       (google-fonts.override { fonts = [ "Radio Canada Big" ]; })
     ];
 

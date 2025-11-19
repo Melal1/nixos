@@ -2,11 +2,11 @@
   environment.systemPackages =
     (with pkgs; [
       kitty
+      gnome-frog
       protonvpn-gui
       filezilla
       puddletag
       waybar
-      eww
       wlogout
       papirus-icon-theme
       hyprpicker
