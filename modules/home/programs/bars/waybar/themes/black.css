@@ -1,0 +1,8 @@
+@define-color bg #141415;
+@define-color fg #A7A7A7;
+@define-color bglight #414141;
+/* @define-color bglight #252530; */
+@define-color dim #626262;
+@define-color dimlight #7D7D7D;
+@define-color error #d8647e;
+@define-color outline #949494 ;

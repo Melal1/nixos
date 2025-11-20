@@ -29,6 +29,9 @@
     nil                                 # LSP for Nix language
     nixpkgs-fmt                         # Formatter for Nix expressions
 
+    # --- json ---
+    nodePackages_latest.vscode-json-languageserver
+
     # --- General / Misc ---
     harper                              # English grammar and style checker
   ];

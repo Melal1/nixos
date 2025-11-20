@@ -18,10 +18,31 @@ safe_link() {
 waybar() {
     pkill waybar
     sleep 0.1
+    if [[ "$1" == "black" ]]; then
+        type="dock"
+        confType="$type-$HOSTNAME"
+        cssType="$type"
+    else
+        type="station"
+        if [[ "$HOSTNAME" == "alpha" ]]; then
+          confType="$type-$HOSTNAME-v"
+          cssType="$type-$HOSTNAME-v"
+        else
+          confType="$type-$HOSTNAME"
+          cssType="$type"
+        fi
+    fi
+
+    configFile="$HOME/.dotfiles/nixos/modules/home/programs/bars/waybar/config-$confType"
+    styleFile="$HOME/.dotfiles/nixos/modules/home/programs/bars/waybar/style-$cssType.css"
+
 
     safe_link \
       "$NixPath/modules/home/programs/bars/waybar/themes/$1.css" \
        "$HOME/.config/waybar/current.css"
+
+    safe_link $configFile "$HOME/.config/waybar/config.jsonc"
+    safe_link $styleFile "$HOME/.config/waybar/style.css"
 
     setsid waybar >/dev/null 2>&1 &
 }
@@ -63,7 +84,7 @@ swaync() {
 
 # --- Theme list -----------------------------------------------------
 
-themes=("onedark_dark" "vague")
+themes=("black" "vague")
 
 choice="$(printf '%s\n' "${themes[@]}" | rofi -dmenu -p "Select theme:")"
 
@@ -78,8 +99,8 @@ swaync "$choice"
 waybar "$choice"
 kitty "$choice"
 
-if [[ "$choice" == "onedark_dark" ]]; then
-  wallSet.py  "$HOME/Pictures/Wall/CarWash.jpg" "3"
+if [[ "$choice" == "black" ]]; then
+  wallSet.py  "$HOME/Pictures/Wall/black.jpg" "3"
 else
   wallSet.py  "$HOME/Pictures/Wall/night(1).png" "3"
 fi
