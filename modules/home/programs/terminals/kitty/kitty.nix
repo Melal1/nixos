@@ -3,13 +3,13 @@
   programs.kitty = {
     enable = true;
     font = {
-      name = "CaskaydiaCove NF SemiBold";
+      name = "Agave Nerd Font";
       size = 15;
     };
     settings = {
-      bold_font = "CaskaydiaCove NF Bold";
+      bold_font = "auto";
       italic_font = "auto";
-      bold_italic_font = "CaskaydiaCove NF Bold Italic";
+      bold_italic_font = "auto";
       modify_font_cell_width = "96%";
       modify_font_underline_position = "-2";
       modify_font_underline_thickness = "150%";
