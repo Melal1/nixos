@@ -181,5 +181,17 @@ window#waybar {
   font-size: 16px;
 }
 
+#battery {
+  font-weight: bold;
+  color: @fg;
+  background-color: @bg;
+  border-radius: 40px;
+  margin: 4px 0 0 12px;
+  padding: 9px 18px;
+  min-height: 24px;
+  font-size: 16px;
+
+}
+
 
 

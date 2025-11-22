@@ -14,6 +14,11 @@ safe_link() {
     echo "Linked: $dest → $src"
 }
 
+hyprland()
+{
+  safe_link "$NixPath/modules/home/programs/wm/hyprland/themes/$1.conf" \
+            "$HOME/.config/hypr/current_theme.conf"
+}
 
 waybar() {
     pkill waybar
@@ -49,14 +54,9 @@ waybar() {
 
 
 ghostty() {
-    pkill ghostty
-    sleep 0.2
-
     safe_link \
         "$NixPath/modules/home/programs/terminals/ghostty/themes/$1" \
         "$HOME/.config/ghostty/theme"
-
-    pkill -SIGUSR2 ghostty
 }
 
 kitty() {
@@ -93,11 +93,21 @@ if [[ -z "$choice" ]]; then
     exit 1
 fi
 
+if [[ "$choice" == "black" || "$choice" == vague ]]; then
+  TermTheme="vague"
+else
+  TermTheme="$choice"
+fi
+
 echo "Theme selected: $choice"
 
 swaync "$choice"
 waybar "$choice"
-kitty "$choice"
+hyprland "$choice"
+
+
+kitty "$TermTheme"
+ghostty "$TermTheme"
 
 if [[ "$choice" == "black" ]]; then
   wallSet.py  "$HOME/Pictures/Wall/black.jpg" "3"
