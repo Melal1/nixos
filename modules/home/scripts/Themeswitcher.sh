@@ -16,8 +16,10 @@ safe_link() {
 
 hyprland()
 {
-  safe_link "$NixPath/modules/home/programs/wm/hyprland/themes/$1.conf" \
-            "$HOME/.config/hypr/current_theme.conf"
+  local src="$NixPath/modules/home/programs/wm/hyprland/themes/$1.conf"
+  local dest="$HOME/.config/hypr/current_theme.conf"
+  ln -s "$src" "$dest"
+  hyprctl reload
 }
 
 waybar() {
