@@ -1,17 +1,13 @@
 { pkgs, unstable, config, ... }: {
   environment.systemPackages =
     (with pkgs; [
-      kitty
       gnome-frog
       protonvpn-gui
       filezilla
       puddletag
-      waybar
       wlogout
       papirus-icon-theme
       hyprpicker
-      discord
-      vesktop
       apple-cursor
       bibata-cursors
       unoconv
@@ -19,22 +15,31 @@
       firefox
       nwg-displays
       obs-studio
-      todoist-electron
+      # todoist-electron
       vlc
       mpv
       gdbgui
-      obsidian
-      vscode
+      # obsidian
+      # vscode
     ])
     ++
     (with unstable; [
       nmgui
+      discord
+      kitty
+      vesktop
     ])
     ++
     (if config.networking.hostName == "zeta" then
       (with pkgs; [
         wineWowPackages.stable
         winetricks
+      ])
+    else if config.networking.hostName == "alpha" then
+
+      (with pkgs; [
+        prismlauncher
+        steam
       ])
     else
       [ ]);

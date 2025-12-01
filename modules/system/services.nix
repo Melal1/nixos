@@ -1,9 +1,14 @@
-{ pkgs, ... }:
+{ pkgs, unstable, ... }:
 {
 
   environment.systemPackages = [
     pkgs.pulseaudio # for pactl
   ];
+
+  services.zerotierone = {
+    enable = false;
+    package = unstable.zerotierone;
+  };
 
   services.pipewire = {
     enable = true;

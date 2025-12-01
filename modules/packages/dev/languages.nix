@@ -1,4 +1,4 @@
-{ pkgs, unstable, ... }: {
+{ pkgs, config, unstable, ... }: {
   environment.systemPackages = (with pkgs; [
 
     ### ──────────────────────
@@ -12,7 +12,6 @@
     vscode-extensions.ms-vscode.cpptools
     gdb
     lua
-
     ### ──────────────────────
     ### Compilers
     ### ──────────────────────
@@ -21,7 +20,15 @@
   (with unstable; [
     clang # LLVM-based C/C++ compiler
     gcc # GNU C Compiler
-  ]);
+  ])
+  ++
+  (if config.networking.hostName == "alpha" then
 
+    (with pkgs;
+    [
+    jdk21_headless
+    ])
+  else
+    [ ]);
 }
 

@@ -28,7 +28,7 @@
       # WARN: this will install all the fonts , for override it will fetch all .
       # TODO: make a repo contain all the fonts i use then install them via nix .
       noto-fonts
-      noto-fonts-emoji
+      noto-fonts-color-emoji
       twitter-color-emoji
       sarasa-gothic
       noto-fonts-cjk-sans

@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, unstable, ... }:
 
 let
   cfg = config.desktop;
@@ -11,6 +11,7 @@ in
 
   config = lib.mkIf (cfg.type == "hyprland") {
     programs.hyprland.enable = true;
+    programs.hyprland.package = unstable.hyprland;
     programs.hyprland.xwayland.enable = true;
 
     environment.systemPackages = with pkgs; [
