@@ -1,4 +1,4 @@
-{ pkgs, unstable, ... }:
+{ pkgs, config, ... }:
 {
 
   environment.systemPackages = [
@@ -6,8 +6,7 @@
   ];
 
   services.zerotierone = {
-    enable = false;
-    package = unstable.zerotierone;
+    enable = (config.networking.hostName == "alpha");
   };
 
   services.pipewire = {

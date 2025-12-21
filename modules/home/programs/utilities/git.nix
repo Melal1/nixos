@@ -1,10 +1,15 @@
 {
   programs.git = {
+    # extraConfig = {
+    #   init.defaultBranch = "main";
+    # };
     enable = true;
-    userName = "melal";
-    userEmail = "example@example.com";
-    extraConfig = {
-      init.defaultBranch = "main";
+    settings = {
+      init.defaultbranch = "main";
+      user = {
+        email = "melal.1@hotmail.com";
+        name = "melal";
+      };
     };
   };
 }

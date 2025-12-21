@@ -2,6 +2,7 @@
   environment.systemPackages =
     (with pkgs; [
       gnome-frog
+      neovide
       protonvpn-gui
       filezilla
       puddletag
@@ -12,15 +13,16 @@
       bibata-cursors
       unoconv
       kdePackages.dolphin
+      localsend
       firefox
       nwg-displays
-      obs-studio
       # todoist-electron
       vlc
       mpv
       gdbgui
       # obsidian
       # vscode
+      zoom-us
     ])
     ++
     (with unstable; [
@@ -39,11 +41,26 @@
 
       (with pkgs; [
         prismlauncher
-        steam
       ])
     else
       [ ]);
 
   programs.kdeconnect.enable = true;
+  programs.steam = {
+    enable = config.networking.hostName == "alpha";
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+  programs.obs-studio = {
+    enable = config.networking.hostName == "alpha";
+
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+      obs-backgroundremoval
+      obs-pipewire-audio-capture
+      obs-vaapi #optional AMD hardware acceleration
+      obs-vkcapture
+    ];
+  };
 }
 
