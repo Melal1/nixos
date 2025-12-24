@@ -20,12 +20,16 @@
         source = ./audio.sh;
         executable = true;
       };
-      ".local/bin/kittSwitch" = {
-        source = ./switcher.sh;
+      ".local/bin/THEMS.sh" = {
+        source = ./Themeswitcher.sh;
         executable = true;
       };
       ".local/bin/wallSet" = {
         source = ./wallSet;
+        executable = true;
+      };
+      ".local/bin/wallSet.py" = {
+        source = ./wall.py;
         executable = true;
       };
       ".local/bin/gengitcommit" = {

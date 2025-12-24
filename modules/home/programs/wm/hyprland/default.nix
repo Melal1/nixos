@@ -9,9 +9,6 @@ in
   home.file.".config/hypr/autostart.conf".source =
     config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/autostart.conf";
 
-  home.file.".config/hypr/current_theme.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/current_theme.conf";
-
   home.file.".config/hypr/input.conf".source =
     config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/input.conf";
 

@@ -15,7 +15,7 @@ in
 
     environment.systemPackages = with pkgs; [
       wl-clipboard
-      rofi-wayland
+      rofi
       waybar
       swaynotificationcenter
     ];

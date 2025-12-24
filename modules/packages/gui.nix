@@ -1,34 +1,35 @@
 { pkgs, unstable, config, ... }: {
   environment.systemPackages =
     (with pkgs; [
-      kitty
+      gnome-frog
+      neovide
       protonvpn-gui
       filezilla
       puddletag
-      waybar
-      eww
       wlogout
       papirus-icon-theme
       hyprpicker
-      discord
-      vesktop
       apple-cursor
       bibata-cursors
       unoconv
       kdePackages.dolphin
+      localsend
       firefox
       nwg-displays
-      obs-studio
-      todoist-electron
+      # todoist-electron
       vlc
       mpv
       gdbgui
-      obsidian
-      vscode
+      # obsidian
+      # vscode
+      zoom-us
     ])
     ++
     (with unstable; [
       nmgui
+      discord
+      kitty
+      vesktop
     ])
     ++
     (if config.networking.hostName == "zeta" then
@@ -36,9 +37,30 @@
         wineWowPackages.stable
         winetricks
       ])
+    else if config.networking.hostName == "alpha" then
+
+      (with pkgs; [
+        prismlauncher
+      ])
     else
       [ ]);
 
   programs.kdeconnect.enable = true;
+  programs.steam = {
+    enable = config.networking.hostName == "alpha";
+    remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
+    dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
+  };
+  programs.obs-studio = {
+    enable = config.networking.hostName == "alpha";
+
+    plugins = with pkgs.obs-studio-plugins; [
+      wlrobs
+      obs-backgroundremoval
+      obs-pipewire-audio-capture
+      obs-vaapi #optional AMD hardware acceleration
+      obs-vkcapture
+    ];
+  };
 }
 

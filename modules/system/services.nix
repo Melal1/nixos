@@ -1,9 +1,13 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
 
   environment.systemPackages = [
     pkgs.pulseaudio # for pactl
   ];
+
+  services.zerotierone = {
+    enable = (config.networking.hostName == "alpha");
+  };
 
   services.pipewire = {
     enable = true;

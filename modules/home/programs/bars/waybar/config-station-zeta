@@ -1,0 +1,214 @@
+[
+  {
+    "modules-center": [
+      "hyprland/workspaces"
+    ],
+    "modules-left": [
+      "user",
+      "hyprland/window",
+      "cava"
+    ],
+    "modules-right": [
+      "pulseaudio/slider",
+      "battery",
+      "group/wireless",
+      "tray",
+      "clock"
+    ],
+"pulseaudio/slider": {
+    "min": 0,
+    "max": 100,
+    "orientation": "horizontal"
+},
+        "battery": {
+        "states": {
+        "warning": 30,
+        "critical": 15
+        },
+        "format": "{icon} <b>{capacity}</b>%",
+        "format-charging": "󰌪  {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-icons": [" ", " ", " ", " ", " "]
+    },
+
+    "bluetooth": {
+      "format-connected": " 󰂱 ",
+      "format-disabled": " 󰂲 ",
+      "format-no-controller": " D ",
+      "format-off": " D ",
+      "format-on": "<b> 󰂯 </b>",
+      "interval": 30,
+      "on-click": "hyprctl dispatch workspace 1 ; sleep 0.2 ;kitty -e bluetui",
+      "tooltip-format-connected": "{device_alias}"
+    },
+    "cava": {
+      "actions": {
+        "on-click-right": "mode"
+      },
+      "bar_delimiter": 0,
+      "bars": 7,
+      
+      "format-icons": [
+        "▁",
+        "▂",
+        "▃",
+        "▄",
+        "▅",
+        "▆",
+        "▇",
+        "█"
+      ],
+      "framerate": 120,
+      "higher_cutoff_freq": 10000,
+      "input_delay": 1,
+      "lower_cutoff_freq": 50,
+      "method": "pulse",
+      "monstercat": false,
+      "noise_reduction": 0.77,
+      "reverse": false,
+      "sensitivity": 1,
+      "source": "auto",
+      "stereo": true,
+      "waves": false
+    },
+    "clock": {
+      "calendar": {
+        "format": {
+          "days": "<span><small>{}</small></span>",
+          "months": "<span><b><u>{}</u></b></span>",
+          "today": "<span foreground='#bbb5e4'><big><b><u>{}</u></b></big></span>",
+          "weekdays": "<span><b>{}</b></span>"
+        },
+        "mode": "month",
+        "mode-mon-col": 4,
+        "on-scroll": 1
+      },
+      "format": "<b>{:%b %d %a %I:%M%p}</b>",
+      "format-alt": "<b>{:%a %I:%M:%S%p}</b>",
+      "interval": 1,
+      "tooltip-format": "<tt>{calendar}</tt>"
+    },
+    "cpu": {
+      "format": "/ C {usage}% ",
+      "interval": 2
+    },
+    "disk": {
+      "format": "D {percentage_used}% ",
+      "interval": 130,
+      "path": "/"
+    },
+    "exclusive": true,
+    "group/wireless": {
+      "modules": [
+        "bluetooth",
+        "network"
+      ],
+      "orientation": "inherit"
+    },
+    "height": 0,
+    "hyprland/language": {
+      "format": "/ K {short}"
+    },
+    "hyprland/window": {
+      "rewrite": {
+        "(.*) - YouTube — Zen Browser": "Youtube",
+        "(.*) — Zen Browser": "Zen",
+        "NotVscode - (.*)": "<b>!VSCode    $1</b>",
+        "home-manager switch --flake (.*)": "󱂵    Rebuilding Home Manager ...",
+        "sudo nixos-rebuild switch --flake (.*)": "󱄅    Rebuilding System ..."
+      },
+      "separate-outputs": true
+    },
+    "hyprland/workspaces": {
+      "format": "{icon}",
+      "format-icons": {
+        "1": " ",
+        "2": " ",
+        "3": "󰇥",
+        "4": " ",
+        "5": " ",
+        "6": "6",
+        "7": "7",
+        "8": " ",
+        "9": " ",
+        "default": " ",
+        "urgent": " "
+      },
+      "on-click": "activate",
+      //"persistent-workspaces": {
+      //  "*": 1
+      //}
+    },
+    "keyboard-state": {
+      "capslock": true,
+      "format": "{name} {icon}",
+      "format-icons": {
+        "locked": "",
+        "unlocked": ""
+      },
+      "numlock": true
+    },
+    "margin-bottom": -4,
+    "margin-left": 120,
+    "margin-right": 120,
+    "memory": {
+      "format": "/ M {}% ",
+      "interval": 10
+    },
+    "network": {
+      "format": " {ifname}",
+      "format-disconnected": "󰤭 ",
+      "format-ethernet": "󰈀 ",
+      "format-icons": [
+        "󰤯 ",
+        "󰤟 ",
+        "󰤢 ",
+        "󰤥 ",
+        "󰤨 "
+      ],
+      "format-wifi": "{icon}",
+      "max-length": 50,
+      "on-click": "nmgui",
+      "on-click-right": "wihotspot",
+      "tooltip-format-wifi": "{essid}   -   {ipaddr}"
+    },
+    "position": "top",
+    "pulseaudio": {
+      "format": "{icon}  {volume}%",
+      "format-bluetooth": "{volume}%  {icon} {format_source}",
+      "format-bluetooth-muted": "M  {icon} {format_source}",
+      "format-icons": {
+        "car": "",
+        "default": [
+          "",
+          " ",
+          " "
+        ],
+        "hands-free": "",
+        "headphone": "",
+        "headset": "",
+        "phone": "",
+        "portable": ""
+      },
+      "format-muted": "<b>Muted</b>",
+      "format-source": "{volume}% ",
+      "format-source-muted": "",
+      "on-click": "pavucontrol"
+    },
+    "reload_style_on_change": true,
+    "spacing": 0,
+    "tray": {
+      "spacing": 10
+    },
+    "user": {
+      "avatar": "/home/melal/Pictures/Pfp/RainUmp_circle.png",
+      "format": "  |",
+      "height": 30,
+      "icon": true,
+      "interval": 60,
+      "open-on-click": false,
+      "width": 30
+    }
+  }
+]
+
