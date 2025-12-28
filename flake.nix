@@ -69,6 +69,7 @@
                 ghostty.packages.${system}.default
                 zen-browser.packages.${system}.default
                 vicinae.packages.${system}.default
+                oldshit.clang-tools
               ];
             })
           ];
