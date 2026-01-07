@@ -7,6 +7,8 @@
       ### ──────────────────────
       libnotify
       jq
+      lolcat
+      timer
       mpc
       playerctl
       tmux

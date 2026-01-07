@@ -6,9 +6,4 @@
     ./virtualisation.nix
     ./services.nix
   ];
-
-  # nix.settings.auto-optimise-store = true;
-
-
-
-    }
+}

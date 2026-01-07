@@ -114,7 +114,7 @@ ghostty "$TermTheme"
 if [[ "$choice" == "black" ]]; then
   wallSet.py  "$HOME/Pictures/Wall/black.jpg" "3"
 else
-  wallSet.py  "$HOME/Pictures/Wall/night(1).png" "3"
+  wallSet.py  "$HOME/Pictures/Wall/knighP_1.png" "3"
 fi
 
 exit 0

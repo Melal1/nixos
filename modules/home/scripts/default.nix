@@ -53,6 +53,11 @@
         executable = true;
 
       };
+      ".local/bin/pomodoro" = {
+        source = ./pomodoro.fish;
+        executable = true;
+
+      };
 
     }
 

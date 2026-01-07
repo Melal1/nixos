@@ -21,7 +21,7 @@
       mpv
       gdbgui
       # obsidian
-      # vscode
+      vscode
       zoom-us
     ])
     ++
