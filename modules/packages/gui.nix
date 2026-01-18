@@ -6,16 +6,13 @@
       protonvpn-gui
       filezilla
       puddletag
-      wlogout
       papirus-icon-theme
-      hyprpicker
       apple-cursor
       bibata-cursors
       unoconv
       kdePackages.dolphin
       localsend
       firefox
-      nwg-displays
       # todoist-electron
       vlc
       mpv

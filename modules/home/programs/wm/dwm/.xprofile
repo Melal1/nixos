@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+/home/melal/.local/bin/DWMAUTOSTART.sh &
+echo "DWMAUTOSTART.sh ran at $(date)" >> /home/melal/dwm-start.log 2>&1
+

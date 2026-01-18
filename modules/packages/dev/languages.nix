@@ -15,6 +15,7 @@
     clang # LLVM-based C/C++ compiler
     gcc # GNU C Compiler
     glibc
+    kdePackages.qtdeclarative
 
     ### ──────────────────────
     ### Compilers

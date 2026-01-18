@@ -43,7 +43,7 @@
         end
 
 
-        # set -g fish_key_bindings fish_vi_key_bindings
+        set -g fish_key_bindings fish_vi_key_bindings
         # bind -M visual y fish_clipboard_copy
         # bind -M normal yy fish_clipboard_copy
         # bind p fish_clipboard_paste
@@ -75,6 +75,14 @@
         set -x FZF_DEFAULT_OPTS '--height 70% --tmux bottom,40% --layout reverse --border top'
 
         zoxide init fish | source
+        if status --is-interactive
+        eval (direnv hook fish)
+        end
+  
+
+
+
+
       '' + (if config.programs.yazi.enable then ''
         function y
           set tmp (mktemp -t "yazi-cwd.XXXXXX")

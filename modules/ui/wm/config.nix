@@ -1,24 +1,16 @@
-{ config, pkgs, lib, ... }:
+{ lib, ... }:
 
-let
-  cfg = config.desktop;
-in
 {
+  imports = [
+    ./x11/dwm.nix
+    ./x11/common.nix
+    ./wayland/hyprland.nix
+  ];
+
   options.desktop.type = lib.mkOption {
-    type = lib.types.enum [ "none" "hyprland" ];
+    type = lib.types.enum [ "none" "hyprland" "dwm" ];
     default = "none";
-  };
-
-  config = lib.mkIf (cfg.type == "hyprland") {
-    programs.hyprland.enable = true;
-    programs.hyprland.xwayland.enable = true;
-
-    environment.systemPackages = with pkgs; [
-      wl-clipboard
-      rofi
-      waybar
-      swaynotificationcenter
-    ];
+    description = "Select desktop environment / window manager";
   };
 }
 
