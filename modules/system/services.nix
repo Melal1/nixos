@@ -6,7 +6,8 @@
   ];
 
   services.zerotierone = {
-    enable = (config.networking.hostName == "alpha");
+    # enable = (config.networking.hostName == "alpha");
+    enable = false;
   };
 
   services.pipewire = {

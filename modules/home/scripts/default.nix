@@ -69,12 +69,12 @@
         };
       })
 
-     (lib.mkIf (windowManager == "dwm") {
-        ".local/bin/DWMAUTOSTART.sh" = {
-          source = ./DWMAUTOSTART.sh;
-          executable = true;
-        };
-      })
+     # (lib.mkIf (windowManager == "dwm") {
+     #    ".local/bin/DWMAUTOSTART.sh" = {
+     #      source = ./DWMAUTOSTART.sh;
+     #      executable = true;
+     #    };
+     #  })
   ];
 }
 

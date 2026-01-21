@@ -73,5 +73,10 @@ in
       else
         "/dev/null"
     );
+  imports = [
+    ../../bars/waybar
+    ../../utilities/swaync
+
+  ];
 }
 

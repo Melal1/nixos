@@ -27,7 +27,7 @@
       pkgs = import nixpkgs { inherit system; };
       unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
       oldshit = import nixpkgs25_05 { inherit system; };
-      windowManager = "hyprland";
+      windowManager = "dwm";
     in
     {
       nixosConfigurations = {

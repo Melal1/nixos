@@ -51,7 +51,6 @@
       imagemagick
       cava
       grim
-      hyprshot
       (ncmpcpp.override {
         visualizerSupport = true;
         clockSupport = true;

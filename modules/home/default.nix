@@ -5,10 +5,8 @@
   imports = [
     ./programs/terminals
     ./shell
-    ./programs/bars
     ./dev
     ./scripts
-    ./programs/utilities
     ./programs/utilities
     ./programs/wm
     ../ui/gtk.nix

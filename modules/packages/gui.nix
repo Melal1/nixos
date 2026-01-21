@@ -20,6 +20,7 @@
       # obsidian
       vscode
       zoom-us
+      xournalpp
     ])
     ++
     (with unstable; [

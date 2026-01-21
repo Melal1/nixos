@@ -4,7 +4,6 @@
     ./fetch.nix
     ./mpd.nix
     ./yazi.nix
-    ./swaync
     ./ncmpcpp
   ];
 
