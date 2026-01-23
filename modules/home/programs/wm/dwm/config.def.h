@@ -13,10 +13,10 @@ static const char *fonts[]          = { "FiraCode Nerd Font:style=SemiBold:size=
 // static const char col_gray3[]       = "#bbbbbb";
 // static const char col_gray4[]       = "#eeeeee";
 // static const char col_cyan[]        = "#005577";
-static const unsigned int gappih    = 20;       /* horiz inner gap between windows */
-static const unsigned int gappiv    = 10;       /* vert inner gap between windows */
-static const unsigned int gappoh    = 10;       /* horiz outer gap between windows and screen edge */
-static const unsigned int gappov    = 30;       /* vert outer gap between windows and screen edge */
+static const unsigned int gappih    = 4;       /* horiz inner gap between windows */
+static const unsigned int gappiv    = 4;       /* vert inner gap between windows */
+static const unsigned int gappoh    = 3;       /* horiz outer gap between windows and screen edge */
+static const unsigned int gappov    = 3;       /* vert outer gap between windows and screen edge */
 static       int smartgaps          = 0;        /* 1 means no outer gap when there is only one window */
 
 static const char black[] = "#191919";
@@ -34,16 +34,14 @@ static const char *colors[][3]      = {
 /* tagging */
 static const char *tags[] = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
+/* xprop(1):
+ *	WM_CLASS(STRING) = instance, class
+ *	WM_NAME(STRING) = title */
+
 static const Rule rules[] = {
-	/* xprop(1):
-	 *	WM_CLASS(STRING) = instance, class
-	 *	WM_NAME(STRING) = title
-	 */
-	/* class      instance    title       tags mask     isfloating   monitor */
 	/* class     instance  title           tags mask  isfloating  isterminal  noswallow  monitor */
-	// { "Gimp",    NULL,     NULL,           0,         1,          0,           0,        -1 },
-	// { "Firefox", NULL,     NULL,           1 << 8,    0,          0,          -1,        -1 },
-	{ "ghostty",      NULL,     NULL,           0,         0,          1,           0,        -1 },
+	{ "discord",      NULL,     NULL,           1 << 8,         0,          0,           0,        1 },
+	{ "zen",      NULL,     NULL,           1 << 2,         0,          0,           0,        -1 },
 	{ "kitty",      NULL,     NULL,           0,         0,          1,           0,        -1 },
 	{ NULL,      NULL,     "Event Tester", 0,         0,          0,           1,        -1 }, /* xev */
 };
@@ -61,6 +59,7 @@ static const int refreshrate = 120;  /* refresh rate (per second) for client mov
 static const Layout layouts[] = {
 	/* symbol     arrange function */
 	{ "[]=",      tile },    /* first entry is default */
+  { "><>",      NULL },    /* no layout function means floating behavior */
 	{ "[M]",      monocle },
 	{ "[@]",      spiral },
 	{ "[\\]",     dwindle },
@@ -73,7 +72,6 @@ static const Layout layouts[] = {
 	{ ":::",      gaplessgrid },
 	{ "|M|",      centeredmaster },
 	{ ">M>",      centeredfloatingmaster },
-	{ "><>",      NULL },    /* no layout function means floating behavior */
 	{ NULL,       NULL },
 };
 
@@ -91,18 +89,19 @@ static const Layout layouts[] = {
 #define STATUSBAR "dwmblocks"
 
 /* commands */
-static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-// static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", col_gray1, "-nf", col_gray3, "-sb", col_cyan, "-sf", col_gray4, NULL };
 static const char *MENU[] = { "vicinae" , "open",NULL};
-static const char *termcmd[]  = { "ghostty", NULL };
+static const char *ClipBoard[] = { "vicinae", "vicinae://extensions/vicinae/clipboard/history" , NULL};
+static const char *Window_Sw[] = {"vicinae","vicinae://extensions/vicinae/wm/switch-windows", NULL};
+static const char *termcmd[]  = { "kitty", NULL };
 static char const* browser[] = { "zen" ,NULL};
 static const char scratchpadname[] = "scratchpad";
 static const char *scratchpadcmd[] = { "ghostty", "-t", scratchpadname, "-g", "120x34", NULL };
-
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_r,      spawn,          {.v = MENU } },
 	{ MODKEY,                       XK_q,      spawn,         {.v = termcmd } },
+	{ MODKEY,                       XK_v,      spawn,         {.v = ClipBoard } },
+	{ MODKEY,                       XK_w,      spawn,         {.v = Window_Sw } },
   { MODKEY,                       XK_f,      spawn,         {.v = browser } },
 	{ MODKEY,                       XK_grave,  togglescratch,  {.v = scratchpadcmd } },
 	{ MODKEY,                       XK_b,      togglebar,      {0} },

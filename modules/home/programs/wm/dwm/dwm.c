@@ -2311,6 +2311,7 @@ view(const Arg *arg)
 	arrange(selmon);
 }
 
+
 pid_t
 winpid(Window w)
 {
@@ -2377,7 +2378,7 @@ getparentprocess(pid_t p)
 	if (!(f = fopen(buf, "r")))
 		return 0;
 
-	// fscanf(f, "%*u %*s %*c %u", &v);
+	fscanf(f, "%*u %*s %*c %u", &v);
 	fclose(f);
 #endif /* __linux__*/
 
