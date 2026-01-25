@@ -1,6 +1,6 @@
 {
   programs.ghostty = {
-    enable = true;
+    enable = false;
     settings = {
       # theme = "vague";
       font-size = 20;

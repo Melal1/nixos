@@ -69,6 +69,8 @@ in
       pamixer
       feh
       xcolor
+      dunst
+      flameshot
     ];
   };
 }

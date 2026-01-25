@@ -3,8 +3,8 @@
   programs.kitty = {
     enable = true;
     font = {
-      name = "Agave Nerd Font";
-      size = 15;
+      name = "CaskaydiaCove Nerd Font";
+      size = 18;
     };
     settings = {
       bold_font = "auto";

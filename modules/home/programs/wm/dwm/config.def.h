@@ -98,9 +98,19 @@ static const char *MENU[] = { "vicinae" , "open",NULL};
 static const char *ClipBoard[] = { "vicinae", "vicinae://extensions/vicinae/clipboard/history" , NULL};
 static const char *Window_Sw[] = {"vicinae","vicinae://extensions/vicinae/wm/switch-windows", NULL};
 static const char *termcmd[]  = { "kitty", NULL };
+static const char *termAlt[] = {
+  "kitty", "-c", "~/.config/kitty/kittyAlt.conf", NULL
+};
 static char const* browser[] = { "zen" ,NULL};
-static const char scratchpadname[] = "scratchpad";
-static const char *scratchpadcmd[] = { "ghostty", "-t", scratchpadname, "-g", "120x34", NULL };
+static const char scratchpadname[] = "Scratch!!";
+static const char *scratchpadcmd[] = {
+    "kitty",
+    "--title", scratchpadname,
+    "--override", "initial_window_width=120c",
+    "--override", "initial_window_height=34c",
+    NULL
+};
+
 static const Key keys[] = {
 	/* modifier                     key        function        argument */
 	{ MODKEY,                       XK_r,      spawn,          {.v = MENU } },

@@ -22,6 +22,7 @@
       vscode
       zoom-us
       xournalpp
+      anydesk
     ])
     ++
     (with unstable; [
