@@ -23,38 +23,41 @@ in
           ];
         });
       };
-      extraConfig = ''
-        ${lib.mkIf (config.networking.hostName == "alpha") ''
-          Section "Device"
-              Identifier "AMD Graphics"
-              Driver "amdgpu"
-              Option "TearFree" "true"
-          EndSection
 
-          Section "Monitor"
-              Identifier "DisplayPort-0"
-              Option "PreferredMode" "2560x1440_180"
-              Option "RightOf" "HDMI-A-0"
-              Modeline "2560x1440_180" 706.00 2560 2568 2600 2670 1440 1443 1448 1470 +hsync -vsync
-              Option "Primary" "true"
-          EndSection
+      extraConfig =
+        if config.networking.hostName == "alpha" then
+          ''
+            Section "Device"
+                    Identifier      "AMD Graphics"
+                    Driver          "amdgpu"
+                    Option          "TearFree" "true"
+            EndSection
 
-          Section "Monitor"
-              Identifier "HDMI-A-0"
-              Option "LeftOf" "DisplayPort-0"
-              Modeline "1920x1080_75" 174.50 1920 1968 2000 2080 1080 1083 1088 1119 +hsync -vsync
-              Option "PreferredMode" "1920x1080_75"
-          EndSection
-        ''}
+            Section "Monitor"
+                Identifier   "DisplayPort-0"
+                Option  "PreferredMode"  "2560x1440_180"
+                Option  "RightOf" "HDMI-A-0"
+                Modeline "2560x1440_180"  706.00  2560 2568 2600 2670  1440 1443 1448 1470 +hsync -vsync
+                Option  "Primary" "true"
+            EndSection
 
-        ${lib.mkIf (config.networking.hostName == "zeta") ''
-          Section "Monitor"
-              Identifier "eDP-1"
-              Option "PreferredMode" "1920x1080_60"
-              Option "Primary" "true"
-          EndSection
-        ''}
-      '';
+            Section "Monitor"
+                Identifier   "HDMI-A-0"
+                Option  "LeftOf" "DisplayPort-0"
+                Modeline "1920x1080_75"  174.50  1920 1968 2000 2080  1080 1083 1088 1119 +hsync -vsync
+                Option  "PreferredMode"  "1920x1080_75"
+            EndSection
+          '' else if config.networking.hostName == "zeta" then
+          ''
+            Section "Monitor"
+                Identifier "eDP-1"
+                Option "PreferredMode" "1920x1080_60"
+                Option "Primary" "true"
+            EndSection
+          '' else
+          ''
+          '';
+
 
 
     };
