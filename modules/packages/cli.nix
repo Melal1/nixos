@@ -20,9 +20,6 @@
       bat
       eza
       fastfetch
-      clipse
-      brightnessctl
-      matugen
 
       fish
       fzf
@@ -35,9 +32,7 @@
       lsd
       cmake
       gnumake
-      premake
       yt-dlp
-      wireguard-tools
       home-manager
       vdhcoapp
       bear
@@ -47,15 +42,10 @@
       ### ──────────────────────
       ###  Media & Graphics (CLI)
       ### ──────────────────────
-      ffmpeg
-      imagemagick
-      cava
-      grim
       (ncmpcpp.override {
         visualizerSupport = true;
         clockSupport = true;
       })
-      zathura
       sioyek
 
       ### ──────────────────────
@@ -63,15 +53,28 @@
       ### ──────────────────────
       lazygit
       # Conditional btop depending on hostname
-      (if config.networking.hostName == "alpha" then pkgs.btop-rocm else pkgs.btop)
       yazi
-    ])
-    ++
+      cava
+    ]) ++
+
     (with unstable;
     [
       neovim
       tree-sitter
-      swww
-    ]);
-}
+    ]) ++
 
+    (if config.networking.hostName == "zeta" then
+      (with pkgs; [
+        btop
+        brightnessctl
+      ])
+    else if config.networking.hostName == "alpha" then
+      (with pkgs; [
+        btop-rocm
+        ffmpeg
+        imagemagick
+        premake
+      ])
+    else
+      [ ]);
+}

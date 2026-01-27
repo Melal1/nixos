@@ -1,35 +1,22 @@
 { pkgs, unstable, config, ... }: {
   environment.systemPackages =
     (with pkgs; [
-      gnome-frog
-      st
-      neovide
       protonvpn-gui
-      filezilla
-      puddletag
       papirus-icon-theme
       apple-cursor
-      bibata-cursors
       unoconv
       kdePackages.dolphin
       localsend
-      firefox
       # todoist-electron
       vlc
-      mpv
       gdbgui
       # obsidian
-      vscode
-      zoom-us
       xournalpp
-      anydesk
     ])
     ++
     (with unstable; [
-      nmgui
       discord
       kitty
-      vesktop
     ])
     ++
     (if config.networking.hostName == "zeta" then
@@ -38,8 +25,15 @@
         winetricks
       ])
     else if config.networking.hostName == "alpha" then
-
       (with pkgs; [
+       puddletag
+       anydesk
+       neovide
+       mpv
+       vscode
+       gnome-frog
+       zoom-us
+       vesktop
         prismlauncher
       ])
     else
