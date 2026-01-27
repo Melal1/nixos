@@ -11,12 +11,15 @@ in
     environment.systemPackages = with pkgs; [
       wl-clipboard
       rofi
+      nmgui
       wlogout
       hyprpicker
+      grim
       nwg-displays
       waybar
       hyprshot
       swaynotificationcenter
+      swww
     ];
   };
 }
