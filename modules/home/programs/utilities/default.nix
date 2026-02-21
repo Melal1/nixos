@@ -5,6 +5,7 @@
     ./mpd.nix
     ./yazi.nix
     ./ncmpcpp
+    ./lazygit
   ];
 
   home.file.".config/tmux/tmux.conf" = {

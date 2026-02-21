@@ -29,7 +29,7 @@
       nmgui
       discord
       kitty
-      vesktop
+      vicinae
     ])
     ++
     (if config.networking.hostName == "zeta" then

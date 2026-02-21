@@ -1,4 +1,4 @@
-{ hostname, windowManager, lib, ... }:
+{ hostname, windowManager, lib, pkgs, ... }:
 
 {
   home.sessionPath = [ "$HOME/.local/bin" ];
@@ -30,7 +30,7 @@
         executable = true;
       };
       ".local/bin/open-github-tmux" = {
-        source = ./open-github.sh;
+        source = ./open-github-tmux.sh;
         executable = true;
       };
       ".local/bin/cir.sh" = {
@@ -43,38 +43,46 @@
       };
     }
 
-     (lib.mkIf (hostname == "zeta" && windowManager == "hyprland") {
-        ".local/bin/DisableHyprlandEffects" = {
-          source = ./DisableHyprlandEffects.sh;
-          executable = true;
-        };
-      })
+    (lib.mkIf (hostname == "zeta" && windowManager == "hyprland") {
+      ".local/bin/DisableHyprlandEffects" = {
+        source = ./DisableHyprlandEffects.sh;
+        executable = true;
+      };
+    })
 
-     (lib.mkIf (windowManager == "hyprland") {
-        ".local/bin/wlogout-script" = {
-          source = ./wlogout.sh;
+    (lib.mkIf (windowManager == "hyprland") {
+      ".local/bin/wlogout-script" = {
+        source = ./wlogout.sh;
+        executable = true;
+      };
+      ".local/bin/THEMS.sh" = {
+        source = ./Themeswitcher.sh;
+        executable = true;
+      };
+      ".local/bin/wallSet" = {
+        source = ./wallSet;
+        executable = true;
+      };
+      ".local/bin/wallSet.py" = {
+        source = ./wall.py;
+        executable = true;
+      };
+    })
+    (
+      lib.mkIf (pkgs ? gh) {
+        ".local/bin/vicinaegithub.sh" = {
+          source = ./vicinae-github.sh;
           executable = true;
         };
-        ".local/bin/THEMS.sh" = {
-          source = ./Themeswitcher.sh;
-          executable = true;
-        };
-        ".local/bin/wallSet" = {
-          source = ./wallSet;
-          executable = true;
-        };
-        ".local/bin/wallSet.py" = {
-          source = ./wall.py;
-          executable = true;
-        };
-      })
+      }
+    )
 
-     # (lib.mkIf (windowManager == "dwm") {
-     #    ".local/bin/DWMAUTOSTART.sh" = {
-     #      source = ./DWMAUTOSTART.sh;
-     #      executable = true;
-     #    };
-     #  })
+    # (lib.mkIf (windowManager == "dwm") {
+    #    ".local/bin/DWMAUTOSTART.sh" = {
+    #      source = ./DWMAUTOSTART.sh;
+    #      executable = true;
+    #    };
+    #  })
   ];
 }
 

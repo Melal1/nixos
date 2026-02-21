@@ -2,7 +2,6 @@
   description = "First!";
 
   inputs = {
-    vicinae.url = "github:vicinaehq/vicinae";
     nixpkgs25_05.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -17,7 +16,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs25_05, nixpkgs-unstable, home-manager, zen-browser, vicinae, quickshell }@inputs:
+  outputs = { self, nixpkgs, nixpkgs25_05, nixpkgs-unstable, home-manager, zen-browser, quickshell }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
@@ -37,19 +36,11 @@
             ({ pkgs, oldsht, ... }: {
               environment.systemPackages = [
                 zen-browser.packages.${system}.default
-                vicinae.packages.${system}.default
                 quickshell.packages.${system}.default
                 oldshit.clang-tools
               ];
             })
-
-
-
-
-
           ];
-
-
         };
 
         zeta = nixpkgs.lib.nixosSystem {
@@ -62,7 +53,6 @@
             ({ pkgs, ... }: {
               environment.systemPackages = [
                 zen-browser.packages.${system}.default
-                vicinae.packages.${system}.default
                 oldshit.clang-tools
               ];
             })
@@ -78,7 +68,6 @@
             hostname = "alpha";
           };
           modules = [
-            vicinae.homeManagerModules.default
             ./modules/home
           ];
         };
@@ -89,7 +78,6 @@
             hostname = "zeta";
           };
           modules = [
-            vicinae.homeManagerModules.default
             ./modules/home
           ];
         };

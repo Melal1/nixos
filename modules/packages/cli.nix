@@ -8,6 +8,7 @@
       libnotify
       xdg-user-dirs
       jq
+      delta
       lolcat
       figlet
       timer
