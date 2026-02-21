@@ -8,6 +8,5 @@
     ./dev/languages.nix
     ./dev/libs.nix
     ./fonts.nix
-
   ];
 }

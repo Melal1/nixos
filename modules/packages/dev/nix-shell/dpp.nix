@@ -1,12 +1,12 @@
 { pkgs }:
 
 pkgs.mkShell {
-  packages = [ pkgs.dpp pkgs.gcc pkgs.gnumake pkgs.cmake ];
-
+  packages = [ pkgs.dpp pkgs.opusfile pkgs.liboggz pkgs.fmt pkgs.gcc pkgs.gnumake pkgs.cmake  ];
   shellHook = ''
-    if command -v fish >/dev/null 2>&1; then
-        exec fish --login
-    fi
+      # Only switch to fish if we are not already in fish
+    if [ -t 1 ] && [ -z "$FISH" ] && command -v fish >/dev/null 2>&1; then
+      exec fish --login
   '';
+
 }
 

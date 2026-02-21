@@ -6,9 +6,12 @@
       ###  CLI Utilities
       ### ──────────────────────
       libnotify
+      xdg-user-dirs
       jq
       lolcat
+      figlet
       timer
+      browsh
       mpc
       playerctl
       tmux
@@ -23,6 +26,7 @@
       clipse
       brightnessctl
       matugen
+      codex
 
       fish
       fzf
@@ -51,6 +55,7 @@
       imagemagick
       cava
       grim
+      asciiquarium
       (ncmpcpp.override {
         visualizerSupport = true;
         clockSupport = true;

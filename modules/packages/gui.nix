@@ -1,9 +1,9 @@
 { pkgs, unstable, config, ... }: {
   environment.systemPackages =
     (with pkgs; [
-      gnome-frog
       st
       neovide
+      normcap
       protonvpn-gui
       filezilla
       puddletag
@@ -41,6 +41,8 @@
 
       (with pkgs; [
         prismlauncher
+        logisim-evolution
+        qpwgraph
       ])
     else
       [ ]);
