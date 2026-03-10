@@ -93,6 +93,7 @@ in
       pamixer
       feh
       xcolor
+      picom
       dunst
       flameshot
     ];

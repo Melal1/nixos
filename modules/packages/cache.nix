@@ -1,3 +1,4 @@
+{ pkgs, ... }:
 {
   nix.settings = {
     extra-substituters = [ "https://vicinae.cachix.org" ];

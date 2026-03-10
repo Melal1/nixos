@@ -30,8 +30,7 @@ in
         "${hyprConfDir}/keybinds/alpha-keybinds.conf"
       else if hostname == "zeta" then
         "${hyprConfDir}/keybinds/zeta-keybinds.conf"
-      else
-        "/dev/null"
+      else "/dev/null"
     );
 
   home.file.".config/hypr/decorations/host.conf".source =

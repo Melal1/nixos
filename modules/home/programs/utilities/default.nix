@@ -1,13 +1,16 @@
+{ windowManager,... }:
 {
-  imports = [
+  imports = ([
     ./git.nix
-    ./fetch.nix
+    ./fastfetch.nix
     ./mpd.nix
-    ./yazi.nix
+    ./yazi
     ./ncmpcpp
     ./lazygit
-  ];
-
+  ])
+  ++ (if windowManager == "hyprland" then [ ./swaync ]
+  else if windowManager == "dwm" then [ ./picom.nix ]
+  else [ ]);
   home.file.".config/tmux/tmux.conf" = {
     source = ./config/tmux.conf;
   };

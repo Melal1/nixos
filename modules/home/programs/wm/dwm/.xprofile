@@ -16,4 +16,6 @@ xwinwrap -g 1920x1080+0+0 -ni -un -st -sp -b -nf -ov \
   -- mpv --cache=no --vo=gpu --hwdec=vaapi --loop --mute=yes \
   --stop-screensaver=no -wid WID ~/Videos/Wall/rainFhd.webm &
 
+picom &
+
 xset r 200 30 &

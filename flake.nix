@@ -2,7 +2,6 @@
   description = "First!";
 
   inputs = {
-    nixpkgs25_05.url = "github:NixOS/nixpkgs/nixos-25.05";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
@@ -16,12 +15,11 @@
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs25_05, nixpkgs-unstable, home-manager, zen-browser, quickshell }@inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, zen-browser, quickshell }@inputs:
     let
       system = "x86_64-linux";
       pkgs = import nixpkgs { inherit system; };
       unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
-      oldshit = import nixpkgs25_05 { inherit system; };
       windowManager = "dwm";
     in
     {
@@ -33,11 +31,10 @@
           inherit system;
           modules = [
             ./hosts/desktop
-            ({ pkgs, oldsht, ... }: {
+            ({ pkgs, ... }: {
               environment.systemPackages = [
                 zen-browser.packages.${system}.default
                 quickshell.packages.${system}.default
-                oldshit.clang-tools
               ];
             })
           ];
@@ -53,7 +50,6 @@
             ({ pkgs, ... }: {
               environment.systemPackages = [
                 zen-browser.packages.${system}.default
-                oldshit.clang-tools
               ];
             })
           ];

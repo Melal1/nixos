@@ -8,6 +8,7 @@
       libnotify
       xdg-user-dirs
       jq
+      discord
       delta
       lolcat
       figlet
@@ -24,15 +25,9 @@
       bat
       eza
       fastfetch
-      clipse
-      brightnessctl
-      matugen
-      codex
-
       fish
       fzf
       grc
-
       starship
       moreutils
       yarn
@@ -42,42 +37,47 @@
       gnumake
       premake
       yt-dlp
-      wireguard-tools
       home-manager
       vdhcoapp
       bear
       tealdeer
       smassh
-
-      ### ──────────────────────
-      ###  Media & Graphics (CLI)
-      ### ──────────────────────
       ffmpeg
-      imagemagick
-      cava
-      grim
       asciiquarium
       (ncmpcpp.override {
         visualizerSupport = true;
         clockSupport = true;
       })
-      zathura
-      sioyek
-
-      ### ──────────────────────
-      ###  TUI
-      ### ──────────────────────
       lazygit
-      # Conditional btop depending on hostname
-      (if config.networking.hostName == "alpha" then pkgs.btop-rocm else pkgs.btop)
       yazi
     ])
     ++
+    (
+      if config.networking.hostName == "alpha" then
+
+        (with pkgs; [
+          btop-rocm
+          imagemagick
+          cava
+          qpwgraph
+        ])
+      else if config.networking.hostName == "zeta" then
+        (with pkgs; [
+          btop
+          brightnessctl
+        ])
+      else
+        [ ]
+    )
+    ++
     (with unstable;
     [
+      codex
       neovim
       tree-sitter
-      swww
     ]);
 }
 
+# swww
+# matugen
+# grim

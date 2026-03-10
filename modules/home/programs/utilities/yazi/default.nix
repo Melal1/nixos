@@ -5,8 +5,8 @@
     enableFishIntegration = true;
     shellWrapperName = "y";
     flavors = {
-      onedark = ./config/yazi/flavors/onedark.yazi;
-      rose-pine = ./config/yazi/flavors/rose-pine.yazi;
+      onedark = ./flavors/onedark.yazi;
+      rose-pine = ./flavors/rose-pine.yazi;
     };
     theme = {
       flavor =

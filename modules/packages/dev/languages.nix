@@ -1,25 +1,32 @@
-{ pkgs, unstable, ... }: {
+{ pkgs, config, unstable, ... }: {
   environment.systemPackages = (with pkgs; [
 
     ### ──────────────────────
     ### Programming Languages
     ### ──────────────────────
-    cargo # Rust package manager and build tool
-    python3 # Python interpreter
-    nodejs # JavaScript runtime
-    typescript # Typescript
-    go # Go programming language
     vscode-extensions.ms-vscode.cpptools
     gdb
     lua
-    clang # LLVM-based C/C++ compiler
-    gcc # GNU C Compiler
-    glibc
-    kdePackages.qtdeclarative
-
-    ### ──────────────────────
-    ### Compilers
-    ### ──────────────────────
+  ])
+  ++ (
+    if config.networking.hostName == "alpha" then
+      (with pkgs; [
+        cargo # Rust package manager and build tool
+        python3 # Python interpreter
+        nodejs # JavaScript runtime
+        typescript # Typescript
+        kdePackages.qtdeclarative
+        go # Go programming language
+      ])
+    else if config.networking.hostName == "zeta" then
+      (with pkgs; [
+      ])
+    else
+      [ ]
+  ) ++
+  (with unstable ;[
+    clang
+    gcc
   ]);
 
 }

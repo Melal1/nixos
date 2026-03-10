@@ -7,8 +7,4 @@
       false
 
   );
-  networking.nftables.enable = false;
-
-
-
 }

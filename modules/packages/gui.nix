@@ -1,12 +1,8 @@
 { pkgs, unstable, config, ... }: {
   environment.systemPackages =
     (with pkgs; [
-      st
-      neovide
       normcap
       protonvpn-gui
-      filezilla
-      puddletag
       papirus-icon-theme
       apple-cursor
       bibata-cursors
@@ -14,15 +10,14 @@
       kdePackages.dolphin
       localsend
       firefox
+      brave
       # todoist-electron
-      vlc
+      sioyek
       mpv
       gdbgui
       # obsidian
-      vscode
-      zoom-us
       xournalpp
-      anydesk
+      vscode
     ])
     ++
     (with unstable; [
@@ -36,13 +31,22 @@
       (with pkgs; [
         wineWowPackages.stable
         winetricks
+        vscode
       ])
     else if config.networking.hostName == "alpha" then
 
       (with pkgs; [
         prismlauncher
         logisim-evolution
+        puddletag
+        vlc
+        neovide
         qpwgraph
+        anydesk
+      ])
+      ++
+      (with unstable;[
+        vesktop
       ])
     else
       [ ]);
