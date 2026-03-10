@@ -28,6 +28,10 @@
     clang
     gcc
   ]);
+  programs.java = {
+    enable = true;
+    package = pkgs.jdk21_headless;
+  };
 
 }
 

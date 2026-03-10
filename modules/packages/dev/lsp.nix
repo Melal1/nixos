@@ -22,8 +22,14 @@
     # --- json ---
     nodePackages_latest.vscode-json-languageserver
 
+    # --- java ---
+    jdt-language-server
+
+
     # --- General / Misc ---
     harper # English grammar and style checker
+
+
   ])
   ++ (
     if config.networking.hostName == "alpha" then
