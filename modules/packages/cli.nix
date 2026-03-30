@@ -33,7 +33,10 @@
       yarn
       lsof
       lsd
+
       cmake
+      gradle
+
       gnumake
       premake
       yt-dlp

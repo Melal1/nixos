@@ -30,7 +30,7 @@
   ]);
   programs.java = {
     enable = true;
-    package = pkgs.jdk21_headless;
+    package = pkgs.jdk21_headless.override { enableJavaFX = true; };
   };
 
 }

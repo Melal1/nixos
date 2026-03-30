@@ -55,6 +55,7 @@
     clang-tools
   ])
   ;
+  programs.nix-ld.enable = true;
 }
 
 

@@ -29,8 +29,6 @@
     ++
     (if config.networking.hostName == "zeta" then
       (with pkgs; [
-        wineWowPackages.stable
-        winetricks
         vscode
       ])
     else if config.networking.hostName == "alpha" then
