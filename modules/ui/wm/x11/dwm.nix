@@ -2,6 +2,24 @@
 
 let
   cfg = config.desktop;
+  host = config.networking.hostName;
+
+  blocksH = pkgs.writeText "blocks.h" (
+    if host == "alpha" then ''
+      #define BLOCKS(X) \
+        X("", "awk '/MemTotal/ {t=$2} /MemFree|Buffers|Cached|SReclaimable/ {f+=$2} /Shmem/ {f-=$2} END {printf \"   %.2fG \", (t-f)/1048576}' /proc/meminfo", 1, 2) \
+        X("", "date +'%a %d %b %H:%M'", 60, 1)
+    '' else if host == "zeta" then ''
+      #define BLOCKS(X) \
+        X("", "awk '/MemTotal/ {t=$2} /MemFree|Buffers|Cached|SReclaimable/ {f+=$2} /Shmem/ {f-=$2} END {printf \"   %.2fG \", (t-f)/1048576}' /proc/meminfo", 1, 2) \
+        X("󰁹 ", "acpi -b | awk -F', ' '{print $2}'", 60, 3) \
+        X("", "date +'%a %d %b %H:%M'", 60, 1)
+    '' else ''
+      #define BLOCKS(X) \
+        X("", "date +'%a %d %b %H:%M'", 60, 1)
+    ''
+  );
+
 in
 {
   config = lib.mkIf (cfg.type == "dwm") {
@@ -82,6 +100,9 @@ in
         nativeBuildInputs = [ pkg-config ];
         buildInputs = [ xorg.libX11 fribidi ] ++ builtins.attrValues { inherit (xorg) libxcb xcbutil; };
 
+        preBuild = ''
+          cp ${blocksH} blocks.h
+        '';
         makeFlags = [ "PREFIX=$(out)" ];
 
         meta = {
