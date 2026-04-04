@@ -26,6 +26,9 @@
     jdt-language-server
 
 
+    pyright # LSP for Python
+    ruff # Linter for Python
+    mypy
     # --- General / Misc ---
     harper # English grammar and style checker
 
@@ -35,9 +38,6 @@
     if config.networking.hostName == "alpha" then
       (with pkgs; [
         # --- Python ---
-        pyright # LSP for Python
-        ruff # Linter for Python
-        mypy
         # --- JavaScript / TypeScript / Web ---
         typescript-language-server # LSP for TypeScript & JavaScript
         tailwindcss-language-server # LSP for Tailwind CSS

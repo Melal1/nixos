@@ -1,12 +1,14 @@
 { pkgs, config, unstable, ... }: {
   environment.systemPackages = (with pkgs; [
 
-    ### ──────────────────────
-    ### Programming Languages
-    ### ──────────────────────
     vscode-extensions.ms-vscode.cpptools
     gdb
     lua
+
+    # Build tools
+    cmake
+    gradle
+    gnumake
   ])
   ++ (
     if config.networking.hostName == "alpha" then
@@ -16,6 +18,7 @@
         nodejs # JavaScript runtime
         typescript # Typescript
         kdePackages.qtdeclarative
+        premake
         go # Go programming language
       ])
     else if config.networking.hostName == "zeta" then
