@@ -5,4 +5,5 @@
   fmt = import ./fmt.nix { inherit pkgs; };
   qksh = import ./quikshell.nix { inherit pkgs; };
   javafx = import ./javafx.nix { inherit pkgs; };
+  py = import ./python.nix { inherit pkgs; };
 }
