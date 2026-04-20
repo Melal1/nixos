@@ -8,6 +8,7 @@ let
     p.numpy
     p.matplotlib
     p.opencv-python
+    p.opencv4Full
   ]);
 in
 pkgs.mkShell {

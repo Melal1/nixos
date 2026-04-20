@@ -8,6 +8,8 @@
       libnotify
       xdg-user-dirs
       jq
+      nmap
+      arp-scan
       discord
       delta
       lolcat

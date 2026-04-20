@@ -116,6 +116,8 @@
         v = "nvim";
         vim = "nvim";
         vi = "nvim";
+        toxclip = "xclip -selection clipboard";
+        scan-local-ips = "sudo arp-scan --interface=wlo1 --localnet";
       };
     };
   };
