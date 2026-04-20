@@ -54,9 +54,18 @@
 
         (with pkgs; [
           btop-rocm
+          nmap
           imagemagick
           cava
+          ninja
           qpwgraph
+        ])
+        ++ (with unstable;[
+          opencode
+          claude-code
+          geminicommit
+          gemini-cli
+          codex
         ])
       else if config.networking.hostName == "zeta" then
         (with pkgs; [
@@ -69,7 +78,8 @@
     ++
     (with unstable;
     [
-      codex
+      timr-tui
+      dooit
       neovim
       tree-sitter
     ]);

@@ -11,6 +11,8 @@
       localsend
       firefox
       brave
+      spotify
+      psst
       # todoist-electron
       sioyek
       mpv
@@ -21,7 +23,6 @@
     ])
     ++
     (with unstable; [
-      nmgui
       discord
       kitty
       vicinae
@@ -30,6 +31,7 @@
     (if config.networking.hostName == "zeta" then
       (with pkgs; [
         vscode
+        nmgui
       ])
     else if config.networking.hostName == "alpha" then
 
@@ -45,6 +47,7 @@
       ++
       (with unstable;[
         vesktop
+        opencode-desktop
       ])
     else
       [ ]);
