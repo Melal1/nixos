@@ -30,7 +30,7 @@
       # GENERAL
       connected_message_on_startup = "yes";
       cyclic_scrolling = "yes";
-      mouse_support = "no";
+      mouse_support = "yes";
       mouse_list_scroll_whole_page = "yes";
       lines_scrolled = "1";
       message_delay_time = "1";

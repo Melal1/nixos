@@ -35,7 +35,6 @@
       yarn
       lsof
       lsd
-      yt-dlp
       home-manager
       vdhcoapp
       bear
@@ -64,7 +63,6 @@
         ])
         ++ (with unstable;[
           opencode
-          claude-code
           geminicommit
           gemini-cli
           codex
@@ -82,6 +80,7 @@
     [
       timr-tui
       dooit
+      yt-dlp
       neovim
       tree-sitter
     ]);
