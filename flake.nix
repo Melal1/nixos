@@ -64,7 +64,7 @@
             hostname = "alpha";
           };
           modules = [
-            ./modules/home
+            ./hosts/desktop/home.nix
           ];
         };
         zeta = home-manager.lib.homeManagerConfiguration {
@@ -74,11 +74,11 @@
             hostname = "zeta";
           };
           modules = [
-            ./modules/home
+            ./hosts/laptop/home.nix
           ];
         };
       };
-      devShells.${system} = import ./modules/packages/dev/nix-shell/default.nix { inherit pkgs; };
+      devShells.${system} = import ./modules/nixos/packages/dev/nix-shell/default.nix { inherit pkgs; };
     };
 }
 

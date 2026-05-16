@@ -7,7 +7,9 @@ let
     p.soundfile
     p.numpy
     p.matplotlib
-    p.opencv-python
+    p.opencv4Full
+    p.pyqt6
+    p.pip
   ]);
 in
 pkgs.mkShell {
