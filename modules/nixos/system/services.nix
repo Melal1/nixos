@@ -5,7 +5,9 @@
     extraGraphics.enable = lib.mkEnableOption "Extra graphics groups for user";
   };
 
+
   config = {
+
     services.ollama = {
       enable = config.my.services.ollama.enable;
       package = unstable.ollama-rocm;
@@ -26,6 +28,19 @@
       enable = true;
       pulse.enable = true;
     };
+
+
+    services.sunshine = {
+      enable = true;
+      autoStart = false;
+      # capSysAdmin = true; # only needed for Wayland -- omit this when using with Xorg
+      openFirewall = true;
+      settings = {
+        file_apps = "/home/melal/.config/sunshine/custom_apps.json";
+      };
+    };
+
+    hardware.uinput.enable = true;
 
     services.printing.enable = false;
 

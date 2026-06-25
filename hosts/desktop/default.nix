@@ -18,17 +18,10 @@
     ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
   '';
 
-  my.groups = {
-    desktop.enable = true;
-    dev.enable = true;
-    gaming.enable = true;
-    media.enable = true;
-    network.enable = true;
-    social.enable = true;
-  };
+
 
   my.services = {
-    ollama.enable = true;
+    # ollama.enable = true;
     extraGraphics.enable = true;
   };
 }

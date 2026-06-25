@@ -1,5 +1,5 @@
 /* Use this shell to compile
-nix-shell -p pkg-config SDL2 xorg.libX11 xorg.libXext xorg.libXrender
+nix-shell -p pkg-config SDL2 libX11 libXext libXrender
 */
 
 #include <X11/Xatom.h>

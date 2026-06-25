@@ -10,9 +10,9 @@ let
 
   ld-lib-path-libs = [
     # Required for the JavaFX GUI to actually render on NixOS
-    pkgs.xorg.libXtst
+    pkgs.libXtst
     pkgs.glib
-    pkgs.xorg.libXxf86vm
+    pkgs.libXxf86vm
     pkgs.libGL
   ];
 in

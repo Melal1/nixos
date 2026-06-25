@@ -10,12 +10,7 @@
       bold_font = "auto";
       italic_font = "auto";
       bold_italic_font = "auto";
-      modify_font_cell_width = "96%";
-      modify_font_underline_position = "-2";
-      modify_font_underline_thickness = "150%";
-      modify_font_strikethrough_position = "2px";
       # allow_remote_control = "yes";
-      linux_disable_bracketed_paste = "yes"; # Fixes paste delay
 
 
 
@@ -24,7 +19,6 @@
 
       disable_ligatures = "cursor";
       undercurl_style = "thin-dense";
-      scrollback_indicator_opacity = "0.5";
       mouse_hide_wait = "-1.0";
       url_color = "#FFFFFF";
       url_style = "curly";
@@ -40,7 +34,6 @@
       cursor_trail = "10";
       cursor_trail_start_threshold = "0";
       cursor_trail_decay = "0.01 0.15";
-      cursor_blink = "true";
       window_padding_width = "1";
 
       wheel_scroll_multiplier = "10.0";
@@ -64,7 +57,7 @@
       "ctrl+shift+k" = "scroll_page_up";
       "ctrl+shift+j" = "scroll_page_down";
       "ctrl+j" = "scroll_line_down";
-      "ctrl+k" = "scroll_line_up";
+      # "ctrl+k" = "scroll_line_up";
       "ctrl+shift+c" = "copy_and_clear_or_interrupt";
     };
     extraConfig = ''

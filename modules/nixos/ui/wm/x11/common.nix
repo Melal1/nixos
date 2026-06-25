@@ -23,8 +23,9 @@ in
     };
 
     environment.systemPackages = with pkgs; [
-      xorg.xrandr
-      xorg.xsetroot
+      xrandr
+      xsetroot
+      normcap
       xclip
     ];
 

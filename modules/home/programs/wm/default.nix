@@ -2,6 +2,7 @@
 {
   imports =
     if windowManager == "hyprland" then [ ./hyprland ]
-    else if windowManager == "dwm" then [./dwm ]
+    else if windowManager == "dwm" then [ ./dwm ]
+    else if windowManager == "niri" then [ ./niri ]
     else [ ];
 }

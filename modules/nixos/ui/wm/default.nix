@@ -1,6 +1,6 @@
-{windowManager ,...}:
+{ windowManager, ... }:
 
 {
   imports = [ ./config.nix ];
-  desktop.type = windowManager ;
+  desktop.type = windowManager;
 }

@@ -9,9 +9,11 @@
       pkill -f 'mpv .* -wid ' 2>/dev/null
       pkill .vicinae-wrappe 2>/dev/null
       pkill dwmblocks 2>/dev/null
+      pkill prayer
 
       vicinae server &
       dwmblocks &
+      prayer -b &
     ''
     + (
       if hostname == "alpha" then

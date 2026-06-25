@@ -19,7 +19,7 @@ marker_selected = { fg = "#ABB2BF", bg = "#E5C07B" }  # Light gray on Orange
 # Tab
 tab_active = { bg = "#282C34", fg = "#61AFEF" }  # Darkened background, Blue text
 tab_inactive = {}
-tab_width = 1
+
 
 # Count
 count_copied = { fg = "#98C379", bg = "#282C34" }  # Green on Darkened background
@@ -144,8 +144,8 @@ rules = [
     { mime = "application/vnd.*", fg = "#98C379" },  # Green
 
     # Fallback
-    { name = "*", fg = "#ABB2BF" },  # Blue
-    { name = "*/", fg = "#61AFEF" }  # Blue
+    { url = "*", fg = "#ABB2BF" },  # Blue
+    { url = "*/", fg = "#61AFEF" }  # Blue
 ]
 
 # : }}}

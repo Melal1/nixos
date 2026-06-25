@@ -13,10 +13,5 @@
 
   networking.hostName = "zeta"; 
 
-  my.groups = {
-    desktop.enable = true;
-    laptop.enable = true;
-    network.enable = true;
-    dev.enable = true;
-  };
+
 }

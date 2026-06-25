@@ -1,6 +1,8 @@
 { lib
 , stdenv
-, xorg
+, libX11
+, libXext
+, libXrender
 }:
 
 stdenv.mkDerivation {
@@ -10,9 +12,9 @@ stdenv.mkDerivation {
   src = lib.cleanSource ./.;
 
   buildInputs = [
-    xorg.libX11
-    xorg.libXext
-    xorg.libXrender
+    libX11
+    libXext
+    libXrender
   ];
 
   buildPhase = ''
