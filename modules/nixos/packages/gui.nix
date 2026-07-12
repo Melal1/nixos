@@ -11,6 +11,7 @@
       mpv
       gdbgui
       xournalpp
+      element-desktop
       vscode
       firefox
       kdePackages.dolphin
@@ -56,7 +57,6 @@
     else
       [ ]);
 
-  programs.kdeconnect.enable = true;
   programs.steam = {
     enable = config.networking.hostName == "alpha";
 

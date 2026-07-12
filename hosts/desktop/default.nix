@@ -1,4 +1,3 @@
-{ pkgs, unstable, ... }:
 {
   imports = [
     ./hardware/configuration.nix
@@ -10,10 +9,11 @@
     ../../modules/nixos/hardware/gpu/amd.nix
     ../../modules/nixos/hardware/bluetooth.nix
     ../../modules/nixos/hardware/performance.nix
+    ./kernel.nix
   ];
-  
+
   networking.hostName = "alpha";
-  
+
   services.udev.extraRules = ''
     ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
   '';

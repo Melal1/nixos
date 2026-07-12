@@ -39,6 +39,7 @@
         file_apps = "/home/melal/.config/sunshine/custom_apps.json";
       };
     };
+    services.zerotierone.enable = true;
 
     hardware.uinput.enable = true;
 

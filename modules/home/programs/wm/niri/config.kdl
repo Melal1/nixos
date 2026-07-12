@@ -11,6 +11,7 @@ prefer-no-csd
 
 // Input device configuration.
 // Find the full list of options on the wiki:
+
 // https://niri-wm.github.io/niri/Configuration:-Input
 input {
   mod-key "Super"
@@ -28,7 +29,7 @@ input {
     // Omitting settings disables them, or leaves them at their default values.
     // All commented-out settings here are examples, not defaults.
     touchpad {
-        off
+        // off
         tap
     }
 
@@ -262,13 +263,11 @@ layout {
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 
-spawn-at-startup "xwayland-satellite"
-spawn-sh-at-startup "prayer -b"
+// spawn-sh-at-startup "xwayland-satellite"
+spawn-sh-at-startup "pkill prayer; sleep 0.5; prayer -r \"Saudi Arabia, Al Aziziyah\" -b --bar-12h"
 spawn-at-startup "qs"
-spawn-sh-at-startup "pkill vicinae; sleep 0.5 ; vicinae server"
-// spawn-sh-at-startup "mpvpaper -vs -o \"no-audio loop --vo=gpu --hwdec=vaapi\" DP-1 ~/Videos/Wall/rain2k.webm -p"
-// spawn-sh-at-startup "mpvpaper -vs -o \"no-audio loop --vo=gpu --hwdec=vaapi\" HDMI-A-1 ~/Videos/Wall/rainFhd.webm -p"
-spawn-sh-at-startup "walls.sh"
+// spawn-sh-at-startup "pkill vicinae; sleep 0.5; vicinae server"
+// spawn-sh-at-startup "walls.sh"
 
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
@@ -577,7 +576,7 @@ binds {
 
     // Cycle through widths set in preset-column-widths.
     // Mod+R { switch-preset-column-width; } //TODO: Figure this
-    Mod+R { spawn-sh "vicinae open";}
+    Mod+R { spawn-sh "quickshell ipc call pill toggle_surface launcher";}
     // Cycling through the presets in reverse order is also possible.
     Mod+Shift+R { switch-preset-column-width-back; }
 
@@ -619,7 +618,9 @@ binds {
     Mod+Shift+Equal { set-window-height "+10%"; }
 
     // Move the focused window between the floating and the tiling layout.
-    Mod+V       { toggle-window-floating; }
+    Mod+V { spawn-sh "quickshell ipc call pill toggle_surface clipboard"; }
+
+    Mod+Ctrl+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
 
     // Toggle tabbed column display mode.

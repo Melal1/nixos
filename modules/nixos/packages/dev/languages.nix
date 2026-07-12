@@ -8,11 +8,12 @@
     cmake
     gradle
     gnumake
+    cargo # Rust package manager and build tool
+    bun
   ])
   ++ (
     if config.networking.hostName == "alpha" then
       (with pkgs; [
-        cargo # Rust package manager and build tool
         python3 # Python interpreter
         nodejs # JavaScript runtime
         typescript # Typescript

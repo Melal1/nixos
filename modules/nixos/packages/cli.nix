@@ -8,6 +8,7 @@
       libnotify
       xdg-user-dirs
       jq
+      speedtest-cli
       nmap
       arp-scan
       discord
@@ -27,6 +28,7 @@
       bat
       eza
       fastfetch
+      codex
       fish
       fzf
       grc
@@ -61,7 +63,6 @@
         ])
         ++ (with unstable;[
           opencode
-          geminicommit
           codex
         ])
       else if config.networking.hostName == "zeta" then
@@ -82,6 +83,7 @@
       zip
       yt-dlp
       rar
+      geminicommit
       ffmpeg
     ]);
 }

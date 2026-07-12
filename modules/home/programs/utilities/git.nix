@@ -1,8 +1,5 @@
 {
   programs.git = {
-    # extraConfig = {
-    #   init.defaultBranch = "main";
-    # };
     enable = true;
     settings = {
       init.defaultbranch = "main";
