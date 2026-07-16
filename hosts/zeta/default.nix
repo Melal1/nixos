@@ -5,6 +5,7 @@
     ../../users
     ../../modules/nixos
     ../../profiles/workstation.nix
+    inputs.pi.nixosModules.default
   ];
 
   networking.hostName = "zeta";
@@ -23,4 +24,7 @@
       inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
       inputs.zen-browser.packages.${sys}.default
     ];
+  programs.pi.coding-agent = {
+    enable = true;
+  };
 }

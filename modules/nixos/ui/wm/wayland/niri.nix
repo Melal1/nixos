@@ -52,7 +52,8 @@ in
         partOf = [ "graphical-session.target" ];
 
         serviceConfig = {
-          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' eDP-1 %h/Videos/Wall/rainFhd.webm";
+          # ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' eDP-1 %h/Videos/Wall/rainFhd.webm";
+          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' HDMI-A-1 %h/Videos/Wall/rainFhd.webm";
           Restart = "always";
           RestartSec = "2";
           RuntimeMaxSec = "1800";

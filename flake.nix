@@ -8,12 +8,17 @@
       url = "github:cushycush/qml-language-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # NOTE: local-path input; this flake only evaluates on machines that have
-    # /home/melal/Dev/projects/cpp/mrem checked out.
-    music-sep = {
-      url = "git+file:/home/melal/Dev/projects/cpp/mrem";
+    pi = {
+      url = "github:lukasl-dev/pi.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # NOTE: local-path input; this flake only evaluates on machines that have
+    # /home/melal/Dev/projects/cpp/mrem checked out.
+    # music-sep = {
+    #   url = "git+file:/home/melal/Dev/projects/cpp/mrem";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
 
     ditto = {
       url = "github:Melal1/ditto";
