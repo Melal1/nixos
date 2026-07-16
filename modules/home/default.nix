@@ -1,12 +1,9 @@
-{ lib, ... }:
+{ config, lib, ... }:
 {
-  options.my.home = {
-    waybar.theme = lib.mkOption {
-      type = lib.types.str;
-      default = "zeta";
-      description = "Theme for Waybar config (e.g., 'alpha-v' or 'zeta')";
-    };
-    scripts.disableHyprlandEffects = lib.mkEnableOption "Disable Hyprland effects script";
+  options.my.home.dotfilesDir = lib.mkOption {
+    type = lib.types.str;
+    default = "${config.home.homeDirectory}/.dotfiles/nixos";
+    description = "Absolute path to this repo checkout, used for out-of-store symlinks.";
   };
 
   imports = [
@@ -16,6 +13,7 @@
     ./scripts
     ./programs/utilities
     ./programs/wm
+    ./programs/bars/waybar
     ./gtk.nix
     ./assets
   ];

@@ -1,81 +1,24 @@
 { config, hostname, ... }:
 let
-  hyprConfDir = "${config.home.homeDirectory}/.dotfiles/nixos/modules/home/programs/wm/hyprland";
+  hyprConfDir = "${config.my.home.dotfilesDir}/modules/home/programs/wm/hyprland";
+  link = config.lib.file.mkOutOfStoreSymlink;
 in
 {
-  home.file.".config/hypr/hyprland.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/source.conf";
+  home.file = {
+    ".config/hypr/hyprland.conf".source = link "${hyprConfDir}/source.conf";
+    ".config/hypr/autostart.conf".source = link "${hyprConfDir}/autostart.conf";
+    ".config/hypr/input.conf".source = link "${hyprConfDir}/input.conf";
+    ".config/hypr/misc.conf".source = link "${hyprConfDir}/misc.conf";
+    ".config/hypr/programs.conf".source = link "${hyprConfDir}/programs.conf";
+    ".config/hypr/windowrules.conf".source = link "${hyprConfDir}/windowrules.conf";
+    ".config/hypr/keybinds/keybindings.conf".source = link "${hyprConfDir}/keybinds/keybindings.conf";
 
-  home.file.".config/hypr/autostart.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/autostart.conf";
-
-  home.file.".config/hypr/input.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/input.conf";
-
-  home.file.".config/hypr/misc.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/misc.conf";
-
-  home.file.".config/hypr/programs.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/programs.conf";
-
-  home.file.".config/hypr/windowrules.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/windowrules.conf";
-
-  home.file.".config/hypr/keybinds/keybindings.conf".source =
-    config.lib.file.mkOutOfStoreSymlink "${hyprConfDir}/keybinds/keybindings.conf";
-
-  home.file.".config/hypr/keybinds/host-keybinds.conf".source =
-    config.lib.file.mkOutOfStoreSymlink (
-      if hostname == "alpha" then
-        "${hyprConfDir}/keybinds/alpha-keybinds.conf"
-      else if hostname == "zeta" then
-        "${hyprConfDir}/keybinds/zeta-keybinds.conf"
-      else "/dev/null"
-    );
-
-  home.file.".config/hypr/decorations/host.conf".source =
-    config.lib.file.mkOutOfStoreSymlink (
-      if hostname == "alpha" then
-        "${hyprConfDir}/decorations/alpha-decorration.conf"
-      else if hostname == "zeta" then
-        "${hyprConfDir}/decorations/zeta-decorration.conf"
-      else
-        "/dev/null"
-    );
-
-  home.file.".config/hypr/animations/host.conf".source =
-    config.lib.file.mkOutOfStoreSymlink (
-      if hostname == "alpha" then
-        "${hyprConfDir}/animations/alpha.conf"
-      else if hostname == "zeta" then
-        "${hyprConfDir}/animations/zeta.conf"
-      else
-        "/dev/null"
-    );
-
-  home.file.".config/hypr/monitors/host.conf".source =
-    config.lib.file.mkOutOfStoreSymlink (
-      if hostname == "alpha" then
-        "${hyprConfDir}/monitors/alpha.conf"
-      else if hostname == "zeta" then
-        "${hyprConfDir}/monitors/zeta.conf"
-      else
-        "/dev/null"
-    );
-
-  home.file.".config/hypr/workspaces/host.conf".source =
-    config.lib.file.mkOutOfStoreSymlink (
-      if hostname == "alpha" then
-        "${hyprConfDir}/workspaces/alpha.conf"
-      else if hostname == "zeta" then
-        "${hyprConfDir}/workspaces/zeta.conf"
-      else
-        "/dev/null"
-    );
-  imports = [
-    ../../bars/waybar
-    ../../utilities/swaync
-
-  ];
+    # Host-specific fragments: files are named after the host, so a new host
+    # only needs matching <hostname>.conf files, no module changes.
+    ".config/hypr/keybinds/host-keybinds.conf".source = link "${hyprConfDir}/keybinds/${hostname}-keybinds.conf";
+    ".config/hypr/decorations/host.conf".source = link "${hyprConfDir}/decorations/${hostname}-decorration.conf";
+    ".config/hypr/animations/host.conf".source = link "${hyprConfDir}/animations/${hostname}.conf";
+    ".config/hypr/monitors/host.conf".source = link "${hyprConfDir}/monitors/${hostname}.conf";
+    ".config/hypr/workspaces/host.conf".source = link "${hyprConfDir}/workspaces/${hostname}.conf";
+  };
 }
-

@@ -1,6 +1,8 @@
 { windowManager, lib, pkgs, config, ... }:
 
 {
+  options.my.home.scripts.disableHyprlandEffects = lib.mkEnableOption "Disable Hyprland effects script";
+
   config = {
     home.sessionPath = [ "$HOME/.local/bin" ];
 
