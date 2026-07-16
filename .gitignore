@@ -1,17 +1,18 @@
 todo.md
-modules/home/programs/wm/dwm/.cache/clangd/index
-modules/home/programs/wm/dwm/config.def.h.orig
-modules/home/programs/wm/dwm/config.def.h.orig
-modules/home/programs/wm/dwm/config.def.h.orig
-modules/home/programs/wm/dwm/config.def.h.rej
-modules/home/programs/wm/dwm/config.h
-modules/home/programs/wm/dwm/config.mk.orig
-modules/home/programs/wm/dwm/config.mk.rej
-modules/home/programs/wm/dwm/drw.o
-modules/home/programs/wm/dwm/dwm
-modules/home/programs/wm/dwm/dwm
-modules/home/programs/wm/dwm/dwm.c.orig
-modules/home/programs/wm/dwm/dwm.c.rej
-modules/home/programs/wm/dwm/dwm.o
-modules/home/programs/wm/dwm/util.o
 /.antigravitycli
+
+# dwm build artifacts
+pkgs/dwm/.cache/
+pkgs/dwm/config.def.h.orig
+pkgs/dwm/config.def.h.rej
+pkgs/dwm/config.h
+pkgs/dwm/config.mk.orig
+pkgs/dwm/config.mk.rej
+pkgs/dwm/*.o
+pkgs/dwm/dwm
+pkgs/dwm/dwm.c.orig
+pkgs/dwm/dwm.c.rej
+
+# dwmblocks-async build artifacts
+pkgs/dwmblocks-async/build/
+pkgs/dwmblocks-async/dwmblocks

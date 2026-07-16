@@ -7,12 +7,12 @@ let
   blocksH = pkgs.writeText "blocks.h" (
     if host == "alpha" then ''
       #define BLOCKS(X) \
-        X("  ", "file:/dev/shm/prayer_status", 1, 3)\
-        X("", "awk '/MemTotal/ {t=$2} /MemFree|Buffers|Cached|SReclaimable/ {f+=$2} /Shmem/ {f-=$2} END {printf \"  %.2fG\", (t-f)/1048576}' /proc/meminfo", 1, 2) \
+        X("  ", "file:/dev/shm/prayer_status", 1, 3)\
+        X("", "awk '/MemTotal/ {t=$2} /MemFree|Buffers|Cached|SReclaimable/ {f+=$2} /Shmem/ {f-=$2} END {printf \"  %.2fG\", (t-f)/1048576}' /proc/meminfo", 1, 2) \
         X("", "date +'%a %d %b %H:%M'", 60, 1) \
     '' else if host == "zeta" then ''
       #define BLOCKS(X) \
-        X("", "awk '/MemTotal/ {t=$2} /MemFree|Buffers|Cached|SReclaimable/ {f+=$2} /Shmem/ {f-=$2} END {printf \"   %.2fG \", (t-f)/1048576}' /proc/meminfo", 1, 2) \
+        X("", "awk '/MemTotal/ {t=$2} /MemFree|Buffers|Cached|SReclaimable/ {f+=$2} /Shmem/ {f-=$2} END {printf \"   %.2fG \", (t-f)/1048576}' /proc/meminfo", 1, 2) \
         X("󰁹 ", "acpi -b | awk -F', ' '{print $2}'", 60, 3) \
         X("", "date +'%a %d %b %H:%M'", 60, 1)
     '' else ''
@@ -30,17 +30,7 @@ in
 
       windowManager.dwm = {
         enable = true;
-        package = pkgs.dwm.overrideAttrs (old: {
-          src = ../../../../home/programs/wm/dwm;
-          buildInputs = (old.buildInputs or [ ]) ++ [
-            pkgs.libX11
-            pkgs.libXinerama
-            pkgs.libXft
-            pkgs.libxcb
-            pkgs.fribidi
-            pkgs.fontconfig
-          ];
-        });
+        package = pkgs.dwm; # custom build from pkgs/dwm (via overlay)
       };
     };
 
@@ -87,31 +77,9 @@ in
 
     programs.dconf.enable = true;
 
-    nixpkgs.overlays = [
-      (final: prev: {
-        xwinwrap-local = final.callPackage ../../../packages/overlays/xwinwrap { };
-      })
-    ];
     environment.systemPackages = with pkgs; [
-      (stdenv.mkDerivation {
-        pname = "dwmblocks-async";
-        version = "4.20.24";
-        src = ../../../../home/programs/wm/dwm/dwmblocks-async;
-
-        nativeBuildInputs = [ pkg-config ];
-        buildInputs = [ libX11 fribidi ] ++ [ libxcb xcbutil ];
-
-        preBuild = ''
-          cp ${blocksH} blocks.h
-        '';
-        makeFlags = [ "PREFIX=$(out)" ];
-
-        meta = {
-          description = "Async dwmblocks";
-          license = lib.licenses.bsd3;
-        };
-      })
-      xwinwrap-local
+      (dwmblocks-async.override { inherit blocksH; })
+      xwinwrap
       pamixer
       feh
       xcolor
@@ -121,4 +89,3 @@ in
     ];
   };
 }
-
