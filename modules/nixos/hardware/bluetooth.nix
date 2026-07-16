@@ -1,18 +1,21 @@
-{ pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
+  options.my.hardware.bluetooth.enable = lib.mkEnableOption "Bluetooth support";
 
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Experimental = true; # Show battery charge of Bluetooth devices
+  config = lib.mkIf config.my.hardware.bluetooth.enable {
+    hardware.bluetooth = {
+      enable = true;
+      powerOnBoot = true;
+      settings = {
+        General = {
+          Experimental = true; # Show battery charge of Bluetooth devices
+        };
       };
     };
-  };
-  services.blueman.enable = true;
+    services.blueman.enable = true;
 
-  environment.systemPackages = [
-    pkgs.bluetui
-  ];
+    environment.systemPackages = [
+      pkgs.bluetui
+    ];
+  };
 }

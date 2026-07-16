@@ -1,15 +1,18 @@
-{ config, pkgs, ... }:
-
+{ config, lib, pkgs, ... }:
 {
-  hardware.graphics = {
-    enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver
-      libvdpau-va-gl
-    ];
-  };
+  options.my.hardware.gpu.intel.enable = lib.mkEnableOption "Intel GPU support";
 
-  environment.sessionVariables = {
-    LIBVA_DRIVER_NAME = "iHD";
+  config = lib.mkIf config.my.hardware.gpu.intel.enable {
+    hardware.graphics = {
+      enable = true;
+      extraPackages = with pkgs; [
+        intel-media-driver
+        libvdpau-va-gl
+      ];
+    };
+
+    environment.sessionVariables = {
+      LIBVA_DRIVER_NAME = "iHD";
+    };
   };
 }

@@ -5,9 +5,11 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     qmlgolsp = {
-    url = "github:cushycush/qml-language-server";
+      url = "github:cushycush/qml-language-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # NOTE: local-path input; this flake only evaluates on machines that have
+    # /home/melal/Dev/projects/cpp/mrem checked out.
     music-sep = {
       url = "git+file:/home/melal/Dev/projects/cpp/mrem";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -46,91 +48,60 @@
     , nixpkgs
     , nixpkgs-unstable
     , home-manager
-    , zen-browser
-    , antigravity-nix
-    , music-sep
     , qmlgolsp
     , qml-niri
-    , quickshell
-    , ditto
+    , ...
     }@inputs:
     let
       system = "x86_64-linux";
       overlays = [ (import ./overlays/default.nix) ];
 
       pkgs = import nixpkgs { inherit system overlays; };
-      unstable = import nixpkgs-unstable { 
-        inherit system; 
+      unstable = import nixpkgs-unstable {
+        inherit system;
         config = {
-          allowUnfree = true; 
+          allowUnfree = true;
           permittedInsecurePackages = [ "pnpm-10.29.2" ];
-        }; 
+        };
       };
       quickshell-niri = qml-niri.packages.${system};
-      windowManager = "niri";
+
+      # Per-host settings. Adding a machine = one entry here + a hosts/<name>/ dir.
+      hosts = {
+        alpha = { windowManager = "niri"; };
+        zeta = { windowManager = "niri"; };
+      };
+
+      mkHost = name: { windowManager }:
+        nixpkgs.lib.nixosSystem {
+          specialArgs = {
+            inherit inputs quickshell-niri unstable windowManager qmlgolsp;
+          };
+          modules = [
+            { nixpkgs.hostPlatform = system; nixpkgs.overlays = overlays; }
+            (./hosts + "/${name}")
+          ];
+        };
+
+      mkHome = name: { windowManager }:
+        home-manager.lib.homeManagerConfiguration {
+          inherit pkgs;
+          extraSpecialArgs = {
+            inherit self windowManager;
+            hostname = name;
+          };
+          modules = [ (./hosts + "/${name}/home.nix") ];
+        };
     in
     {
-      nixosConfigurations = {
-        alpha = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs quickshell-niri unstable windowManager qmlgolsp;
-          };
-          modules = [
-            { nixpkgs.hostPlatform = system; nixpkgs.overlays = overlays; }
-            ./hosts/desktop
-            ({ pkgs, ... }:
-              let sys = pkgs.stdenv.hostPlatform.system; in {
-                environment.systemPackages = [
-                  ditto.packages.${sys}.default
-                  zen-browser.packages.${sys}.default
-                  antigravity-nix.packages.${sys}.google-antigravity-cli
-                  music-sep.packages.${sys}.default
-                ];
-              })
-          ];
-        };
+      nixosConfigurations = builtins.mapAttrs mkHost hosts;
 
-        zeta = nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs quickshell-niri unstable windowManager qmlgolsp;
-          };
-          modules = [
-            { nixpkgs.hostPlatform = system; nixpkgs.overlays = overlays; }
-            ./hosts/laptop
-            ({ pkgs, ... }:
-              let sys = pkgs.stdenv.hostPlatform.system; in {
-                environment.systemPackages = [
-                  antigravity-nix.packages.${sys}.google-antigravity-cli
-                  zen-browser.packages.${sys}.default
-                ];
-              })
-          ];
-        };
-      };
+      # Standalone home-manager (kept separate from nixosConfigurations on purpose)
+      homeConfigurations = builtins.mapAttrs mkHome hosts;
 
-      homeConfigurations = {
-        alpha = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit self windowManager;
-            hostname = "alpha";
-          };
-          modules = [
-            ./hosts/desktop/home.nix
-          ];
-        };
-        zeta = home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit self windowManager;
-            hostname = "zeta";
-          };
-          modules = [
-            ./hosts/laptop/home.nix
-          ];
-        };
-      };
-      devShells.${system} = import ./modules/nixos/packages/dev/nix-shell/default.nix { inherit pkgs; };
+      # Custom packages, buildable standalone: nix build .#dwm
+      packages.${system} = { inherit (pkgs) dwm dwmblocks-async xwinwrap; };
+
+      devShells.${system} = import ./shells { inherit pkgs; };
     };
 }
-

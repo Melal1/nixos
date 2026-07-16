@@ -1,49 +1,32 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, ... }:
 {
+  options.my.hardware.gpu.nvidia.enable = lib.mkEnableOption "NVIDIA GPU support";
 
-  # Enable OpenGL
-  hardware.graphics = {
-    enable = true;
-  };
+  config = lib.mkIf config.my.hardware.gpu.nvidia.enable {
+    # Enable OpenGL
+    hardware.graphics.enable = true;
 
-  # boot.kernelParams = ["nvidia_drm.modeset=1"];
+    # Load nvidia driver for Xorg and Wayland
+    services.xserver.videoDrivers = [ "nvidia" ];
 
-  # Load nvidia driver for Xorg and Wayland
-  services.xserver.videoDrivers = ["nvidia"];
+    hardware.nvidia = {
+      # Nvidia power management. Experimental, can cause sleep/suspend to fail.
+      powerManagement.enable = false;
 
-  hardware.nvidia = {
+      # Fine-grained power management. Turns off GPU when not in use.
+      # Experimental, Turing or newer only.
+      powerManagement.finegrained = false;
 
-    # Modesetting is required.
-    # modesetting.enable = true;
+      # Use the NVidia open source kernel module (not nouveau).
+      # Turing and later only, driver 515.43.04+.
+      open = false;
 
-    # Nvidia power management. Experimental, and can cause sleep/suspend to fail.
-    # Enable this if you have graphical corruption issues or application crashes after waking
-    # up from sleep. This fixes it by saving the entire VRAM memory to /tmp/ instead 
-    # of just the bare essentials.
-    powerManagement.enable = false;
+      # Enable the `nvidia-settings` menu.
+      nvidiaSettings = true;
 
-    # Fine-grained power management. Turns off GPU when not in use.
-    # Experimental and only works on modern Nvidia GPUs (Turing or newer).
-    powerManagement.finegrained = false;
-
-    # Use the NVidia open source kernel module (not to be confused with the
-    # independent third-party "nouveau" open source driver).
-    # Support is limited to the Turing and later architectures. Full list of 
-    # supported GPUs is at: 
-    # https://github.com/NVIDIA/open-gpu-kernel-modules#compatible-gpus 
-    # Only available from driver 515.43.04+
-    open = false;
-
-    # Enable the Nvidia settings menu,
-	# accessible via `nvidia-settings`.
-    nvidiaSettings = true;
-
-    # Optionally, you may need to select the appropriate driver version for your specific GPU.
-
-
-
-    # stable always fail to build 
-    # package = config.boot.kernelPackages.nvidiaPackages.stable;
-    package = config.boot.kernelPackages.nvidiaPackages.production;
+      # stable always fails to build
+      # package = config.boot.kernelPackages.nvidiaPackages.stable;
+      package = config.boot.kernelPackages.nvidiaPackages.production;
+    };
   };
 }
