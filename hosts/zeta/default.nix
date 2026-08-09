@@ -15,6 +15,7 @@
     gpu.intel.enable = true;
     touchpad.enable = true;
     batteryOpt.enable = true;
+    vial-qmk.enable = true;
   };
 
   # Host-specific packages coming from flake inputs

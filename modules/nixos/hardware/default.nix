@@ -9,5 +9,6 @@
     ./gpu/intel.nix
     ./gpu/nvidia.nix
     ./input/touchpad.nix
+    ./vial-qmk.nix
   ];
 }
