@@ -14,6 +14,7 @@
     ruff
     mypy
     harper
+    roslyn-ls
   ])
   ++ (
     if config.networking.hostName == "alpha" then
