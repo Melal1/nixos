@@ -8,6 +8,8 @@
 
   config = {
 
+
+    environment.wordlist.enable = true;
     services.ollama = {
       enable = config.my.services.ollama.enable;
       package = unstable.ollama-rocm;
@@ -31,7 +33,7 @@
 
 
     services.sunshine = {
-      enable = true;
+      enable = false;
       autoStart = false;
       # capSysAdmin = true; # only needed for Wayland -- omit this when using with Xorg
       openFirewall = true;

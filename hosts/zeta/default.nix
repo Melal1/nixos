@@ -24,6 +24,7 @@
     [
       inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
       inputs.zen-browser.packages.${sys}.default
+      inputs.ditto.packages.${sys}.default
     ];
   programs.pi.coding-agent = {
     enable = true;
