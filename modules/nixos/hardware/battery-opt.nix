@@ -4,6 +4,7 @@
 
   config = lib.mkIf config.my.hardware.batteryOpt.enable {
     services.auto-cpufreq.enable = true;
+    services.upower.enable = true;
     services.auto-cpufreq.settings = {
       battery = {
         governor = "powersave";
