@@ -45,20 +45,20 @@ in
       # ----------------------------------------------------
       # Zeta Configuration (Laptop / Single Monitor)
       # ----------------------------------------------------
-      mpvpaper = lib.mkIf (hostname == "zeta") {
-        description = "mpvpaper wallpaper with auto-restart (Zeta)";
-        wantedBy = [ "graphical-session.target" ];
-        after = [ "graphical-session.target" ];
-        partOf = [ "graphical-session.target" ];
-
-        serviceConfig = {
-          # ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' eDP-1 %h/Videos/Wall/rainFhd.webm";
-          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' HDMI-A-1 %h/Videos/Wall/rainFhd.webm";
-          Restart = "always";
-          RestartSec = "2";
-          RuntimeMaxSec = "1800";
-        };
-      };
+      # mpvpaper = lib.mkIf (hostname == "zeta") {
+      #   description = "mpvpaper wallpaper with auto-restart (Zeta)";
+      #   wantedBy = [ "graphical-session.target" ];
+      #   after = [ "graphical-session.target" ];
+      #   partOf = [ "graphical-session.target" ];
+      #
+      #   serviceConfig = {
+      #     ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' eDP-1 %h/Videos/Wall/rainFhd.webm";
+      #     # ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' HDMI-A-1 %h/Videos/Wall/rainFhd.webm";
+      #     Restart = "always";
+      #     RestartSec = "2";
+      #     RuntimeMaxSec = "1800";
+      #   };
+      # };
 
       # ----------------------------------------------------
       # Alpha Configuration (Desktop / Dual Monitor)
@@ -99,7 +99,6 @@ in
       nautilus
       mpd-mpris
       cliphist
-      waybar
       mpvpaper
     ];
   };

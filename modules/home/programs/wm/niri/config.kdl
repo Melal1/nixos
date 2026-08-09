@@ -266,6 +266,8 @@ layout {
 // spawn-sh-at-startup "xwayland-satellite"
 spawn-sh-at-startup "pkill prayer; sleep 0.5; prayer -r \"Saudi Arabia, Al Aziziyah\" -b --bar-12h"
 spawn-at-startup "qs"
+spawn-at-startup "awww-daemon"
+spawn-sh-at-startup "awww img ~/Pictures/Wall/navid-nooren-t2trY9VMAKQ-unsplash.jpg"
 // spawn-sh-at-startup "pkill vicinae; sleep 0.5; vicinae server"
 // spawn-sh-at-startup "walls.sh"
 
@@ -401,7 +403,7 @@ binds {
     Mod+Q hotkey-overlay-title="Open kitty" { spawn "kitty"; }
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
-    Mod+B hotkey-overlay-title="Run zen" {spawn "zen";}
+    Mod+B hotkey-overlay-title="Run zen" {spawn "zen-beta";}
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
     // Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
@@ -577,6 +579,9 @@ binds {
     // Cycle through widths set in preset-column-widths.
     // Mod+R { switch-preset-column-width; } //TODO: Figure this
     Mod+R { spawn-sh "quickshell ipc call pill toggle_surface launcher";}
+    Mod+X { spawn-sh "quickshell ipc call pill toggle_surface power";}
+    Mod+N { spawn-sh "quickshell ipc call pill toggle_surface link";}
+    Mod+Shift+N { spawn-sh "quickshell ipc call pill toggle_surface dnd";}
     // Cycling through the presets in reverse order is also possible.
     Mod+Shift+R { switch-preset-column-width-back; }
 
