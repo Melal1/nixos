@@ -17,4 +17,6 @@ pkgs: {
   dwmblocks-async = pkgs.callPackage ./dwmblocks-async { };
 
   xwinwrap = pkgs.callPackage ./xwinwrap { };
+
+  easydotnet = pkgs.callPackage ./easydotnet { };
 }

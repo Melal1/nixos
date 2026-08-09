@@ -16,3 +16,6 @@ pkgs/dwm/dwm.c.rej
 # dwmblocks-async build artifacts
 pkgs/dwmblocks-async/build/
 pkgs/dwmblocks-async/dwmblocks
+
+# nix build output symlinks
+/result

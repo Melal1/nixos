@@ -3,13 +3,17 @@
     vscode-extensions.ms-vscode.cpptools
     gdb
     lua
+    netcoredbg
 
     # Build tools
-    cmake
     gradle
     gnumake
     cargo # Rust package manager and build tool
     bun
+    # dotnet-sdk_9
+    dotnet-sdk_10
+    csharpier
+    easydotnet
   ])
   ++ (
     if config.networking.hostName == "alpha" then
@@ -29,6 +33,8 @@
   (with unstable; [
     clang
     gcc
+    cmake
+    luajit
   ]);
   programs.java = {
     enable = true;

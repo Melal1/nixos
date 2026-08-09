@@ -105,7 +105,7 @@
       homeConfigurations = builtins.mapAttrs mkHome hosts;
 
       # Custom packages, buildable standalone: nix build .#dwm
-      packages.${system} = { inherit (pkgs) dwm dwmblocks-async xwinwrap; };
+      packages.${system} = { inherit (pkgs) dwm dwmblocks-async xwinwrap easydotnet; };
 
       devShells.${system} = import ./shells { inherit pkgs; };
     };
