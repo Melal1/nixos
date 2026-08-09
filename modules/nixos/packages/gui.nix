@@ -1,4 +1,4 @@
-{ pkgs, unstable, config, ... }: {
+{ pkgs, lib, unstable, config, ... }: {
   environment.systemPackages =
     (with pkgs; [
       proton-vpn
@@ -10,6 +10,7 @@
       sioyek
       mpv
       gdbgui
+      obsidian
       xournalpp
       element-desktop
       vscode
@@ -63,15 +64,16 @@
     remotePlay.openFirewall = true; # Open ports in the firewall for Steam Remote Play
     dedicatedServer.openFirewall = true; # Open ports in the firewall for Source Dedicated Server
   };
-  programs.obs-studio = {
-    enable = config.networking.hostName == "alpha";
 
-    plugins = with pkgs.obs-studio-plugins; [
+  programs.obs-studio = {
+    enable = config.networking.hostName == "alpha" || config.networking.hostName == "zeta";
+
+    plugins = lib.optionals (config.networking.hostName == "alpha") (with pkgs.obs-studio-plugins; [
       wlrobs
       obs-backgroundremoval
       obs-pipewire-audio-capture
       obs-vaapi #optional AMD hardware acceleration
       obs-vkcapture
-    ];
+    ]);
   };
 }

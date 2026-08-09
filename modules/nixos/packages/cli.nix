@@ -62,7 +62,6 @@
           qpwgraph
         ])
         ++ (with unstable;[
-          opencode
           codex
         ])
       else if config.networking.hostName == "zeta" then
@@ -79,11 +78,13 @@
       timr-tui
       dooit
       neovim
+      herdr
       tree-sitter
       zip
       yt-dlp
       rar
       geminicommit
       ffmpeg
+      opencode
     ]);
 }

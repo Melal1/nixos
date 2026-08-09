@@ -16,5 +16,6 @@
     ncurses
     dpp
     fmt
+    kdePackages.qtdeclarative
   ]);
 }

@@ -30,6 +30,8 @@
       noto-fonts
       noto-fonts-color-emoji
       twitter-color-emoji
+      atkinson-hyperlegible
+      iosevka
       sarasa-gothic
       noto-fonts-cjk-sans
       nerd-fonts.iosevka
