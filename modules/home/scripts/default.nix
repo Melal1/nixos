@@ -9,6 +9,17 @@
     home.file = lib.mkMerge [
 
       {
+        ".local/bin/assets-setup" = {
+          source = "${import ./assets-setup.nix {
+            inherit pkgs;
+            dotfilesDir = config.my.home.dotfilesDir;
+          }}/bin/assets-setup";
+          executable = true;
+        };
+        ".local/bin/theme-switch" = {
+          source = "${import ./theme-switch.nix { inherit pkgs; }}/bin/theme-switch";
+          executable = true;
+        };
         ".local/bin/tmux-sessionizer" = {
           source = ./tmux/tmux-sessionizer;
           executable = true;
@@ -56,14 +67,6 @@
       (lib.mkIf (windowManager == "hyprland") {
         ".local/bin/wlogout-script" = {
           source = ./wlogout.sh;
-          executable = true;
-        };
-        ".local/bin/THEMS.sh" = {
-          source = ./Themeswitcher.sh;
-          executable = true;
-        };
-        ".local/bin/wallSet" = {
-          source = ./wallSet;
           executable = true;
         };
         ".local/bin/wallSet.py" = {

@@ -13,7 +13,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # NOTE: local-path input; this flake only evaluates on machines that have
     # /home/melal/Dev/projects/cpp/mrem checked out.
     # music-sep = {
     #   url = "git+file:/home/melal/Dev/projects/cpp/mrem";
@@ -42,6 +41,10 @@
       url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    spicetify-nix = {
+      url = "github:Gerg-L/spicetify-nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -53,8 +56,6 @@
     , nixpkgs
     , nixpkgs-unstable
     , home-manager
-    , qmlgolsp
-    , qml-niri
     , ...
     }@inputs:
     let
@@ -66,21 +67,26 @@
         inherit system;
         config = {
           allowUnfree = true;
-          permittedInsecurePackages = [ "pnpm-10.29.2" ];
+          # permittedInsecurePackages = [ "pnpm-10.29.2" ];
         };
       };
-      quickshell-niri = qml-niri.packages.${system};
 
-      # Per-host settings. Adding a machine = one entry here + a hosts/<name>/ dir.
-      hosts = {
-        alpha = { windowManager = "niri"; };
-        zeta = { windowManager = "niri"; };
-      };
+      # Hosts are auto-discovered from hosts/<name>/meta.nix.
+      # Adding a machine = creating hosts/<name>/ with meta.nix + default.nix + home.nix.
+      hosts =
+        let
+          dirs = builtins.readDir ./hosts;
+          isHost = name: type:
+            type == "directory" && builtins.pathExists (./hosts + "/${name}/meta.nix");
+        in
+        nixpkgs.lib.mapAttrs
+          (name: _: import (./hosts + "/${name}/meta.nix"))
+          (nixpkgs.lib.filterAttrs isHost dirs);
 
       mkHost = name: { windowManager }:
         nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit inputs quickshell-niri unstable windowManager qmlgolsp;
+            inherit inputs unstable windowManager;
           };
           modules = [
             { nixpkgs.hostPlatform = system; nixpkgs.overlays = overlays; }
@@ -92,17 +98,26 @@
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit self windowManager;
+            inherit self windowManager inputs;
             hostname = name;
+            osConfig = self.nixosConfigurations.${name}.config;
           };
-          modules = [ (./hosts + "/${name}/home.nix") ];
+          modules = [
+            inputs.spicetify-nix.homeManagerModules.default
+            (./hosts + "/${name}/home.nix")
+          ];
         };
+      baseHomeConfigs = builtins.mapAttrs mkHome hosts;
     in
     {
       nixosConfigurations = builtins.mapAttrs mkHost hosts;
 
       # Standalone home-manager (kept separate from nixosConfigurations on purpose)
-      homeConfigurations = builtins.mapAttrs mkHome hosts;
+      homeConfigurations =
+        baseHomeConfigs
+        // nixpkgs.lib.mapAttrs'
+          (name: conf: nixpkgs.lib.nameValuePair "${conf.config.home.username}@${name}" conf)
+          baseHomeConfigs;
 
       # Custom packages, buildable standalone: nix build .#dwm
       packages.${system} = { inherit (pkgs) dwm dwmblocks-async xwinwrap easydotnet; };

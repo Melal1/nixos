@@ -1,8 +1,9 @@
-{ config, lib, pkgs, qmlgolsp, quickshell-niri, ... }:
+{ config, lib, pkgs, inputs, ... }:
 
 let
-  cfg = config.desktop;
+  cfg = config.my.desktop;
   hostname = config.networking.hostName;
+  sys = pkgs.stdenv.hostPlatform.system;
 in
 {
   config = lib.mkIf (cfg.type == "niri") {
@@ -41,65 +42,15 @@ in
           Restart = "on-failure";
         };
       };
-
-      # ----------------------------------------------------
-      # Zeta Configuration (Laptop / Single Monitor)
-      # ----------------------------------------------------
-      # mpvpaper = lib.mkIf (hostname == "zeta") {
-      #   description = "mpvpaper wallpaper with auto-restart (Zeta)";
-      #   wantedBy = [ "graphical-session.target" ];
-      #   after = [ "graphical-session.target" ];
-      #   partOf = [ "graphical-session.target" ];
-      #
-      #   serviceConfig = {
-      #     ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' eDP-1 %h/Videos/Wall/rainFhd.webm";
-      #     # ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -v -o 'no-audio loop --hwdec=auto' HDMI-A-1 %h/Videos/Wall/rainFhd.webm";
-      #     Restart = "always";
-      #     RestartSec = "2";
-      #     RuntimeMaxSec = "1800";
-      #   };
-      # };
-
-      # ----------------------------------------------------
-      # Alpha Configuration (Desktop / Dual Monitor)
-      # ----------------------------------------------------
-      mpvpaper-dp1 = lib.mkIf (hostname == "alpha") {
-        description = "mpvpaper wallpaper DP-1 (Alpha)";
-        wantedBy = [ "graphical-session.target" ];
-        after = [ "graphical-session.target" ];
-        partOf = [ "graphical-session.target" ];
-
-        serviceConfig = {
-          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -vs -o 'no-audio loop --vo=gpu --hwdec=vaapi' DP-1 %h/Videos/Wall/rain2k.webm";
-          Restart = "always";
-          RestartSec = "2";
-          RuntimeMaxSec = "1800";
-        };
-      };
-
-      mpvpaper-hdmi = lib.mkIf (hostname == "alpha") {
-        description = "mpvpaper wallpaper HDMI-A-1 (Alpha)";
-        wantedBy = [ "graphical-session.target" ];
-        after = [ "graphical-session.target" ];
-        partOf = [ "graphical-session.target" ];
-
-        serviceConfig = {
-          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -vs -o 'no-audio loop --vo=gpu --hwdec=vaapi' HDMI-A-1 %h/Videos/Wall/rainFhd.webm";
-          Restart = "always";
-          RestartSec = "2";
-          RuntimeMaxSec = "1800";
-        };
-      };
     };
 
     environment.systemPackages = with pkgs; [
-      qmlgolsp.packages.${pkgs.stdenv.hostPlatform.system}.default
-      quickshell-niri.quickshell
+      inputs.qmlgolsp.packages.${sys}.default
+      inputs.qml-niri.packages.${sys}.quickshell
       xwayland-satellite
       nautilus
       mpd-mpris
       cliphist
-      mpvpaper
     ];
   };
 }

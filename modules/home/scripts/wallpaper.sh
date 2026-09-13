@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-WALLFOLDER="$HOME/Pictures/Wall"
+WALLFOLDER="$HOME/Pictures/Wallpapers"
 WALLFILE="$HOME/.cache/personal/wallpaper"
 
 echo "Step 1: Checking wallpaper folder..."

@@ -105,7 +105,7 @@ def main():
         monitor_cmds = {}
 
         for m in monitors:
-            cmd = f'swww img -o "{m}" "{selected}" --transition-type grow  --transition-duration 1 --transition-step 30'
+            cmd = f'awww img -o "{m}" "{selected}" --transition-type grow  --transition-duration 1 --transition-step 30'
             os.system(cmd)
             monitor_cmds[m] = cmd
 
@@ -186,7 +186,7 @@ def main():
                     f'magick "{wallpaper}" -rotate {rotate} "{final_wall}"', shell=True
                 )
 
-            cmd = f'swww img -o "{monitors[m_idx]}" "{final_wall}"'
+            cmd = f'awww img -o "{monitors[m_idx]}" "{final_wall}"'
             os.system(cmd)
             monitor_cmds[monitors[m_idx]] = cmd
 

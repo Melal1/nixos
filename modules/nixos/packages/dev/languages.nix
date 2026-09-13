@@ -14,18 +14,18 @@
     dotnet-sdk_10
     csharpier
     easydotnet
+    nodejs # JavaScript runtime
   ])
   ++ (
-    if config.networking.hostName == "alpha" then
+    if config.networking.hostName == "snowflake" then
       (with pkgs; [
         python3 # Python interpreter
-        nodejs # JavaScript runtime
         typescript # Typescript
         kdePackages.qtdeclarative
         premake5
         go # Go programming language
       ])
-    else if config.networking.hostName == "zeta" then
+    else if config.networking.hostName == "rusty" then
       [ ]
     else
       [ ]

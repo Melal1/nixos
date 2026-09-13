@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  cfg = config.desktop;
+  cfg = config.my.desktop;
 in
 {
   config = lib.mkIf (cfg.type == "hyprland") {

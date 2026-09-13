@@ -8,7 +8,7 @@
 }:
 
 let
-  version = "3.4.14";
+  version = "3.4.25";
 in
 stdenv.mkDerivation {
   pname = "easydotnet";
@@ -17,7 +17,7 @@ stdenv.mkDerivation {
   # NuGet flat-container URL: stable, no redirect, fetchurl-friendly.
   src = fetchurl {
     url = "https://api.nuget.org/v3-flatcontainer/easydotnet/${version}/easydotnet.${version}.nupkg";
-    sha256 = "sha256-a1ZBCZZyvyQvlXmhxnMgeslzgEq9Pk4q9+1gojtJ9XE=";
+    sha256 = "sha256-RburiBDwtkNcTmzce2HHY1HJWdoOFx9x692PBd2VD9Y=";
   };
 
   # A .nupkg is a zip; native ELFs inside (netcoredbg, libdbgshim.so) need patching.
@@ -71,15 +71,12 @@ stdenv.mkDerivation {
       \) \
       -exec chmod +x {} +
 
-    # Resolve the managed entry DLL from its *.runtimeconfig.json sibling.
-    runtimeConfig=$(find $out/lib/easydotnet/tools -path '*/net8.0/any/*.runtimeconfig.json' -print -quit)
-    if [ -z "$runtimeConfig" ]; then
-      echo "easydotnet: could not locate *.runtimeconfig.json under tools/" >&2
+    # Resolve the managed entry DLL (EasyDotnet.IDE.dll declared in DotnetToolSettings.xml).
+    entryDll=$(find $out/lib/easydotnet/tools -name 'EasyDotnet.IDE.dll' -print -quit)
+    if [ -z "$entryDll" ]; then
+      echo "easydotnet: could not locate EasyDotnet.IDE.dll under tools/" >&2
       exit 1
     fi
-    # The runtimeconfig is named e.g. EasyDotnet.IDE.runtimeconfig.json — the
-    # entry DLL is the same stem with a .dll extension, not the bare stem.
-    entryDll=''${runtimeConfig%.runtimeconfig.json}.dll
 
     mkdir -p $out/bin
     makeWrapper ${dotnet-sdk_10}/bin/dotnet $out/bin/dotnet-easydotnet \

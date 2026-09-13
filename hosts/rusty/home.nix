@@ -2,7 +2,7 @@
   imports = [ ../../modules/home ];
   
   my.home = {
-    waybar.theme = "zeta";
+    waybar.theme = "rusty";
     scripts.disableHyprlandEffects = true;
   };
 }

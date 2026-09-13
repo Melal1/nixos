@@ -2,6 +2,7 @@
   imports = [ ../../modules/home ];
   
   my.home = {
-    waybar.theme = "alpha-v";
+    waybar.theme = "snowflake-v";
+    videoWallpaper.enable = true;
   };
 }

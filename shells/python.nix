@@ -1,28 +1,23 @@
 { pkgs }:
 
 let
-  # Define the python environment once so we can reference it
-  myPython = pkgs.python3.withPackages (p: [
-    p.requests
-    p.soundfile
-    p.numpy
-    p.matplotlib
-    p.opencv4Full
-    p.pyqt6
-    p.pip
-  ]);
+  runtimeLibs = with pkgs; [
+    stdenv.cc.cc.lib
+    zlib
+    glib
+    libGL
+    libsndfile
+  ];
 in
 pkgs.mkShell {
-  packages = [
-    myPython
+  packages = with pkgs; [
+    uv
+    python3
   ];
 
   shellHook = ''
-      # Only switch to fish if we are not already in fish
-      export PYTHONPATH="${myPython}/${pkgs.python3.sitePackages}"
-    if [ -t 1 ] && [ -z "$FISH" ] && command -v fish >/dev/null 2>&1; then
-      exec fish --login
+    # Shared libraries for uv / PyPI wheels
+    export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath runtimeLibs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    unset PYTHONPATH
   '';
 }
-
-

@@ -9,7 +9,7 @@
     ./wayland/hyprland.nix
   ];
 
-  options.desktop.type = lib.mkOption {
+  options.my.desktop.type = lib.mkOption {
     type = lib.types.enum [ "none" "hyprland" "dwm" "niri" ];
     default = "none";
     description = "Select desktop environment / window manager";

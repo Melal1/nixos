@@ -12,12 +12,13 @@
     jdt-language-server
     pyright
     ruff
+    libxml2
     mypy
     harper
     roslyn-ls
   ])
   ++ (
-    if config.networking.hostName == "alpha" then
+    if config.networking.hostName == "snowflake" then
       (with pkgs; [
         typescript-language-server
         tailwindcss-language-server
@@ -25,7 +26,7 @@
         prettier
         eslint
       ])
-    else if config.networking.hostName == "zeta" then
+    else if config.networking.hostName == "rusty" then
       [ ]
     else
       [ ]

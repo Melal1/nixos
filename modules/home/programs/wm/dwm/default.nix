@@ -16,22 +16,22 @@
       prayer -b &
     ''
     + (
-      if hostname == "alpha" then
+      if hostname == "snowflake" then
         ''
           xwinwrap -g 2560x1440+1920+0 -ni -un -st -sp -b -nf -ov \
             -- mpv --cache=no --vo=gpu --hwdec=vaapi --loop --mute=yes \
-            --stop-screensaver=no -wid WID ~/Videos/Wall/rain2k.webm &
+            --stop-screensaver=no -wid WID ~/Videos/Wallpapers/rain2k.webm &
 
           xwinwrap -g 1920x1080+0+0 -ni -un -st -sp -b -nf -ov \
             -- mpv --cache=no --vo=gpu --hwdec=vaapi --loop --mute=yes \
-            --stop-screensaver=no -wid WID ~/Videos/Wall/rainFhd.webm &
+            --stop-screensaver=no -wid WID ~/Videos/Wallpapers/rainFhd.webm &
         ''
       else
         ''
           # xwinwrap -g 1920x1080+0+0 -ni -un -st -sp -b -nf -ov \
           #   -- mpv --cache=no --vo=gpu --loop --mute=yes \
-          #   --stop-screensaver=no -wid WID ~/Videos/Wall/rainFhd.webm &
-          feh --bg-scale ~/Pictures/Wall/black.jpg
+          #   --stop-screensaver=no -wid WID ~/Videos/Wallpapers/rainFhd.webm &
+          feh --bg-scale ~/Pictures/Wallpapers/black.jpg
         ''
     )
     + ''

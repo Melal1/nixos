@@ -5,16 +5,7 @@
       plugins = [
         # Enable a plugin (here grc for colorized command output) from nixpkgs
         { name = "grc"; src = pkgs.fishPlugins.grc.src; }
-        {
-          name = "fzf";
-          src = pkgs.fetchFromGitHub {
-            owner = "PatrickF1";
-            repo = "fzf.fish";
-            rev = "8920367cf85eee5218cc25a11e209d46e2591e7a";
-            sha256 = "T8KYLA/r/gOKvAivKRoeqIwE2pINlxFQtZJHpOy9GMM=";
-
-          };
-        }
+        { name = "fzf-fish"; src = pkgs.fishPlugins.fzf-fish.src; }
       ];
 
       shellInit = ''
@@ -124,10 +115,10 @@
         vhm = "nvim ~/.dotfiles/nixos/modules/home/";
         qa = "exit";
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
-        h-r = (if hostname == "alpha" then
-          "home-manager switch --flake ~/.dotfiles/nixos#alpha"
-        else if hostname == "zeta" then
-          "home-manager switch --flake ~/.dotfiles/nixos#zeta"
+        h-r = (if hostname == "snowflake" then
+          "home-manager switch --flake ~/.dotfiles/nixos#snowflake"
+        else if hostname == "rusty" then
+          "home-manager switch --flake ~/.dotfiles/nixos#rusty"
         else
           "home-manager switch --flake ~/.dotfiles/nixos/.#"
         );
@@ -144,10 +135,11 @@
   };
 
   home.sessionVariables = {
-    BROWSER = "zen";
+    BROWSER = "brave-origin";
     EDITOR = "nvim";
     CODELLDB_PATH =
       "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
+    DOTNET_ROOT = "${pkgs.dotnet-sdk_10}/share/dotnet"; 
   };
 }
 

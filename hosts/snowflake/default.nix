@@ -6,14 +6,16 @@
     ./kernel.nix
     ../../users
     ../../modules/nixos
-    ../../profiles/workstation.nix
   ];
 
-  networking.hostName = "alpha";
+  networking.hostName = "snowflake";
 
   my.hardware = {
+    bluetooth.enable = true;
     gpu.amd.enable = true;
     performance.enable = true;
+    vial-qmk.enable = true;
+    rgb.enable = true;
   };
 
   my.services.extraGraphics.enable = true;
@@ -29,6 +31,6 @@
       inputs.ditto.packages.${sys}.default
       inputs.zen-browser.packages.${sys}.default
       inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
-      inputs.music-sep.packages.${sys}.default
+      # inputs.music-sep.packages.${sys}.default
     ];
 }

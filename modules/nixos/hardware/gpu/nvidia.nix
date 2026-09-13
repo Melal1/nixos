@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, unstable, ... }:
 {
   options.my.hardware.gpu.nvidia.enable = lib.mkEnableOption "NVIDIA GPU support";
 
@@ -24,8 +24,8 @@
       # Enable the `nvidia-settings` menu.
       nvidiaSettings = true;
 
-      # stable always fails to build
-      # package = config.boot.kernelPackages.nvidiaPackages.stable;
+      # Always use the nvidia package matching the host kernel to avoid
+      # mismatched kernel module versions.
       package = config.boot.kernelPackages.nvidiaPackages.production;
     };
   };

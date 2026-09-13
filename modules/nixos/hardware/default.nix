@@ -3,12 +3,13 @@
 {
   imports = [
     ./bluetooth.nix
-    ./battery-opt.nix
+    ./batteryOpt.nix
     ./performance.nix
     ./gpu/amd.nix
     ./gpu/intel.nix
     ./gpu/nvidia.nix
     ./input/touchpad.nix
     ./vial-qmk.nix
+    ./rgb.nix
   ];
 }

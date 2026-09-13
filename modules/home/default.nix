@@ -7,20 +7,16 @@
   };
 
   imports = [
-    ./programs/terminals
+    ./programs
     ./shell
     ./dev
     ./scripts
-    ./programs/utilities
-    ./programs/wm
-    ./programs/bars/waybar
     ./gtk.nix
-    ./assets
   ];
 
   config = {
     home.username = "melal";
-    home.homeDirectory = "/home/melal/";
+    home.homeDirectory = "/home/melal";
     programs.home-manager.enable = true;
 
     home.stateVersion = "24.11";

@@ -1,7 +1,7 @@
 { config, ... }:
 {
   virtualisation.waydroid.enable = (
-    if config.networking.hostName == "alpha" then
+    if config.networking.hostName == "snowflake" then
       false
     else
       false

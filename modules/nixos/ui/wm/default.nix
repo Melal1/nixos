@@ -2,5 +2,5 @@
 
 {
   imports = [ ./config.nix ];
-  desktop.type = windowManager;
+  my.desktop.type = windowManager;
 }

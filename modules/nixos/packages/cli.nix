@@ -8,10 +8,10 @@
       libnotify
       xdg-user-dirs
       jq
+      watchman
       speedtest-cli
       nmap
       arp-scan
-      discord
       delta
       lolcat
       figlet
@@ -51,7 +51,7 @@
     ])
     ++
     (
-      if config.networking.hostName == "alpha" then
+      if config.networking.hostName == "snowflake" then
 
         (with pkgs; [
           btop-rocm
@@ -64,7 +64,7 @@
         ++ (with unstable;[
           codex
         ])
-      else if config.networking.hostName == "zeta" then
+      else if config.networking.hostName == "rusty" then
         (with pkgs; [
           btop
           brightnessctl
@@ -75,8 +75,8 @@
     ++
     (with unstable;
     [
+      spotdl
       timr-tui
-      dooit
       neovim
       herdr
       tree-sitter

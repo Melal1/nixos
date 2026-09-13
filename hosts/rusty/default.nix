@@ -4,13 +4,14 @@
     ./hardware-configuration.nix
     ../../users
     ../../modules/nixos
-    ../../profiles/workstation.nix
+    ./kernel.nix
     inputs.pi.nixosModules.default
   ];
 
-  networking.hostName = "zeta";
+  networking.hostName = "rusty";
 
   my.hardware = {
+    bluetooth.enable = true;
     gpu.nvidia.enable = true;
     gpu.intel.enable = true;
     touchpad.enable = true;
