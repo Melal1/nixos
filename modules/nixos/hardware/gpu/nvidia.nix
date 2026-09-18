@@ -1,4 +1,9 @@
-{ config, lib, unstable, ... }:
+{
+  config,
+  lib,
+  unstable,
+  ...
+}:
 {
   options.my.hardware.gpu.nvidia.enable = lib.mkEnableOption "NVIDIA GPU support";
 

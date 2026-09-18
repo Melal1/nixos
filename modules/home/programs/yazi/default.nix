@@ -9,8 +9,7 @@
       rose-pine = ./flavors/rose-pine.yazi;
     };
     theme = {
-      flavor =
-      {
+      flavor = {
         dark = "onedark";
       };
     };

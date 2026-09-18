@@ -2,7 +2,7 @@
 
 let
   # Choose the version that matches your JDK requirements
-  javafx-pkg = pkgs.openjfx21; 
+  javafx-pkg = pkgs.openjfx21;
 
   libs = [
     # General build dependencies
@@ -21,7 +21,9 @@ pkgs.mkShell {
     pkgs.jdk
     pkgs.gradle
     javafx-pkg
-  ] ++ libs ++ ld-lib-path-libs;
+  ]
+  ++ libs
+  ++ ld-lib-path-libs;
 
   shellHook = ''
     # Fixes the "cannot find shared libraries" runtime errors
@@ -29,7 +31,7 @@ pkgs.mkShell {
 
     # Helps some LSPs and Gradle plugins locate the JavaFX SDK path
     export JAVAFX_HOME="${javafx-pkg}"
-    
+
     echo "JavaFX Dev Environment Loaded"
     echo "JDK Path: $(which java)"
   '';

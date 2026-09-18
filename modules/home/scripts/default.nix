@@ -1,7 +1,13 @@
-{ windowManager, lib, pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  ...
+}:
 
 {
-  options.my.home.scripts.disableHyprlandEffects = lib.mkEnableOption "Disable Hyprland effects script";
+  options.my.home.scripts.disableHyprlandEffects =
+    lib.mkEnableOption "Disable Hyprland effects script";
 
   config = {
     home.sessionPath = [ "$HOME/.local/bin" ];
@@ -10,10 +16,12 @@
 
       {
         ".local/bin/assets-setup" = {
-          source = "${import ./assets-setup.nix {
-            inherit pkgs;
-            dotfilesDir = config.my.home.dotfilesDir;
-          }}/bin/assets-setup";
+          source = "${
+            import ./assets-setup.nix {
+              inherit pkgs;
+              dotfilesDir = config.my.home.dotfilesDir;
+            }
+          }/bin/assets-setup";
           executable = true;
         };
         ".local/bin/theme-switch" = {
@@ -57,14 +65,14 @@
         };
       }
 
-      (lib.mkIf (config.my.home.scripts.disableHyprlandEffects && windowManager == "hyprland") {
+      (lib.mkIf (config.my.home.scripts.disableHyprlandEffects && config.my.home.wm.hyprland.enable) {
         ".local/bin/DisableHyprlandEffects" = {
           source = ./DisableHyprlandEffects.sh;
           executable = true;
         };
       })
 
-      (lib.mkIf (windowManager == "hyprland") {
+      (lib.mkIf config.my.home.wm.hyprland.enable {
         ".local/bin/wlogout-script" = {
           source = ./wlogout.sh;
           executable = true;
@@ -74,14 +82,12 @@
           executable = true;
         };
       })
-      (
-        lib.mkIf (pkgs ? gh) {
-          ".local/bin/vicinaegithub.sh" = {
-            source = ./vicinae-github.sh;
-            executable = true;
-          };
-        }
-      )
+      (lib.mkIf (pkgs ? gh) {
+        ".local/bin/vicinaegithub.sh" = {
+          source = ./vicinae-github.sh;
+          executable = true;
+        };
+      })
     ];
   };
 }

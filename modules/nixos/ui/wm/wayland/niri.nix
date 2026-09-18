@@ -1,12 +1,16 @@
-{ config, lib, pkgs, inputs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  inputs,
+  ...
+}:
 
 let
-  cfg = config.my.desktop;
-  hostname = config.networking.hostName;
   sys = pkgs.stdenv.hostPlatform.system;
 in
 {
-  config = lib.mkIf (cfg.type == "niri") {
+  config = lib.mkIf config.my.desktop.niri.enable {
     programs.niri.enable = true;
     services = {
       displayManager.ly.enable = true;

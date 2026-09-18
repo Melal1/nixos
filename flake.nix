@@ -49,20 +49,27 @@
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
-    { self
-    , nixpkgs
-    , nixpkgs-unstable
-    , home-manager
-    , ...
+    {
+      self,
+      nixpkgs,
+      nixpkgs-unstable,
+      home-manager,
+      treefmt-nix,
+      ...
     }@inputs:
     let
       system = "x86_64-linux";
       overlays = [ (import ./overlays/default.nix) ];
 
       pkgs = import nixpkgs { inherit system overlays; };
+      treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       unstable = import nixpkgs-unstable {
         inherit system;
         config = {
@@ -76,29 +83,34 @@
       hosts =
         let
           dirs = builtins.readDir ./hosts;
-          isHost = name: type:
-            type == "directory" && builtins.pathExists (./hosts + "/${name}/meta.nix");
+          isHost = name: type: type == "directory" && builtins.pathExists (./hosts + "/${name}/meta.nix");
         in
-        nixpkgs.lib.mapAttrs
-          (name: _: import (./hosts + "/${name}/meta.nix"))
-          (nixpkgs.lib.filterAttrs isHost dirs);
+        nixpkgs.lib.mapAttrs (name: _: import (./hosts + "/${name}/meta.nix")) (
+          nixpkgs.lib.filterAttrs isHost dirs
+        );
 
-      mkHost = name: { windowManager }:
+      mkHost =
+        name: _:
         nixpkgs.lib.nixosSystem {
           specialArgs = {
-            inherit inputs unstable windowManager;
+            inherit inputs unstable;
+            hostname = name;
           };
           modules = [
-            { nixpkgs.hostPlatform = system; nixpkgs.overlays = overlays; }
+            {
+              nixpkgs.hostPlatform = system;
+              nixpkgs.overlays = overlays;
+            }
             (./hosts + "/${name}")
           ];
         };
 
-      mkHome = name: { windowManager }:
+      mkHome =
+        name: _:
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
-            inherit self windowManager inputs;
+            inherit self inputs unstable;
             hostname = name;
             osConfig = self.nixosConfigurations.${name}.config;
           };
@@ -112,16 +124,47 @@
     {
       nixosConfigurations = builtins.mapAttrs mkHost hosts;
 
-      # Standalone home-manager (kept separate from nixosConfigurations on purpose)
       homeConfigurations =
         baseHomeConfigs
-        // nixpkgs.lib.mapAttrs'
-          (name: conf: nixpkgs.lib.nameValuePair "${conf.config.home.username}@${name}" conf)
-          baseHomeConfigs;
+        // nixpkgs.lib.mapAttrs' (
+          name: conf: nixpkgs.lib.nameValuePair "${conf.config.home.username}@${name}" conf
+        ) baseHomeConfigs;
 
-      # Custom packages, buildable standalone: nix build .#dwm
-      packages.${system} = { inherit (pkgs) dwm dwmblocks-async xwinwrap easydotnet; };
+      packages.${system} = {
+        inherit (pkgs)
+          dwm
+          dwmblocks-async
+          xwinwrap
+          easydotnet
+          ;
+      };
 
       devShells.${system} = import ./shells { inherit pkgs; };
+
+      formatter.${system} = treefmtEval.config.build.wrapper;
+
+      checks.${system} = {
+        formatting = treefmtEval.config.build.check self;
+
+        deadnix =
+          pkgs.runCommand "deadnix-check"
+            {
+              nativeBuildInputs = [ pkgs.deadnix ];
+            }
+            ''
+              deadnix --fail --no-lambda-pattern-names ${self}
+              touch "$out"
+            '';
+
+        statix =
+          pkgs.runCommand "statix-check"
+            {
+              nativeBuildInputs = [ pkgs.statix ];
+            }
+            ''
+              statix check --config ${self}/statix.toml ${self}
+              touch "$out"
+            '';
+      };
     };
 }

@@ -1,9 +1,14 @@
-{ config, hostname, ... }:
+{
+  config,
+  lib,
+  hostname,
+  ...
+}:
 let
   hyprConfDir = "${config.my.home.dotfilesDir}/modules/home/programs/wm/hyprland";
   link = config.lib.file.mkOutOfStoreSymlink;
 in
-{
+lib.mkIf config.my.home.wm.hyprland.enable {
   home.file = {
     ".config/hypr/hyprland.conf".source = link "${hyprConfDir}/source.conf";
     ".config/hypr/autostart.conf".source = link "${hyprConfDir}/autostart.conf";
@@ -15,8 +20,10 @@ in
 
     # Host-specific fragments: files are named after the host, so a new host
     # only needs matching <hostname>.conf files, no module changes.
-    ".config/hypr/keybinds/host-keybinds.conf".source = link "${hyprConfDir}/keybinds/${hostname}-keybinds.conf";
-    ".config/hypr/decorations/host.conf".source = link "${hyprConfDir}/decorations/${hostname}-decorration.conf";
+    ".config/hypr/keybinds/host-keybinds.conf".source =
+      link "${hyprConfDir}/keybinds/${hostname}-keybinds.conf";
+    ".config/hypr/decorations/host.conf".source =
+      link "${hyprConfDir}/decorations/${hostname}-decorration.conf";
     ".config/hypr/animations/host.conf".source = link "${hyprConfDir}/animations/${hostname}.conf";
     ".config/hypr/monitors/host.conf".source = link "${hyprConfDir}/monitors/${hostname}.conf";
     ".config/hypr/workspaces/host.conf".source = link "${hyprConfDir}/workspaces/${hostname}.conf";

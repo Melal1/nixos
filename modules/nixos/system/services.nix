@@ -1,13 +1,17 @@
-{ pkgs, unstable, config, lib, ... }:
+{
+  pkgs,
+  unstable,
+  config,
+  lib,
+  ...
+}:
 {
   options.my.services = {
     ollama.enable = lib.mkEnableOption "Ollama service";
     extraGraphics.enable = lib.mkEnableOption "Extra graphics groups for user";
   };
 
-
   config = {
-
 
     environment.wordlist.enable = true;
     services.ollama = {
@@ -30,7 +34,6 @@
       enable = true;
       pulse.enable = true;
     };
-
 
     services.sunshine = {
       enable = false;

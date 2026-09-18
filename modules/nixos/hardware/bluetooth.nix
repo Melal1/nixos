@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   options.my.hardware.bluetooth.enable = lib.mkEnableOption "Bluetooth support";
 

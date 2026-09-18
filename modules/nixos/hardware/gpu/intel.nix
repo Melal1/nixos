@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   options.my.hardware.gpu.intel.enable = lib.mkEnableOption "Intel GPU support";
 

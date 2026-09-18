@@ -1,11 +1,12 @@
-{ lib
-, stdenv
-, pkg-config
-, libX11
-, fribidi
-, libxcb
-, xcbutil
-, blocksH ? null # optional path to a generated blocks.h (host-specific)
+{
+  lib,
+  stdenv,
+  pkg-config,
+  libX11,
+  fribidi,
+  libxcb,
+  xcbutil,
+  blocksH ? null, # optional path to a generated blocks.h (host-specific)
 }:
 
 stdenv.mkDerivation {
@@ -15,7 +16,12 @@ stdenv.mkDerivation {
   src = lib.cleanSource ./.;
 
   nativeBuildInputs = [ pkg-config ];
-  buildInputs = [ libX11 fribidi libxcb xcbutil ];
+  buildInputs = [
+    libX11
+    fribidi
+    libxcb
+    xcbutil
+  ];
 
   preBuild = lib.optionalString (blocksH != null) ''
     cp ${blocksH} blocks.h

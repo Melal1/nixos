@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   options.my.hardware.rgb.enable = lib.mkEnableOption "OpenRgb Support";
 
@@ -10,4 +15,3 @@
     };
   };
 }
-

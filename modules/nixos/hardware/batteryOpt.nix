@@ -1,6 +1,7 @@
 { config, lib, ... }:
 {
-  options.my.hardware.batteryOpt.enable = lib.mkEnableOption "battery optimisation (auto-cpufreq, deep sleep)";
+  options.my.hardware.batteryOpt.enable =
+    lib.mkEnableOption "battery optimisation (auto-cpufreq, deep sleep)";
 
   config = lib.mkIf config.my.hardware.batteryOpt.enable {
     services.auto-cpufreq.enable = true;

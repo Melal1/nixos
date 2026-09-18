@@ -1,10 +1,11 @@
-{ config, lib, pkgs, ... }:
-
-let
-  cfg = config.my.desktop;
-in
 {
-  config = lib.mkIf (cfg.type == "dwm") {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  config = lib.mkIf config.my.desktop.dwm.enable {
 
     services = {
       displayManager.ly.enable = true;
@@ -31,4 +32,3 @@ in
 
   };
 }
-

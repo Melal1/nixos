@@ -1,10 +1,11 @@
-{ lib
-, stdenv
-, fetchurl
-, unzip
-, autoPatchelfHook
-, makeWrapper
-, dotnet-sdk_10
+{
+  lib,
+  stdenv,
+  fetchurl,
+  unzip,
+  autoPatchelfHook,
+  makeWrapper,
+  dotnet-sdk_10,
 }:
 
 let
@@ -93,7 +94,10 @@ stdenv.mkDerivation {
     homepage = "https://github.com/GustavEikaas/easy-dotnet";
     mainProgram = "dotnet-easydotnet";
     platforms = platforms.linux;
-    sourceProvenance = with sourceTypes; [ binaryNativeCode fromSource ];
+    sourceProvenance = with sourceTypes; [
+      binaryNativeCode
+      fromSource
+    ];
     license = licenses.mit;
   };
 }

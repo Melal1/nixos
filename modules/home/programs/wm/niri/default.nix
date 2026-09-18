@@ -1,85 +1,125 @@
-{ config, lib, pkgs, hostname, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  hostname,
+  osConfig ? null,
+  ...
+}:
 let
-  niriDir = "${config.home.homeDirectory}/.dotfiles/nixos/modules/home/programs/wm/niri";
+  niriDir = "${config.my.home.dotfilesDir}/modules/home/programs/wm/niri";
   videoWallpaper = config.my.home.videoWallpaper.enable;
+  videoOutputs =
+    if osConfig != null && (osConfig ? my.host.displays) then osConfig.my.host.displays else [ ];
+  gsrEnabled =
+    if osConfig != null && (osConfig ? my.programs.gpu-screen-recorder.enable) then
+      osConfig.my.programs.gpu-screen-recorder.enable
+    else
+      false;
+  easyeffectsEnabled =
+    if osConfig != null && (osConfig ? my.programs.easyeffects.enable) then
+      osConfig.my.programs.easyeffects.enable
+    else
+      false;
 in
 
 {
-  options.my.home.videoWallpaper.enable = lib.mkEnableOption
-    "video wallpapers via mpvpaper (needs ~/Videos/Wallpapers from the assets repo)";
+  options.my.home.videoWallpaper.enable =
+    lib.mkEnableOption "video wallpapers via mpvpaper (needs ~/Videos/Wallpapers from the assets repo)";
 
-  config = {
+  options.my.home.gpu-screen-recorder.autostart = lib.mkOption {
+    type = lib.types.bool;
+    default = gsrEnabled;
+    description = "Autostart GPU Screen Recorder UI overlay in Niri";
+  };
+
+  options.my.home.easyeffects.autostart = lib.mkOption {
+    type = lib.types.bool;
+    default = easyeffectsEnabled;
+    description = "Autostart EasyEffects daemon in Niri";
+  };
+
+  config = lib.mkIf config.my.home.wm.niri.enable {
+    assertions = [
+      {
+        assertion = !videoWallpaper || videoOutputs != [ ];
+        message = "my.home.videoWallpaper.enable requires at least one display in my.host.displays.";
+      }
+    ];
+
     home.file.".config/niri/config.kdl".source =
       config.lib.file.mkOutOfStoreSymlink "${niriDir}/config.kdl";
 
-    # Snowflake video wallpapers (desktop / dual monitor), opt-in via
+    # Video wallpapers, one service per declared output, opt-in via
     # my.home.videoWallpaper.enable. Reads the mutable indirection link
     # (~/.local/state/theme/video) so theme-switch can swap videos without a
     # rebuild; the link is seeded by `assets-setup`.
-    systemd.user.services = {
-      mpvpaper-dp1 = lib.mkIf (videoWallpaper && hostname == "snowflake") {
-        Unit = {
-          Description = "mpvpaper wallpaper DP-1 (Snowflake)";
-          After = [ "graphical-session.target" ];
-          PartOf = [ "graphical-session.target" ];
-        };
-        Service = {
-          # mpvpaper idles forever (never exits -> no Restart) when the video
-          # link is missing at start; wait for assets-setup/theme-switch to
-          # seed it first. If the wait times out, ExecStartPre fails and
-          # Restart=always polls again until the link appears.
-          ExecStartPre = "${pkgs.bash}/bin/bash -c 'for i in $(seq 1 300); do [ -e %h/.local/state/theme/video ] && exit 0; sleep 1; done; exit 1'";
-          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -vs -o 'no-audio loop --vo=gpu --hwdec=vaapi' DP-1 %h/.local/state/theme/video";
-          Restart = "always";
-          RestartSec = "2";
-          RuntimeMaxSec = "1800";
-        };
-        Install.WantedBy = [ "graphical-session.target" ];
-      };
-
-      mpvpaper-hdmi = lib.mkIf (videoWallpaper && hostname == "snowflake") {
-        Unit = {
-          Description = "mpvpaper wallpaper HDMI-A-1 (Snowflake)";
-          After = [ "graphical-session.target" ];
-          PartOf = [ "graphical-session.target" ];
-        };
-        Service = {
-          ExecStartPre = "${pkgs.bash}/bin/bash -c 'for i in $(seq 1 300); do [ -e %h/.local/state/theme/video ] && exit 0; sleep 1; done; exit 1'";
-          ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -vs -o 'no-audio loop --vo=gpu --hwdec=vaapi' HDMI-A-1 %h/.local/state/theme/video";
-          Restart = "always";
-          RestartSec = "2";
-          RuntimeMaxSec = "1800";
-        };
-        Install.WantedBy = [ "graphical-session.target" ];
-      };
-    };
+    systemd.user.services = lib.mkIf videoWallpaper (
+      lib.listToAttrs (
+        map (
+          output:
+          lib.nameValuePair "mpvpaper-${output}" {
+            Unit = {
+              Description = "mpvpaper wallpaper ${output}";
+              After = [ "graphical-session.target" ];
+              PartOf = [ "graphical-session.target" ];
+            };
+            Service = {
+              # mpvpaper idles forever (never exits -> no Restart) when the video
+              # link is missing at start; wait for assets-setup/theme-switch to
+              # seed it first. If the wait times out, ExecStartPre fails and
+              # Restart=always polls again until the link appears.
+              ExecStartPre = "${pkgs.bash}/bin/bash -c 'for i in $(seq 1 300); do [ -e %h/.local/state/theme/video ] && exit 0; sleep 1; done; exit 1'";
+              ExecStart = "${pkgs.mpvpaper}/bin/mpvpaper -vs -o 'no-audio loop --vo=gpu --hwdec=vaapi' ${output} %h/.local/state/theme/video";
+              Restart = "always";
+              RestartSec = "2";
+              RuntimeMaxSec = "1800";
+            };
+            Install.WantedBy = [ "graphical-session.target" ];
+          }
+        ) videoOutputs
+      )
+    );
 
     home.packages = lib.optional videoWallpaper pkgs.mpvpaper;
 
     home.file.".local/bin/niri-autostart" = {
       executable = true;
-      text =
-        ''
-          #!/usr/bin/env bash
-          # Auto-generated by Nix for ${hostname}
+      text = ''
+        #!/usr/bin/env bash
+        # Auto-generated by Nix for ${hostname}
 
-        ''
-        + (
-          if videoWallpaper && hostname == "snowflake" then
-            ''
-              # Video wallpapers are managed by the mpvpaper systemd user services
-            ''
-          else
-            ''
-              # Static wallpaper via awww, through the theme indirection link
-              # (seeded by assets-setup, changed by theme-switch)
-              awww-daemon &
-              sleep 0.5
-              WALL="$HOME/.local/state/theme/wallpaper"
-              [ -e "$WALL" ] || WALL="$HOME/Pictures/Wallpapers/default.jpg"
-              awww img "$WALL" &
-            ''
-        );
+      ''
+      + (
+        if videoWallpaper && videoOutputs != [ ] then
+          ''
+            # Video wallpapers are managed by the mpvpaper systemd user services
+          ''
+        else
+          ''
+            # Static wallpaper via awww, through the theme indirection link
+            # (seeded by assets-setup, changed by theme-switch)
+            awww-daemon &
+            sleep 0.5
+            WALL="$HOME/.local/state/theme/wallpaper"
+            [ -e "$WALL" ] || WALL="$HOME/Pictures/Wallpapers/default.jpg"
+            awww img "$WALL" &
+          ''
+      )
+      + lib.optionalString config.my.home.gpu-screen-recorder.autostart ''
+
+        # GPU Screen Recorder UI overlay
+        if ! pgrep -x "gsr-ui" > /dev/null; then
+          gsr-ui &
+        fi
+      ''
+      + lib.optionalString config.my.home.easyeffects.autostart ''
+
+        # EasyEffects audio daemon
+        if ! pgrep -x "easyeffects" > /dev/null; then
+          easyeffects --hide-window --service-mode &
+        fi
+      '';
     };
   };
 }

@@ -1,6 +1,5 @@
-{ config, ... }:
-{
-
+{ config, lib, ... }:
+lib.mkIf config.my.home.wm.hyprland.enable {
   home.file.".config/swaync/config.json" = {
     source = config.lib.file.mkOutOfStoreSymlink (./config.json);
   };
@@ -17,5 +16,4 @@
     source = config.lib.file.mkOutOfStoreSymlink ./icons;
     recursive = true;
   };
-
 }

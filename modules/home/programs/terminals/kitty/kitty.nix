@@ -1,7 +1,13 @@
-{ hostname, ... }:
 {
+  config,
+  lib,
+  unstable,
+  ...
+}:
+lib.mkIf config.my.home.terminals.kitty.enable {
   programs.kitty = {
     enable = true;
+    package = unstable.kitty;
     font = {
       name = "CaskaydiaCove Nerd Font";
       size = 18;
@@ -11,8 +17,6 @@
       italic_font = "auto";
       bold_italic_font = "auto";
       # allow_remote_control = "yes";
-
-
 
       input_delay = "0"; # Reduces input buffering
       sync_to_monitor = "no"; # Prevents vsync-induced input lag

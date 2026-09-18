@@ -15,10 +15,6 @@ prefer-no-csd
 // Find the full list of options on the wiki:
 
 // https://niri-wm.github.io/niri/Configuration:-Input
-environment {
-    NIXOS_OZONE_WL "1"
-    ELECTRON_OZONE_PLATFORM_HINT "wayland"
-}
 input {
   mod-key "Super"
   workspace-auto-back-and-forth
@@ -289,7 +285,8 @@ blur {
 
 window-rule {
     match app-id="kitty"
-    match app-id="com.mitchellh.ghostty"
+    // match app-id="com.mitchellh.ghostty"
+    match app-id="foot"
     
     draw-border-with-background false
 
@@ -405,7 +402,7 @@ binds {
     Mod+Shift+Slash { show-hotkey-overlay; }
 
     // Suggested binds for running programs: terminal, app launcher, screen locker.
-    Mod+Q hotkey-overlay-title="Open ghostty" { spawn "ghostty"; }
+    Mod+Q hotkey-overlay-title="Open foot" { spawn "foot"; }
     Mod+Shift+Q hotkey-overlay-title="Open kitty" { spawn "kitty"; }
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }

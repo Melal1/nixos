@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  # - Time 
+  # - Time
   time.timeZone = "Asia/Riyadh";
   # - Locale
   i18n = {
@@ -35,7 +35,7 @@
     ];
   };
   nixpkgs.config.permittedInsecurePackages = [
-    "pnpm-10.29.2"
+    "olm-3.2.16"
   ];
 
 }

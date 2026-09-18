@@ -1,4 +1,10 @@
-{ config, lib, pkgs, osConfig ? null, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  osConfig ? null,
+  ...
+}:
 let
   rgbEnabled =
     if osConfig != null && (osConfig ? my.hardware.rgb.enable) then

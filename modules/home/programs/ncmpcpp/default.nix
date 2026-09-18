@@ -80,29 +80,90 @@
     };
     bindings = [
       # Basic navigation
-      { key = "j"; command = "scroll_down"; }
-      { key = "k"; command = "scroll_up"; }
-      { key = "h"; command = "previous_column"; }
-      { key = "l"; command = "next_column"; }
+      {
+        key = "j";
+        command = "scroll_down";
+      }
+      {
+        key = "k";
+        command = "scroll_up";
+      }
+      {
+        key = "h";
+        command = "previous_column";
+      }
+      {
+        key = "l";
+        command = "next_column";
+      }
 
       # Jump 10 lines
-      { key = "J"; command = [ "scroll_down" "scroll_down" "scroll_down" "scroll_down" "scroll_down" "scroll_down" "scroll_down" "scroll_down" "scroll_down" "scroll_down" ]; }
-      { key = "K"; command = [ "scroll_up" "scroll_up" "scroll_up" "scroll_up" "scroll_up" "scroll_up" "scroll_up" "scroll_up" "scroll_up" "scroll_up" ]; }
+      {
+        key = "J";
+        command = [
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+          "scroll_down"
+        ];
+      }
+      {
+        key = "K";
+        command = [
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+          "scroll_up"
+        ];
+      }
 
       # Play/pause and next/previous
-      { key = "p"; command = "pause"; }
-      { key = "n"; command = "next"; }
-      { key = "b"; command = "previous"; }
+      {
+        key = "p";
+        command = "pause";
+      }
+      {
+        key = "n";
+        command = "next";
+      }
+      {
+        key = "b";
+        command = "previous";
+      }
 
       # Volume controls
-      { key = "+"; command = "volume_up"; }
-      { key = "-"; command = "volume_down"; }
+      {
+        key = "+";
+        command = "volume_up";
+      }
+      {
+        key = "-";
+        command = "volume_down";
+      }
 
       # Toggle visualizer
-      { key = "v"; command = "show_visualizer"; }
+      {
+        key = "v";
+        command = "show_visualizer";
+      }
 
       # Quit
-      { key = "q"; command = "quit"; }
+      {
+        key = "q";
+        command = "quit";
+      }
     ];
   };
 }

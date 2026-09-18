@@ -1,4 +1,9 @@
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   options.my.hardware.vial-qmk.enable = lib.mkEnableOption "Enable vial-qmk Keyboards";
 

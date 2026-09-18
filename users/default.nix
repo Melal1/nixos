@@ -1,6 +1,5 @@
 {
-  imports =
-    [
-      ./melal.nix
-    ];
+  imports = [
+    ./melal.nix
+  ];
 }

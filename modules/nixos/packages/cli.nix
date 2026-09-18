@@ -1,4 +1,11 @@
-{ pkgs, unstable, config, ... }: {
+{
+  pkgs,
+  unstable,
+  config,
+  lib,
+  ...
+}:
+{
   environment.systemPackages =
     (with pkgs; [
 
@@ -11,12 +18,11 @@
       watchman
       speedtest-cli
       nmap
+      iamb
       arp-scan
       delta
       lolcat
       figlet
-      timer
-      browsh
       mpc
       playerctl
       tmux
@@ -28,7 +34,6 @@
       bat
       eza
       fastfetch
-      codex
       fish
       fzf
       grc
@@ -40,7 +45,6 @@
       home-manager
       bear
       tealdeer
-      smassh
       asciiquarium
       (ncmpcpp.override {
         visualizerSupport = true;
@@ -49,42 +53,17 @@
       lazygit
       yazi
     ])
-    ++
-    (
-      if config.networking.hostName == "snowflake" then
-
-        (with pkgs; [
-          btop-rocm
-          nmap
-          imagemagick
-          cava
-          ninja
-          qpwgraph
-        ])
-        ++ (with unstable;[
-          codex
-        ])
-      else if config.networking.hostName == "rusty" then
-        (with pkgs; [
-          btop
-          brightnessctl
-        ])
-      else
-        [ ]
-    )
-    ++
-    (with unstable;
-    [
-      spotdl
-      timr-tui
+    ++ (with unstable; [
       neovim
       herdr
       tree-sitter
       zip
       yt-dlp
       rar
-      geminicommit
       ffmpeg
       opencode
-    ]);
+    ])
+    ++ lib.optionals config.my.virtualisation.mssql.enable [
+      unstable.lazysql
+    ];
 }

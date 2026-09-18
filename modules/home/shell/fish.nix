@@ -1,11 +1,24 @@
-{ pkgs, config, hostname, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  hostname,
+  ...
+}:
+{
   programs = {
     fish = {
       enable = true;
       plugins = [
         # Enable a plugin (here grc for colorized command output) from nixpkgs
-        { name = "grc"; src = pkgs.fishPlugins.grc.src; }
-        { name = "fzf-fish"; src = pkgs.fishPlugins.fzf-fish.src; }
+        {
+          name = "grc";
+          src = pkgs.fishPlugins.grc.src;
+        }
+        {
+          name = "fzf-fish";
+          src = pkgs.fishPlugins.fzf-fish.src;
+        }
       ];
 
       shellInit = ''
@@ -92,12 +105,13 @@
         if status --is-interactive
         eval (direnv hook fish)
         end
-  
 
 
 
 
-      '' + (if config.programs.yazi.enable then ''
+
+      ''
+      + lib.optionalString config.programs.yazi.enable ''
         function y
           set tmp (mktemp -t "yazi-cwd.XXXXXX")
           yazi $argv --cwd-file="$tmp"
@@ -106,7 +120,7 @@
           end
           rm -f -- "$tmp"
         end
-      '' else "");
+      '';
 
       preferAbbrs = true;
       shellAbbrs = {
@@ -115,14 +129,7 @@
         vhm = "nvim ~/.dotfiles/nixos/modules/home/";
         qa = "exit";
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
-        h-r = (if hostname == "snowflake" then
-          "home-manager switch --flake ~/.dotfiles/nixos#snowflake"
-        else if hostname == "rusty" then
-          "home-manager switch --flake ~/.dotfiles/nixos#rusty"
-        else
-          "home-manager switch --flake ~/.dotfiles/nixos/.#"
-        );
-        cursS = "nix develop ~/.dotfiles/nixos/.#ncurses";
+        h-r = "home-manager switch --flake ~/.dotfiles/nixos/#${toString hostname}";
       };
 
       shellAliases = {
@@ -137,9 +144,7 @@
   home.sessionVariables = {
     BROWSER = "brave-origin";
     EDITOR = "nvim";
-    CODELLDB_PATH =
-      "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
-    DOTNET_ROOT = "${pkgs.dotnet-sdk_10}/share/dotnet"; 
+    CODELLDB_PATH = "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
+    DOTNET_ROOT = "${pkgs.dotnet-sdk_10}/share/dotnet";
   };
 }
-

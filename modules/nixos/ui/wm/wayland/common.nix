@@ -1,10 +1,14 @@
-{ config, lib, pkgs, ... }:
-
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
-  cfg = config.my.desktop;
+  isWayland = config.my.desktop.niri.enable || config.my.desktop.hyprland.enable;
 in
 {
-  config = lib.mkIf (cfg.type == "niri" || cfg.type == "hyprland") {
+  config = lib.mkIf isWayland {
 
     environment.systemPackages = with pkgs; [
       wl-clipboard
@@ -15,4 +19,3 @@ in
 
   };
 }
-

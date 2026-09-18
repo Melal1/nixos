@@ -1,7 +1,12 @@
 { pkgs }:
 
 pkgs.mkShell {
-  packages = [ pkgs.fmt pkgs.gcc pkgs.gnumake pkgs.cmake ];
+  packages = [
+    pkgs.fmt
+    pkgs.gcc
+    pkgs.gnumake
+    pkgs.cmake
+  ];
 
   shellHook = ''
       # Only switch to fish if we are not already in fish
@@ -9,5 +14,3 @@ pkgs.mkShell {
       exec fish --login
   '';
 }
-
-

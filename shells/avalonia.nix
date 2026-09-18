@@ -24,7 +24,8 @@ in
 pkgs.mkShell {
   packages = [
     pkgs.dotnet-sdk_10
-  ] ++ libList;
+  ]
+  ++ libList;
 
   shellHook = ''
     # Dynamically point LD_LIBRARY_PATH to native shared object (.so) files

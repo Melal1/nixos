@@ -1,29 +1,36 @@
-{ config, ... }:
 {
+  config,
+  lib,
+  unstable,
+  ...
+}:
+lib.mkIf config.my.home.terminals.ghostty.enable {
   programs.ghostty = {
     enable = true;
+    package = unstable.ghostty;
+    systemd.enable = false;
     settings = {
       # theme = "vague";
-      font-size = 18;
+      font-size = 14;
       font-family = "CaskaydiaCove Nerd Font";
       font-style = "SemiBold";
       # font-style-bold = "Bold";
       # font-style-italic = "SemiBold Italic";
       # font-style-bold-italic = "Bold Italic";
 
-      window-padding-balance = true;
-      window-decoration = false;
-      window-theme = "system";
-      confirm-close-surface = false;
-      resize-overlay = "never";
+      # window-padding-balance = true;
+      # window-decoration = false;
+      # window-theme = "system";
+      # confirm-close-surface = false;
+      # resize-overlay = "never";
       quit-after-last-window-closed = true;
       quit-after-last-window-closed-delay = "10m";
       gtk-single-instance = "detect";
-      adjust-cell-width = 0;
-      adjust-cell-height = "+10%";
-      bold-color = "bright";
-      mouse-hide-while-typing = true;
-      mouse-scroll-multiplier = 2;
+      # adjust-cell-width = 0;
+      # adjust-cell-height = "+10%";
+      # bold-color = "bright";
+      # mouse-hide-while-typing = true;
+      # mouse-scroll-multiplier = 2;
       cursor-style = "block";
       window-vsync = false;
       config-file = "${config.home.homeDirectory}/.config/ghostty/theme";
@@ -45,4 +52,3 @@
     enableFishIntegration = true;
   };
 }
-

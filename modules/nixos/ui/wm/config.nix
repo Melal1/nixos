@@ -9,10 +9,9 @@
     ./wayland/hyprland.nix
   ];
 
-  options.my.desktop.type = lib.mkOption {
-    type = lib.types.enum [ "none" "hyprland" "dwm" "niri" ];
-    default = "none";
-    description = "Select desktop environment / window manager";
+  options.my.desktop = {
+    niri.enable = lib.mkEnableOption "Niri Wayland scrollable-tiling compositor";
+    hyprland.enable = lib.mkEnableOption "Hyprland Wayland compositor";
+    dwm.enable = lib.mkEnableOption "dwm X11 dynamic window manager";
   };
 }
-

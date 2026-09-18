@@ -18,7 +18,7 @@
 
       modules = [
         "break"
-        
+
         {
           type = "Title";
           format = "{}";

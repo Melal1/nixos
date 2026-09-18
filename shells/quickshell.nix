@@ -22,6 +22,3 @@ pkgs.mkShell {
         echo "  ninja"
   '';
 }
-
-
-

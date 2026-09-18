@@ -1,10 +1,12 @@
-{ config, lib, pkgs, ... }:
-
-let
-  cfg = config.my.desktop;
-in
 {
-  config = lib.mkIf (cfg.type == "hyprland") {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+
+{
+  config = lib.mkIf config.my.desktop.hyprland.enable {
     programs.hyprland.enable = true;
     programs.hyprland.xwayland.enable = true;
 

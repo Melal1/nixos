@@ -1,8 +1,9 @@
-{ lib
-, stdenv
-, libX11
-, libXext
-, libXrender
+{
+  lib,
+  stdenv,
+  libX11,
+  libXext,
+  libXrender,
 }:
 
 stdenv.mkDerivation {
