@@ -11,5 +11,6 @@
     ./input/touchpad.nix
     ./vial-qmk.nix
     ./rgb.nix
+    ./android-webcam.nix
   ];
 }

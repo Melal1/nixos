@@ -2,7 +2,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../users
     ../../modules/nixos
     ./kernel.nix
     inputs.pi.nixosModules.default

@@ -19,6 +19,10 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
+    skwd-wall = {
+      url = "github:liixini/skwd-wall/nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     ditto = {
       url = "github:Melal1/ditto";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -89,8 +93,34 @@
           nixpkgs.lib.filterAttrs isHost dirs
         );
 
+      # User definitions are auto-discovered from users/<name>/meta.nix.
+      # A host's meta.nix decides which of these accounts it actually has.
+      users =
+        let
+          dirs = builtins.readDir ./users;
+          isUser =
+            name: type:
+            type == "directory"
+            && builtins.pathExists (./users + "/${name}/meta.nix")
+            && builtins.pathExists (./users + "/${name}/nixos.nix")
+            && builtins.pathExists (./users + "/${name}/home.nix");
+        in
+        nixpkgs.lib.mapAttrs (name: _: (import (./users + "/${name}/meta.nix")) // { inherit name; }) (
+          nixpkgs.lib.filterAttrs isUser dirs
+        );
+
+      hostUsers =
+        hostName: host:
+        map (
+          userName:
+          if builtins.hasAttr userName users then
+            userName
+          else
+            throw "hosts/${hostName}/meta.nix references unknown user '${userName}'"
+        ) (host.users or [ ]);
+
       mkHost =
-        name: _:
+        name: host:
         nixpkgs.lib.nixosSystem {
           specialArgs = {
             inherit inputs unstable;
@@ -102,33 +132,51 @@
               nixpkgs.overlays = overlays;
             }
             (./hosts + "/${name}")
-          ];
+          ]
+          ++ map (userName: import (./users + "/${userName}/nixos.nix") { user = users.${userName}; }) (
+            hostUsers name host
+          );
         };
 
       mkHome =
-        name: _:
+        hostName: userName:
         home-manager.lib.homeManagerConfiguration {
           inherit pkgs;
           extraSpecialArgs = {
             inherit self inputs unstable;
-            hostname = name;
-            osConfig = self.nixosConfigurations.${name}.config;
+            hostname = hostName;
+            osConfig = self.nixosConfigurations.${hostName}.config;
           };
           modules = [
             inputs.spicetify-nix.homeManagerModules.default
-            (./hosts + "/${name}/home.nix")
+            (import (./users + "/${userName}/home.nix") { user = users.${userName}; })
+            (./hosts + "/${hostName}/home.nix")
           ];
         };
-      baseHomeConfigs = builtins.mapAttrs mkHome hosts;
+
+      homeConfigs = nixpkgs.lib.foldl' (
+        configs: hostName:
+        configs
+        // builtins.listToAttrs (
+          map (userName: {
+            name = "${userName}@${hostName}";
+            value = mkHome hostName userName;
+          }) (hostUsers hostName hosts.${hostName})
+        )
+      ) { } (builtins.attrNames hosts);
+
+      # Keep #<hostname> working where a host has exactly one configured user.
+      singleUserHosts = nixpkgs.lib.filterAttrs (
+        hostName: host: builtins.length (hostUsers hostName host) == 1
+      ) hosts;
+      legacyHomeConfigs = builtins.mapAttrs (
+        hostName: host: homeConfigs."${builtins.head (hostUsers hostName host)}@${hostName}"
+      ) singleUserHosts;
     in
     {
       nixosConfigurations = builtins.mapAttrs mkHost hosts;
 
-      homeConfigurations =
-        baseHomeConfigs
-        // nixpkgs.lib.mapAttrs' (
-          name: conf: nixpkgs.lib.nameValuePair "${conf.config.home.username}@${name}" conf
-        ) baseHomeConfigs;
+      homeConfigurations = homeConfigs // legacyHomeConfigs;
 
       packages.${system} = {
         inherit (pkgs)

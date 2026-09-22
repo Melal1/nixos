@@ -1,6 +1,30 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 let
   cfg = config.my.programs.steam;
+
+  steamWithGamingRuntime = pkgs.steam.override {
+    extraPkgs =
+      pkgs: with pkgs; [
+        libxcursor
+        libxi
+        libxinerama
+        libxscrnsaver
+        stdenv.cc.cc.lib
+        gamemode
+        gperftools
+        keyutils
+        libkrb5
+        libpng
+        libpulseaudio
+        libvorbis
+        mangohud
+      ];
+  };
 in
 {
   options.my.programs.steam = {
@@ -8,10 +32,21 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    programs.steam = {
-      enable = true;
-      remotePlay.openFirewall = true;
-      dedicatedServer.openFirewall = true;
+
+    environment.systemPackages = [
+      pkgs.steamcmd
+      pkgs.mangohud
+    ];
+    programs = {
+      gamemode.enable = true;
+      steam = {
+        enable = true;
+        remotePlay.openFirewall = true;
+        dedicatedServer.openFirewall = true;
+        package = steamWithGamingRuntime;
+        extraCompatPackages = [ pkgs.proton-ge-bin ];
+        protontricks.enable = true;
+      };
     };
   };
 }

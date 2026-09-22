@@ -366,9 +366,31 @@
         "qml-niri": "qml-niri",
         "qmlgolsp": "qmlgolsp",
         "quickshell": "quickshell",
+        "skwd-wall": "skwd-wall",
         "spicetify-nix": "spicetify-nix",
         "treefmt-nix": "treefmt-nix_3",
         "zen-browser": "zen-browser"
+      }
+    },
+    "skwd-wall": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1790098491,
+        "narHash": "sha256-dtybYzJt1OyXepG/xWo5/MxzQb2Ree6Y+/SMOqHEthw=",
+        "owner": "liixini",
+        "repo": "skwd-wall",
+        "rev": "cac52a7539ddf8e2d7ab7d69bd051200a129f62c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "liixini",
+        "ref": "nix",
+        "repo": "skwd-wall",
+        "type": "github"
       }
     },
     "spicetify-nix": {

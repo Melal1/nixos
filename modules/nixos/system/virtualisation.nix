@@ -10,12 +10,18 @@ in
 {
   options.my.virtualisation = {
     mssql.enable = lib.mkEnableOption "Microsoft SQL Server container (podman backend)";
+    databaseEnabled = lib.mkOption {
+      type = lib.types.bool;
+      readOnly = true;
+      description = "Whether any configured database service is enabled";
+    };
     docker.enable = lib.mkEnableOption "Docker daemon";
     docker.autoStart = lib.mkEnableOption "Start Docker on boot";
   };
 
   config = lib.mkMerge [
     {
+      my.virtualisation.databaseEnabled = cfg.mssql.enable || config.services.postgresql.enable;
       virtualisation.waydroid.enable = false;
     }
 

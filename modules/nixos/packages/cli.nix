@@ -63,7 +63,8 @@
       ffmpeg
       opencode
     ])
-    ++ lib.optionals config.my.virtualisation.mssql.enable [
+    ++ lib.optionals config.my.virtualisation.databaseEnabled [
       unstable.lazysql
+      pkgs.pgmodeler
     ];
 }

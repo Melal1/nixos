@@ -15,10 +15,6 @@
   ];
 
   config = {
-    home.username = "melal";
-    home.homeDirectory = "/home/melal";
     programs.home-manager.enable = true;
-
-    home.stateVersion = "24.11";
   };
 }

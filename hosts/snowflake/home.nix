@@ -3,6 +3,6 @@
 
   my.home = {
     waybar.theme = "snowflake-v";
-    videoWallpaper.enable = true;
+    videoWallpaper.enable = false;
   };
 }

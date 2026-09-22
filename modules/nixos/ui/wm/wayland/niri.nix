@@ -21,13 +21,14 @@ in
     xdg.portal = {
       enable = true;
       xdgOpenUsePortal = true;
-      extraPortals = [
-        pkgs.xdg-desktop-portal
-        pkgs.xdg-desktop-portal-gtk
-        pkgs.xdg-desktop-portal-gnome
+      extraPortals = with pkgs; [
+        # xdg-desktop-portal
+        xdg-desktop-portal-gtk
+        # xdg-desktop-portal-gnome
       ];
       config = {
-        common.default = [ "gnome" ];
+        # common.default = [ "gnome" ];
+        common.default = [ "gtk" ];
       };
     };
 
@@ -52,6 +53,7 @@ in
       inputs.qmlgolsp.packages.${sys}.default
       inputs.qml-niri.packages.${sys}.quickshell
       xwayland-satellite
+      xdg-desktop-portal-gtk
       nautilus
       mpd-mpris
       cliphist

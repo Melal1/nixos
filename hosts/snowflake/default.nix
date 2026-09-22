@@ -4,7 +4,6 @@
     ./hardware-configuration.nix
     ./keyboard.nix
     ./kernel.nix
-    ../../users
     ../../modules/nixos
   ];
 
@@ -27,9 +26,12 @@
     performance.enable = true;
     vial-qmk.enable = true;
     rgb.enable = true;
-  };
+    androidWebcam = {
+      enable = true;
+      autoStart = false;
 
-  my.services.extraGraphics.enable = true;
+    };
+  };
 
   my.desktop = {
     niri.enable = true;
@@ -60,6 +62,6 @@
       inputs.ditto.packages.${sys}.default
       inputs.zen-browser.packages.${sys}.default
       inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
-      # inputs.music-sep.packages.${sys}.default
+      inputs.skwd-wall.packages.${sys}.default
     ];
 }
