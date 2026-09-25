@@ -8,7 +8,7 @@ This repository contains my declarative NixOS and standalone Home Manager config
 - `hosts/`: One directory per machine, named after the flake output.
   - `hosts/snowflake/`: Desktop machine. `hardware-configuration.nix` + a thin list of `my.*` toggles.
   - `hosts/rusty/`: Laptop machine.
-  - `hosts/<name>/meta.nix`: Per-host metadata (`windowManager`) read by the flake.
+  - `hosts/<name>/meta.nix`: Per-host metadata (`users`) read by the flake.
 - `modules/`: Shared modules, all host-agnostic.
   - `modules/nixos/`: System modules. Features are gated behind `my.*` enable options.
   - `modules/home/`: Home Manager modules (programs, shell, dev, scripts).
