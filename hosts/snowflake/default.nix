@@ -62,6 +62,5 @@
       inputs.ditto.packages.${sys}.default
       inputs.zen-browser.packages.${sys}.default
       inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
-      inputs.skwd-wall.packages.${sys}.default
     ];
 }

@@ -20,9 +20,8 @@
 #   2. --random picks one at random
 #   3. otherwise the default.* convention
 #
-# After re-pointing the links the script re-applies: awww for the static
-# wallpaper, mpvpaper service restart if the video link changed, and a config
-# reload signal to kitty (SIGUSR1) and ghostty (SIGUSR2).
+# After re-pointing the links the script applies the selected image or video
+# through skwd-wall, then reloads kitty (SIGUSR1) and ghostty (SIGUSR2).
 { pkgs }:
 
 pkgs.writers.writeBashBin "theme-switch" ''
@@ -160,42 +159,29 @@ pkgs.writers.writeBashBin "theme-switch" ''
       CHOSEN_WALL="$(readlink -f "$THEME_DIR/wallpaper")"
     fi
 
-    if [ -n "$CHOSEN_WALL" ]; then
+    # --- Wallpaper (image or video) via skwd-wall ---------------------------------
+    CHOSEN_MEDIA=""
+    if [ -e "$THEME_DIR/video" ]; then
+      CHOSEN_MEDIA="$(readlink -f "$THEME_DIR/video")"
+      mkdir -p "$STATE_DIR"
+      ln -sfn "$CHOSEN_MEDIA" "$STATE_DIR/video"
+      ok "video: $(basename "$CHOSEN_MEDIA")"
+    elif [ -n "$CHOSEN_WALL" ]; then
+      CHOSEN_MEDIA="$CHOSEN_WALL"
       mkdir -p "$STATE_DIR"
       ln -sfn "$CHOSEN_WALL" "$STATE_DIR/wallpaper"
       ok "wallpaper: $(basename "$CHOSEN_WALL")"
-      if pgrep -x awww-daemon >/dev/null; then
-        awww img "$STATE_DIR/wallpaper" \
-          && ok "awww applied" \
-          || warn "awww img failed"
+    fi
+
+    if [ -n "$CHOSEN_MEDIA" ]; then
+      ln -sfn "$CHOSEN_MEDIA" "$STATE_DIR/media"
+      if command -v skwd-helm >/dev/null && systemctl --user is-active --quiet skwd-walld; then
+        skwd-helm apply "$CHOSEN_MEDIA" \
+          && ok "skwd-wall applied" \
+          || warn "skwd-helm apply failed"
+      else
+        warn "skwd-walld is not active; wallpaper will apply at the next Niri login"
       fi
-    fi
-
-    # --- Video wallpaper ------------------------------------------------------------
-    VIDEO_CHANGED=0
-    if [ -e "$THEME_DIR/video" ]; then
-      NEW_VIDEO="$(readlink -f "$THEME_DIR/video")"
-      OLD_VIDEO=""
-      [ -e "$STATE_DIR/video" ] && OLD_VIDEO="$(readlink -f "$STATE_DIR/video")"
-      mkdir -p "$STATE_DIR"
-      ln -sfn "$NEW_VIDEO" "$STATE_DIR/video"
-      ok "video: $(basename "$NEW_VIDEO")"
-      [ "$NEW_VIDEO" != "$OLD_VIDEO" ] && VIDEO_CHANGED=1
-    fi
-
-    # mpvpaper caches the file at start; restart all declared output services
-    # to pick up a new video.
-    if [ "$VIDEO_CHANGED" -eq 1 ]; then
-      systemctl --user list-units --type=service --state=active --no-legend 'mpvpaper-*' \
-        | while read -r unit _; do
-            case "$unit" in
-              mpvpaper-*.service)
-                systemctl --user restart "$unit" \
-                  && ok "restarted $unit" \
-                  || warn "could not restart $unit"
-                ;;
-            esac
-          done
     fi
 
     # --- Live terminal reload -------------------------------------------------------

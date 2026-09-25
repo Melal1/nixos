@@ -27,6 +27,7 @@
       playerctl
       tmux
       unzip
+      spotdl
       ripgrep
       fd
       tree

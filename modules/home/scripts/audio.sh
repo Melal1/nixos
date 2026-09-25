@@ -7,7 +7,7 @@
 CARD_NAME="bluez_card.88_0E_85_5C_BE_62"
 HEADSET_SOURCE="bluez_input.88:0E:85:5C:BE:62"
 OTHER_MIC="alsa_input.usb-MV-SILICON_M8_20190808-00.analog-stereo"
-ICONDIR="$HOME/.config/swaync/icons"
+ICONDIR="$HOME/.local/share/icons/osd"
 
 # Common notify-send flags
 NOTIFY_FLAGS='-e -h string:x-canonical-private-synchronous:osd -u low'

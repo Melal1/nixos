@@ -4,7 +4,7 @@
 # CONFIG
 # ----------------------------- #
 
-ICONDIR="$HOME/.config/swaync/icons"
+ICONDIR="$HOME/.local/share/icons/osd"
 NOTIFY_FLAGS='-e -h string:x-canonical-private-synchronous:osd -u low'
 
 # ----------------------------- #
@@ -52,4 +52,3 @@ esac
 
 brightness_noti
 exit 0
-

@@ -404,6 +404,7 @@ binds {
     // Suggested binds for running programs: terminal, app launcher, screen locker.
     Mod+Q hotkey-overlay-title="Open foot" { spawn "foot"; }
     Mod+Shift+Q hotkey-overlay-title="Open kitty" { spawn "kitty"; }
+    Mod+Shift+W hotkey-overlay-title="Wallpaper Picker" { spawn "skwd-helm" "ui" "toggle"; }
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
     Mod+B hotkey-overlay-title="Run Brave origin" {spawn "brave-origin";}

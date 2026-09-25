@@ -11,13 +11,14 @@
 #   git@github.com:Melal1/quickshell.git        ->  ~/.config/quickshell
 #   git@github.com:Melal1/neovim.git (b: java)  ->  ~/.config/nvim
 #
-# Also sets the default terminal theme (vague) for kitty + ghostty and, if an
-# awww daemon is running, the default wallpaper.
+# Also sets the default terminal theme (vague) for kitty + ghostty and applies
+# the default wallpaper through skwd-wall when its daemon is running.
 #
-# Also seeds the theme indirection links (used by niri-autostart, mpvpaper and
+# Also seeds the theme indirection links (used by niri-autostart and
 # theme-switch), only if absent — re-runs never clobber the current theme:
 #   ~/.local/state/theme/wallpaper  ->  ~/.local/share/assets/wallpapers/default.jpg
 #   ~/.local/state/theme/video      ->  ~/.local/share/assets/videos/rain2k.webm
+#   ~/.local/state/theme/media      ->  ~/.local/share/assets/wallpapers/default.jpg
 #
 # Idempotent: safe to re-run; existing checkouts and correct symlinks are left alone.
 { pkgs, dotfilesDir }:
@@ -156,16 +157,17 @@ pkgs.writers.writeBashBin "assets-setup" ''
   info "Theme state links"
   symlink_absent "$ASSETS_DIR/wallpapers/default.jpg" "$HOME/.local/state/theme/wallpaper"
   symlink_absent "$ASSETS_DIR/videos/rain2k.webm"     "$HOME/.local/state/theme/video"
+  symlink_absent "$ASSETS_DIR/wallpapers/default.jpg" "$HOME/.local/state/theme/media"
 
   # --- 6. Wallpaper ------------------------------------------------------------
   info "Wallpaper"
   if [ -e "$HOME/.local/state/theme/wallpaper" ]; then
-    if pgrep -x awww-daemon >/dev/null; then
-      awww img "$HOME/.local/state/theme/wallpaper" \
-        && ok "awww: wallpaper applied" \
-        || warn "awww img failed"
+    if command -v skwd-helm >/dev/null && systemctl --user is-active --quiet skwd-walld; then
+      skwd-helm apply "$HOME/.local/state/theme/media" \
+        && ok "skwd-wall: wallpaper applied" \
+        || warn "skwd-helm apply failed"
     else
-      ok "wallpaper link present (awww daemon not running; niri applies it at login)"
+      ok "wallpaper link present (skwd-walld not running; niri applies it at login)"
     fi
   else
     warn "~/.local/state/theme/wallpaper not set"

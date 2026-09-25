@@ -21,7 +21,7 @@ lib.mkIf config.my.home.terminals.foot.enable {
         background = "141415";
         selection-foreground = "cdcdcd";
         selection-background = "878787";
-        alpha = 0.7;
+        alpha = 0.8;
 
         regular0 = "252530";
         regular1 = "d8647e";

@@ -127,6 +127,7 @@
             hostname = name;
           };
           modules = [
+            inputs.skwd-wall.nixosModules.default
             {
               nixpkgs.hostPlatform = system;
               nixpkgs.overlays = overlays;
@@ -179,12 +180,7 @@
       homeConfigurations = homeConfigs // legacyHomeConfigs;
 
       packages.${system} = {
-        inherit (pkgs)
-          dwm
-          dwmblocks-async
-          xwinwrap
-          easydotnet
-          ;
+        inherit (pkgs) easydotnet;
       };
 
       devShells.${system} = import ./shells { inherit pkgs; };
