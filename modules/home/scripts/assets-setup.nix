@@ -37,7 +37,7 @@ pkgs.writers.writeBashBin "assets-setup" ''
 
   MISSING=0
 
-  # symlink <source> <dest> — create/replace dest as a symlink to source.
+  # symlink <source> <dest> — back up existing dest to dest.bk, then link to source.
   symlink() {
     local src="$1" dest="$2"
     if [ ! -e "$src" ]; then
@@ -50,7 +50,15 @@ pkgs.writers.writeBashBin "assets-setup" ''
       ok "already linked: $dest"
       return
     fi
-    rm -rf "$dest"
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+      local backup="$dest.bk"
+      if [ -e "$backup" ] || [ -L "$backup" ]; then
+        rm -rf "$backup"
+      fi
+      cp -a "$dest" "$backup"
+      ok "backup: $dest -> $backup"
+      rm -rf "$dest"
+    fi
     ln -s "$src" "$dest"
     ok "linked: $dest -> $src"
   }
