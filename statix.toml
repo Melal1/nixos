@@ -1,0 +1,3 @@
+# Flat option paths are deliberate in this configuration: they make module
+# settings easy to scan without changing NixOS/Home Manager merge semantics.
+disabled = [ "repeated_keys" ]

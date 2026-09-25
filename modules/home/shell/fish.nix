@@ -1,20 +1,24 @@
-{ pkgs, config, hostname, ... }: {
+{
+  pkgs,
+  config,
+  lib,
+  hostname,
+  ...
+}:
+{
   programs = {
     fish = {
       enable = true;
       plugins = [
         # Enable a plugin (here grc for colorized command output) from nixpkgs
-        { name = "grc"; src = pkgs.fishPlugins.grc.src; }
-          {
-        name = "fzf";
-        src = pkgs.fetchFromGitHub {
-          owner = "PatrickF1";
-          repo = "fzf.fish";
-          rev = "8920367cf85eee5218cc25a11e209d46e2591e7a";
-          sha256 = "T8KYLA/r/gOKvAivKRoeqIwE2pINlxFQtZJHpOy9GMM=";
-
-        };
-      }
+        {
+          name = "grc";
+          src = pkgs.fishPlugins.grc.src;
+        }
+        {
+          name = "fzf-fish";
+          src = pkgs.fishPlugins.fzf-fish.src;
+        }
       ];
 
       shellInit = ''
@@ -33,6 +37,29 @@
             fzf-tmux $argv
           else
             command fzf $argv
+          end
+        end
+
+        function rgn
+          set -l res (rg --color=always --line-number --no-heading --smart-case $argv | fzf --ansi --delimiter : --preview 'bat --color=always {1} --highlight-line {2}' --preview-window 'up,60%,+{2}-10')
+          if test -n "$res"
+            set -l tokens (string split ":" $res)
+            # tokens[1] is the file path, tokens[2] is the line number
+            nvim +$tokens[2] $tokens[1]
+          end
+        end
+
+        function rgi
+          set -l res (fzf --disabled --ansi \
+            --bind "start:reload(rg --column --line-number --no-heading --color=always --smart-case ''')" \
+            --bind "change:reload(rg --column --line-number --no-heading --color=always --smart-case {q} || true)" \
+            --delimiter : \
+            --preview 'bat --color=always {1} --highlight-line {2}' \
+            --preview-window 'up,60%,+{2}-10')
+            
+          if test -n "$res"
+            set -l tokens (string split ":" $res)
+            nvim +$tokens[2] $tokens[1]
           end
         end
 
@@ -78,12 +105,13 @@
         if status --is-interactive
         eval (direnv hook fish)
         end
-  
 
 
 
 
-      '' + (if config.programs.yazi.enable then ''
+
+      ''
+      + lib.optionalString config.programs.yazi.enable ''
         function y
           set tmp (mktemp -t "yazi-cwd.XXXXXX")
           yazi $argv --cwd-file="$tmp"
@@ -92,7 +120,7 @@
           end
           rm -f -- "$tmp"
         end
-      '' else "");
+      '';
 
       preferAbbrs = true;
       shellAbbrs = {
@@ -101,14 +129,7 @@
         vhm = "nvim ~/.dotfiles/nixos/modules/home/";
         qa = "exit";
         x-r = "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
-        h-r = (if hostname == "alpha" then
-          "home-manager switch --flake ~/.dotfiles/nixos#alpha"
-        else if hostname == "zeta" then
-          "home-manager switch --flake ~/.dotfiles/nixos#zeta"
-        else
-          "home-manager switch --flake ~/.dotfiles/nixos/.#"
-        );
-        cursS = "nix develop ~/.dotfiles/nixos/.#ncurses";
+        h-r = "home-manager switch --flake ~/.dotfiles/nixos/#${toString hostname}";
       };
 
       shellAliases = {
@@ -121,10 +142,9 @@
   };
 
   home.sessionVariables = {
-    BROWSER = "zen";
+    BROWSER = "brave-origin";
     EDITOR = "nvim";
-    CODELLDB_PATH =
-      "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
+    CODELLDB_PATH = "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
+    DOTNET_ROOT = "${pkgs.dotnet-sdk_10}/share/dotnet";
   };
 }
-

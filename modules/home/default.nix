@@ -1,19 +1,20 @@
+{ config, lib, ... }:
 {
-  home.username = "melal";
-  home.homeDirectory = "/home/melal/";
-  programs.home-manager.enable = true;
+  options.my.home.dotfilesDir = lib.mkOption {
+    type = lib.types.str;
+    default = "${config.home.homeDirectory}/.dotfiles/nixos";
+    description = "Absolute path to this repo checkout, used for out-of-store symlinks.";
+  };
+
   imports = [
-    ./programs/terminals
+    ./programs
     ./shell
     ./dev
     ./scripts
-    ./programs/utilities
-    ./programs/wm
-    ../ui/gtk.nix
-    ./assests
+    ./gtk.nix
   ];
 
-
-
-  home.stateVersion = "24.11";
+  config = {
+    programs.home-manager.enable = true;
+  };
 }

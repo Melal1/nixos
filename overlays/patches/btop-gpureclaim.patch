@@ -1,0 +1,42 @@
+--- a/src/linux/btop_collect.cpp
++++ b/src/linux/btop_collect.cpp
+@@ -2148,7 +2148,8 @@
+ 		ifstream meminfo(Shared::procPath / "meminfo");
+ 		if (meminfo.good()) {
+ 			bool got_avail = false;
+-			for (string label; meminfo.peek() != 'D' and meminfo >> label;) {
++			uint64_t gpu_reclaim = 0;
++			for (string label; meminfo >> label;) {
+ 				if (label == "MemFree:") {
+ 					meminfo >> mem.stats.at("free");
+ 					mem.stats.at("free") <<= 10;
+@@ -2161,7 +2162,6 @@
+ 				else if (label == "Cached:") {
+ 					meminfo >> mem.stats.at("cached");
+ 					mem.stats.at("cached") <<= 10;
+-					if (not show_swap and not swap_disk) break;
+ 				}
+ 				else if (label == "SwapTotal:") {
+ 					meminfo >> mem.stats.at("swap_total");
+@@ -2170,11 +2170,21 @@
+ 				else if (label == "SwapFree:") {
+ 					meminfo >> mem.stats.at("swap_free");
+ 					mem.stats.at("swap_free") <<= 10;
++				}
++				else if (label == "GPUReclaim:") {
++					meminfo >> gpu_reclaim;
++					gpu_reclaim <<= 10;
++				}
++				else if (label.rfind("DirectMap", 0) == 0) {
+ 					break;
+ 				}
+ 				meminfo.ignore(SSmax, '\n');
+ 			}
+ 			if (not got_avail) mem.stats.at("available") = mem.stats.at("free") + mem.stats.at("cached");
++			if (gpu_reclaim > 0) {
++				mem.stats.at("cached") += gpu_reclaim;
++				mem.stats.at("available") += gpu_reclaim;
++			}
+ 			if (zfs_arc_cached) {
+ 				mem.stats.at("cached") += arc_size;
+ 				// The ARC will not shrink below arc_min_size, so that memory is not available
