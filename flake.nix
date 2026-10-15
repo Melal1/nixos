@@ -220,6 +220,29 @@
           + "\ntouch \"$out\"\n"
         );
 
+        niri-config = pkgs.runCommand "niri-config-check" { nativeBuildInputs = [ pkgs.niri ]; } ''
+          niri validate --config ${./modules/home/programs/wm/niri/config.kdl}
+          touch "$out"
+        '';
+
+        assets-setup =
+          pkgs.runCommand "assets-setup-check"
+            {
+              nativeBuildInputs = [
+                pkgs.bash
+                pkgs.git
+                pkgs.coreutils
+                (import ./modules/home/scripts/assets-setup.nix {
+                  inherit pkgs;
+                  dotfilesDir = self;
+                })
+              ];
+            }
+            ''
+              bash ${./tests/assets-setup.sh}
+              touch "$out"
+            '';
+
         formatting = treefmtEval.config.build.check self;
 
         deadnix =
@@ -241,6 +264,9 @@
               statix check --config ${self}/statix.toml ${self}
               touch "$out"
             '';
-      };
+      }
+      // nixpkgs.lib.mapAttrs' (
+        name: home: nixpkgs.lib.nameValuePair "home-${name}" home.activationPackage
+      ) homeConfigs;
     };
 }
