@@ -1,19 +1,17 @@
 { pkgs }:
 
 pkgs.mkShell {
-  packages = [
+  nativeBuildInputs = [
+    pkgs.gcc
+    pkgs.gnumake
+    pkgs.cmake
+    pkgs.pkg-config
+  ];
+
+  buildInputs = [
     pkgs.dpp
     pkgs.opusfile
     pkgs.liboggz
     pkgs.fmt
-    pkgs.gcc
-    pkgs.gnumake
-    pkgs.cmake
   ];
-  shellHook = ''
-      # Only switch to fish if we are not already in fish
-    if [ -t 1 ] && [ -z "$FISH" ] && command -v fish >/dev/null 2>&1; then
-      exec fish --login
-  '';
-
 }

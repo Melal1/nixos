@@ -1,15 +1,11 @@
 { pkgs }:
 
 pkgs.mkShell {
-  packages = [
-    pkgs.ncurses
+  nativeBuildInputs = [
     pkgs.gcc
     pkgs.gnumake
+    pkgs.pkg-config
   ];
 
-  shellHook = ''
-    if command -v fish >/dev/null 2>&1; then
-        exec fish --login
-    fi
-  '';
+  buildInputs = [ pkgs.ncurses ];
 }

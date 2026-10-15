@@ -10,9 +10,12 @@ let
   ];
 in
 pkgs.mkShell {
+  # Also expose libraries referenced only by the hook to host package selection.
+  passthru.runtimePackages = runtimeLibs;
+
   packages = with pkgs; [
     uv
-    python3
+    python313
   ];
 
   shellHook = ''

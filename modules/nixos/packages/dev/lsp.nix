@@ -1,19 +1,21 @@
 {
   pkgs,
-  config,
-  lib,
   unstable,
   ...
 }:
 {
   environment.systemPackages =
     (with pkgs; [
+      vscode-extensions.ms-vscode.cpptools
+      gdb
+      netcoredbg
+      csharpier
+      easydotnet
       cmake-language-server
       shellcheck
       shfmt
       bash-language-server
       stylua
-      lua-language-server
       nil
       nixpkgs-fmt
       vscode-json-languageserver
@@ -24,23 +26,20 @@
       mypy
       harper
       roslyn-ls
-    ])
-    ++ lib.optionals (config.networking.hostName == "snowflake") (
-      with pkgs;
-      [
-        typescript-language-server
-        tailwindcss-language-server
-        vscode-langservers-extracted
-        prettier
-        eslint
-      ]
-    )
-    ++ (with unstable; [
       clang-tools
+    ])
+    ++ (with unstable; [
+      emmylua-ls
+      lua-language-server
+
     ]);
   programs.nix-ld = {
     enable = true;
     libraries = with pkgs; [
+      libx11
+      qt6.qtbase
+      stdenv.cc.cc.lib
+      libglvnd
       icu
       zlib
     ];

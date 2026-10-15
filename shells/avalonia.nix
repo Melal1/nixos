@@ -29,7 +29,8 @@ pkgs.mkShell {
 
   shellHook = ''
     # Dynamically point LD_LIBRARY_PATH to native shared object (.so) files
-    export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath libList}:$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath libList}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+    export DOTNET_ROOT="${pkgs.dotnet-sdk_10}/share/dotnet"
 
     echo "Avalonia .NET 10 environment loaded!"
 

@@ -88,6 +88,7 @@
       overlays = [ (import ./overlays/default.nix) ];
 
       pkgs = import nixpkgs { inherit system overlays; };
+      devShells = import ./shells { inherit pkgs; };
       treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
       unstable = import nixpkgs-unstable {
         inherit system;
@@ -198,11 +199,27 @@
         inherit (pkgs) easydotnet;
       };
 
-      devShells.${system} = import ./shells { inherit pkgs; };
+      devShells.${system} = devShells;
 
       formatter.${system} = treefmtEval.config.build.wrapper;
 
       checks.${system} = {
+        shell-hooks = pkgs.runCommand "shell-hooks-check" { nativeBuildInputs = [ pkgs.bash ]; } (
+          nixpkgs.lib.concatStringsSep "\n" (
+            nixpkgs.lib.mapAttrsToList (
+              name: shell:
+              let
+                # Syntax checking only needs the text, not the packages referenced by the hook.
+                hook = pkgs.writeText "${name}-shell-hook.sh" (
+                  builtins.unsafeDiscardStringContext (shell.shellHook or "")
+                );
+              in
+              "bash -n ${hook}"
+            ) devShells
+          )
+          + "\ntouch \"$out\"\n"
+        );
+
         formatting = treefmtEval.config.build.check self;
 
         deadnix =

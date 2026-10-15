@@ -18,7 +18,7 @@ let
 in
 pkgs.mkShell {
   packages = [
-    pkgs.jdk
+    pkgs.jdk21
     pkgs.gradle
     javafx-pkg
   ]
@@ -27,7 +27,7 @@ pkgs.mkShell {
 
   shellHook = ''
     # Fixes the "cannot find shared libraries" runtime errors
-    export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath ld-lib-path-libs}:$LD_LIBRARY_PATH"
+    export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath ld-lib-path-libs}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
     # Helps some LSPs and Gradle plugins locate the JavaFX SDK path
     export JAVAFX_HOME="${javafx-pkg}"
