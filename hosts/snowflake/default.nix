@@ -9,6 +9,8 @@
 
   networking.hostName = "snowflake";
 
+  boot.loader.grub.useOSProber = true;
+
   my.host = {
     displays = [
       "DP-1"

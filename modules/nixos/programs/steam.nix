@@ -31,22 +31,26 @@ in
     enable = lib.mkEnableOption "Steam gaming client";
   };
 
-  config = lib.mkIf cfg.enable {
+  config = lib.mkMerge [
+    (lib.mkIf cfg.enable {
+      environment.systemPackages = [
+        pkgs.steamcmd
+        pkgs.mangohud
+      ];
 
-    environment.systemPackages = [
-      pkgs.steamcmd
-      pkgs.mangohud
-    ];
-    programs = {
-      gamemode.enable = true;
-      steam = {
-        enable = true;
-        remotePlay.openFirewall = true;
-        dedicatedServer.openFirewall = true;
-        package = steamWithGamingRuntime;
-        extraCompatPackages = [ pkgs.proton-ge-bin ];
-        protontricks.enable = true;
+      programs = {
+        gamemode.enable = true;
+
+        steam = {
+          enable = true;
+          remotePlay.openFirewall = true;
+          dedicatedServer.openFirewall = true;
+          package = steamWithGamingRuntime;
+          extraCompatPackages = [ pkgs.proton-ge-bin ];
+          protontricks.enable = true;
+        };
       };
-    };
-  };
+    })
+
+  ];
 }

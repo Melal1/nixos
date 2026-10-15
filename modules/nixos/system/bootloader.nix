@@ -1,8 +1,6 @@
-{ config, ... }:
 {
   boot = {
     kernelParams = [
-      "mitigations=off"
       "quiet"
     ];
 
@@ -13,7 +11,6 @@
         device = "nodev";
         efiSupport = true;
         efiInstallAsRemovable = true;
-        useOSProber = config.networking.hostName == "snowflake";
       };
     };
   };
