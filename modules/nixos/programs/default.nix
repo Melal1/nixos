@@ -5,5 +5,6 @@
     ./obs.nix
     ./steam.nix
     ./terminals.nix
+    ./ipad-screen-mirror.nix
   ];
 }

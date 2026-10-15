@@ -41,6 +41,7 @@
     gpu-screen-recorder.enable = true;
     easyeffects.enable = true;
     steam.enable = true;
+    ipad-screen-mirror.enable = true;
     obs.enable = true;
     terminals = {
       kitty.enable = true;

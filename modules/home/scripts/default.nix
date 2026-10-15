@@ -6,6 +6,9 @@
 }:
 
 {
+  imports = [
+    ./play-rec.nix
+  ];
   config = {
     home.sessionPath = [ "$HOME/.local/bin" ];
 
