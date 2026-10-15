@@ -142,7 +142,7 @@
   };
 
   home.sessionVariables = {
-    BROWSER = "brave-origin";
+    BROWSER = lib.mkDefault "firefox";
     EDITOR = "nvim";
     CODELLDB_PATH = "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
     DOTNET_ROOT = "${pkgs.dotnet-sdk_10}/share/dotnet";

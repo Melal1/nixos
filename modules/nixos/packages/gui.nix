@@ -1,8 +1,6 @@
 {
   pkgs,
-  lib,
   unstable,
-  config,
   ...
 }:
 {
@@ -18,21 +16,16 @@
       jetbrains.rider
       sioyek
       mpv
-      gdbgui
       obsidian
       xournalpp
-      element-desktop
-      firefox
-      kdePackages.dolphin
       kdePackages.gwenview
       discord
-
+      librewolf
     ])
     ++ (with unstable; [
       # vicinae
       localsend
       qpwgraph
-      brave-origin
       telegram-desktop
     ]);
 }

@@ -3,6 +3,7 @@
   lib,
   pkgs,
   inputs,
+  unstable,
   ...
 }:
 
@@ -32,27 +33,10 @@ in
       };
     };
 
-    systemd.user.services = {
-      xwayland-satellite = {
-        description = "Xwayland outside Wayland";
-        bindsTo = [ "graphical-session.target" ];
-        after = [ "graphical-session.target" ];
-        wantedBy = [ "graphical-session.target" ];
-
-        serviceConfig = {
-          Type = "notify";
-          NotifyAccess = "all";
-          ExecStart = "${pkgs.xwayland-satellite}/bin/xwayland-satellite";
-          StandardOutput = "journal";
-          Restart = "on-failure";
-        };
-      };
-    };
-
     environment.systemPackages = with pkgs; [
       inputs.qmlgolsp.packages.${sys}.default
-      inputs.qml-niri.packages.${sys}.quickshell
-      xwayland-satellite
+      inputs.quickshell-niri.packages.${sys}.quickshell
+      unstable.xwayland-satellite
       xdg-desktop-portal-gtk
       nautilus
       mpd-mpris

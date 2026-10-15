@@ -19,12 +19,22 @@
     #   inputs.nixpkgs.follows = "nixpkgs";
     # };
 
+    tincan-cli = {
+      url = "github:bilalyazicioglu/tincan-cli/develop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    timr-tui = {
+      url = "github:sectore/timr-tui";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     skwd-wall = {
       url = "github:liixini/skwd-wall/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     ditto = {
-      url = "github:Melal1/ditto";
+      url = "github:arvingarciabtw/ditto";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     quickshell = {
@@ -32,13 +42,18 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    qml-niri = {
+    quickshell-niri = {
       url = "github:imiric/qml-niri/main";
-      inputs.nixpkgs.follows = "nixpkgs";
       inputs.quickshell.follows = "quickshell";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
+
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    helium-flake = {
+      url = "github:oxcl/nix-flake-helium-browser";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     antigravity-nix = {
