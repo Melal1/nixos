@@ -126,6 +126,8 @@ Matching packages already on Rusty are reused; missing packages are fetched from
 Snowflake first, then internet caches, or built locally. Snowflake does not build
 or download packages in response to cache requests.
 
+For a separate configuration, follow the [revision-matching instructions](NIX-DOWNLOAD-RECOVERY.md#matching-nixpkgs-revisions-for-a-lan-cache) to align its nixpkgs lock entry with Snowflake while keeping its own `flake.nix` input URL.
+
 Stop serving on Snowflake when finished:
 
 ```bash

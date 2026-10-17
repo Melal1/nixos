@@ -14,5 +14,6 @@
     ++ (with unstable; [
       # (timr-tui.override { enableSound = true; })
       codex
+      cloudflared
     ]);
 }

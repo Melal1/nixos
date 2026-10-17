@@ -5,7 +5,9 @@ import it into the Nix store so an existing build can continue. The worked examp
 is `ms-vscode.cpptools` version `1.31.5`, whose Marketplace download failed with
 HTTP/2 errors on Snowflake.
 
-The package version, expected checksum, and flake lock file stay the same.
+The source-download recovery keeps the package version, expected checksum, and
+flake lock file the same. The optional [LAN cache section](#matching-nixpkgs-revisions-for-a-lan-cache)
+explains how to change a lock entry when another machine needs matching builds.
 
 Run the commands in the same Bash terminal unless a step says otherwise. The
 example requires Bash, curl, Python 3, GNU coreutils, and Nix with `nix-command`
@@ -343,8 +345,120 @@ rm -- "$archive_name" parts/part{0..7}
 rmdir parts
 ```
 
+## Matching nixpkgs revisions for a LAN cache
+
+When sharing Snowflake's cache with Rusty or a friend's separate configuration,
+matching the pinned nixpkgs revision improves package reuse. The same channel
+name, such as `nixos-26.05`, is insufficient: the branch advances over time, and
+two lock files can select different commits from it.
+
+Only exact store paths can be reused. Matching nixpkgs revisions does not make
+different platforms, package options, overrides, or dependencies identical.
+
+### 1. Obtain Snowflake's pinned revision
+
+On Snowflake, from the configuration repository:
+
+```bash
+cd ~/.dotfiles/nixos
+jq -r '.nodes.nixpkgs.locked.rev' flake.lock
+```
+
+For the configuration used in this guide, that prints:
+
+```text
+a033e66ab94a6bedf2c3d58d93a36319d3cbbbaf
+```
+
+`jq` reads JSON, and `-r` prints the value without quotes. The expression follows
+`nodes` → `nixpkgs` → `locked` → `rev`, which contains the exact Git commit.
+To inspect the complete entry:
+
+```bash
+jq '.nodes.nixpkgs' flake.lock
+```
+
+`original.ref` identifies the requested branch, such as `nixos-26.05`.
+`locked.rev` identifies the commit selected when the lock entry was written.
+
+These expressions assume the lock node is named `nixpkgs`, as it is here. If
+another flake uses different node names, inspect its root input mapping to find
+the corresponding node.
+
+### 2. Change only the other machine's lock entry
+
+On the other machine, enter its own configuration directory. Keep its existing
+input URL in `flake.nix`, for example:
+
+```nix
+inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+```
+
+Write the desired revision into `flake.lock` with:
+
+```bash
+nix flake lock \
+  --override-input nixpkgs \
+  github:NixOS/nixpkgs/a033e66ab94a6bedf2c3d58d93a36319d3cbbbaf
+```
+
+Replace the example revision with Snowflake's current `locked.rev` when using
+this procedure later. This behavior was verified with Nix `2.34.8`: the command
+updates the existing lock entry, preserves the original branch reference, and
+leaves `flake.nix` unchanged. Subsequent normal evaluations use the saved revision.
+
+Review and verify the result:
+
+```bash
+git diff -- flake.lock
+jq -r '.nodes.nixpkgs.locked.rev' flake.lock
+```
+
+The revision should match the value obtained on Snowflake. Keep this change in
+the other machine's configuration repository; the whole `flake.lock` does not
+need to match Snowflake's because the two flakes can have other inputs.
+
+### 3. Match unstable too, if the configuration uses it
+
+On Snowflake, obtain that input's revision with:
+
+```bash
+jq -r '.nodes."nixpkgs-unstable".locked.rev' flake.lock
+```
+
+The extra quotes are needed because the node name contains a hyphen. The revision
+used in this guide is `7fd4004d0511991fff3a0524856a9be09e28c5f0`.
+If the other flake also has an input named `nixpkgs-unstable`, update it there:
+
+```bash
+nix flake lock \
+  --override-input nixpkgs-unstable \
+  github:NixOS/nixpkgs/7fd4004d0511991fff3a0524856a9be09e28c5f0
+```
+
+Use the input name from the other machine's flake if it differs. There is no need
+to add an unstable input to a configuration that does not use one.
+
+### 4. Rebuild using the LAN cache
+
+Start Snowflake's service, obtain its actual public signing key, and pass the
+cache options to the other machine's rebuild as described in the
+[README's LAN cache instructions](README.md#on-demand-lan-cache). Use that
+machine's own host output instead of `snowflake` or `rusty` where appropriate.
+
+A later explicit update follows the branch from `flake.nix` again:
+
+```bash
+nix flake update nixpkgs
+```
+
+If the branch has advanced, this selects a newer commit and can reduce cache
+overlap until Snowflake also has those builds. Normal rebuilds do not advance a
+valid, unchanged lock entry on their own.
+
 ## References
 
 - [curl command-line reference](https://curl.se/docs/manpage.html): HTTP versions, redirects, headers, and byte ranges.
 - [Nix `store prefetch-file` reference](https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-store-prefetch-file): local-file imports, expected hashes, and store filenames.
 - [Microsoft C/C++ extension release v1.31.5](https://github.com/microsoft/vscode-cpptools/releases/tag/v1.31.5): the alternate official archive used in this recovery.
+- [Nix `flake lock` reference](https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-flake-lock.html) and [Nix `flake update` reference](https://nix.dev/manual/nix/2.34/command-ref/new-cli/nix3-flake-update.html): lock-file management and updating selected inputs.
