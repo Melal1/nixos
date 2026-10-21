@@ -5,5 +5,6 @@
     ./networking.nix
     ./virtualisation.nix
     ./services.nix
+    ./nix-serve.nix
   ];
 }

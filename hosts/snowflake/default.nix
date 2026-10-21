@@ -15,34 +15,9 @@
 
   networking.hostName = "snowflake";
 
-  # Serve the existing store over Ethernet only when manually started.
-  services.nix-serve = {
+  my.services.nix-serve = {
     enable = true;
-    package = pkgs.nix-serve-ng;
-    port = 5000;
-    secretKeyFile = "/var/lib/nix-cache/cache.sec";
-  };
-  systemd.services.nix-serve.wantedBy = lib.mkForce [ ];
-  networking.firewall.interfaces.enp4s0.allowedTCPPorts = [ 5000 ];
-
-  # Generate once at activation; the private key never enters Git or the store.
-  system.activationScripts.nixCacheSigningKey = {
-    deps = [ "var" ];
-    text = ''
-      ${pkgs.coreutils}/bin/install -d -m 0700 /var/lib/nix-cache
-      (
-        set -e
-        umask 077
-        if [ ! -e /var/lib/nix-cache/cache.sec ]; then
-          ${config.nix.package}/bin/nix-store --generate-binary-cache-key snowflake-1 \
-            /var/lib/nix-cache/cache.sec /var/lib/nix-cache/cache.pub
-        fi
-        ${config.nix.package}/bin/nix --extra-experimental-features nix-command \
-          key convert-secret-to-public < /var/lib/nix-cache/cache.sec \
-          > /var/lib/nix-cache/cache.pub
-        ${pkgs.coreutils}/bin/chmod 0600 /var/lib/nix-cache/cache.sec
-      )
-    '';
+    interface = "enp4s0";
   };
 
   boot.loader.grub.useOSProber = true;
