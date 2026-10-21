@@ -19,6 +19,12 @@ let
       [ ];
 in
 {
+  # Import option declarations on every host; each list gates its own contents.
+  options.my.packages = lib.genAttrs [ "cli" "gui" "io" "development" "fonts" ] (group: {
+    shared.enable = lib.mkEnableOption "the shared ${group} package list";
+    host.enable = lib.mkEnableOption "this host's ${group} package list";
+  });
+
   imports = [
     ./cache.nix
     ./io.nix

@@ -6,66 +6,46 @@
   ...
 }:
 {
-  environment.systemPackages =
-    (with pkgs; [
+  config = lib.mkIf config.my.packages.cli.shared.enable {
+    environment.systemPackages =
+      (with pkgs; [
 
-      ### ──────────────────────
-      ###  CLI Utilities
-      ### ──────────────────────
-      libnotify
-      xdg-user-dirs
-      jq
-      watchman
-      speedtest-cli
-      nmap
-      iamb
-      arp-scan
-      delta
-      lolcat
-      figlet
-      mpc
-      playerctl
-      tmux
-      unzip
-      spotdl
-      ripgrep
-      fd
-      tree
-      zoxide
-      bat
-      eza
-      fastfetch
-      fish
-      fzf
-      grc
-      starship
-      moreutils
-      yarn
-      lsof
-      lsd
-      home-manager
-      bear
-      tealdeer
-      asciiquarium
-      (ncmpcpp.override {
-        visualizerSupport = true;
-        clockSupport = true;
-      })
-      lazygit
-      yazi
-    ])
-    ++ (with unstable; [
-      neovim
-      herdr
-      tree-sitter
-      zip
-      yt-dlp
-      rar
-      ffmpeg
-      opencode
-    ])
-    ++ lib.optionals config.my.virtualisation.databaseEnabled [
-      unstable.lazysql
-      pkgs.pgmodeler
-    ];
+        ### ──────────────────────
+        ###  CLI Utilities
+        ### ──────────────────────
+        jq
+        nmap
+        arp-scan
+        lolcat
+        figlet
+        tmux
+        unzip
+        ripgrep
+        fd
+        tree
+        zoxide
+        bat
+        eza
+        fzf
+        grc
+        moreutils
+        lsof
+        lsd
+        home-manager
+        tealdeer
+        bc
+      ])
+      ++ (with unstable; [
+        neovim
+        herdr
+        zip
+        yt-dlp
+        rar
+        ffmpeg
+        opencode
+      ])
+      ++ lib.optionals config.my.virtualisation.databaseEnabled [
+        unstable.lazysql
+      ];
+  };
 }

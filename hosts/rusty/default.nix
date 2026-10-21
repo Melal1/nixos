@@ -32,6 +32,29 @@
     niri.enable = true;
   };
 
+  my.packages = {
+    cli = {
+      shared.enable = true;
+      host.enable = true;
+    };
+    gui = {
+      shared.enable = true;
+      host.enable = true;
+    };
+    io = {
+      shared.enable = true;
+      host.enable = true;
+    };
+    development = {
+      shared.enable = true;
+      host.enable = true;
+    };
+    fonts = {
+      shared.enable = true;
+      host.enable = true;
+    };
+  };
+
   my.programs = {
     nix-ld.enable = true;
     obs.enable = false;
