@@ -121,8 +121,8 @@
     let
       sys = pkgs.stdenv.hostPlatform.system;
     in
-    [
-      inputs.helium-flake.packages.${sys}.default
+    lib.optional config.my.packages.gui.host.enable inputs.helium-flake.packages.${sys}.default
+    ++ lib.optionals config.my.packages.cli.host.enable [
       inputs.tincan-cli.packages.${sys}.default
       inputs.timr-tui.packages.${sys}.linuxSound
     ];
