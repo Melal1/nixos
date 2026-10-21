@@ -2,6 +2,7 @@
   description = "First!";
 
   inputs = {
+    flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
     qmlgolsp = {
@@ -79,234 +80,28 @@
   };
 
   outputs =
-    {
-      self,
-      nixpkgs,
-      nixpkgs-unstable,
-      home-manager,
-      treefmt-nix,
-      ...
-    }@inputs:
-    let
-      system = "x86_64-linux";
-      overlays = [ (import ./overlays/default.nix) ];
+    inputs:
+    inputs.flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
 
-      pkgs = import nixpkgs { inherit system overlays; };
-      devShells = import ./shells { inherit pkgs; };
-      treefmtEval = treefmt-nix.lib.evalModule pkgs ./treefmt.nix;
-      unstable = import nixpkgs-unstable {
-        inherit system;
-        config = {
-          allowUnfree = true;
-          # permittedInsecurePackages = [ "pnpm-10.29.2" ];
+      imports = [
+        ./flake/hosts.nix
+        ./flake/checks.nix
+        inputs.treefmt-nix.flakeModule
+      ];
+
+      perSystem = { system, pkgs, ... }: {
+        _module.args.pkgs = import inputs.nixpkgs {
+          inherit system;
+          overlays = [ (import ./overlays/default.nix) ];
+        };
+
+        packages.easydotnet = pkgs.easydotnet;
+        devShells = import ./shells { inherit pkgs; };
+        treefmt = {
+          imports = [ ./treefmt.nix ];
+          flakeCheck = false;
         };
       };
-
-      # Hosts are auto-discovered from hosts/<name>/meta.nix.
-      # Adding a machine = creating hosts/<name>/ with meta.nix + default.nix + home.nix.
-      hosts =
-        let
-          dirs = builtins.readDir ./hosts;
-          isHost = name: type: type == "directory" && builtins.pathExists (./hosts + "/${name}/meta.nix");
-        in
-        nixpkgs.lib.mapAttrs (name: _: import (./hosts + "/${name}/meta.nix")) (
-          nixpkgs.lib.filterAttrs isHost dirs
-        );
-
-      # User definitions are auto-discovered from users/<name>/meta.nix.
-      # A host's meta.nix decides which of these accounts it actually has.
-      users =
-        let
-          dirs = builtins.readDir ./users;
-          isUser =
-            name: type:
-            type == "directory"
-            && builtins.pathExists (./users + "/${name}/meta.nix")
-            && builtins.pathExists (./users + "/${name}/nixos.nix")
-            && builtins.pathExists (./users + "/${name}/home.nix");
-        in
-        nixpkgs.lib.mapAttrs (name: _: (import (./users + "/${name}/meta.nix")) // { inherit name; }) (
-          nixpkgs.lib.filterAttrs isUser dirs
-        );
-
-      hostUsers =
-        hostName: host:
-        map (
-          userName:
-          if builtins.hasAttr userName users then
-            userName
-          else
-            throw "hosts/${hostName}/meta.nix references unknown user '${userName}'"
-        ) (host.users or [ ]);
-
-      mkHost =
-        name: host:
-        nixpkgs.lib.nixosSystem {
-          specialArgs = {
-            inherit inputs unstable;
-            hostname = name;
-          };
-          modules = [
-            inputs.skwd-wall.nixosModules.default
-            {
-              nixpkgs.hostPlatform = system;
-              nixpkgs.overlays = overlays;
-            }
-            (./hosts + "/${name}")
-          ]
-          ++ map (userName: import (./users + "/${userName}/nixos.nix") { user = users.${userName}; }) (
-            hostUsers name host
-          );
-        };
-
-      mkHome =
-        hostName: userName:
-        home-manager.lib.homeManagerConfiguration {
-          inherit pkgs;
-          extraSpecialArgs = {
-            inherit self inputs unstable;
-            hostname = hostName;
-            osConfig = self.nixosConfigurations.${hostName}.config;
-          };
-          modules = [
-            (import (./users + "/${userName}/home.nix") { user = users.${userName}; })
-            (./hosts + "/${hostName}/home.nix")
-          ];
-        };
-
-      homeConfigs = nixpkgs.lib.foldl' (
-        configs: hostName:
-        configs
-        // builtins.listToAttrs (
-          map (userName: {
-            name = "${userName}@${hostName}";
-            value = mkHome hostName userName;
-          }) (hostUsers hostName hosts.${hostName})
-        )
-      ) { } (builtins.attrNames hosts);
-
-      # Keep #<hostname> working where a host has exactly one configured user.
-      singleUserHosts = nixpkgs.lib.filterAttrs (
-        hostName: host: builtins.length (hostUsers hostName host) == 1
-      ) hosts;
-      legacyHomeConfigs = builtins.mapAttrs (
-        hostName: host: homeConfigs."${builtins.head (hostUsers hostName host)}@${hostName}"
-      ) singleUserHosts;
-    in
-    {
-      nixosConfigurations = builtins.mapAttrs mkHost hosts;
-
-      homeConfigurations = homeConfigs // legacyHomeConfigs;
-
-      packages.${system} = {
-        inherit (pkgs) easydotnet;
-      };
-
-      devShells.${system} = devShells;
-
-      formatter.${system} = treefmtEval.config.build.wrapper;
-
-      checks.${system} = {
-        module-evaluation =
-          let
-            results = import ./tests/module-evaluation.nix { inherit self inputs; };
-          in
-          pkgs.writeText "module-evaluation-check" (builtins.toJSON results);
-
-        shell-hooks = pkgs.runCommand "shell-hooks-check" { nativeBuildInputs = [ pkgs.bash ]; } (
-          nixpkgs.lib.concatStringsSep "\n" (
-            nixpkgs.lib.mapAttrsToList (
-              name: shell:
-              let
-                # Syntax checking only needs the text, not the packages referenced by the hook.
-                hook = pkgs.writeText "${name}-shell-hook.sh" (
-                  builtins.unsafeDiscardStringContext (shell.shellHook or "")
-                );
-              in
-              "bash -n ${hook}"
-            ) devShells
-          )
-          + "\ntouch \"$out\"\n"
-        );
-
-        niri-config = pkgs.runCommand "niri-config-check" { nativeBuildInputs = [ pkgs.niri ]; } ''
-          mkdir -p niri
-          cp ${./modules/home/programs/wm/niri/config.kdl} niri/config.kdl
-          cp ${./modules/home/programs/wm/niri/themes/default.kdl} niri/default.kdl
-          ${nixpkgs.lib.concatMapStringsSep "\n" (
-            homeName:
-            nixpkgs.lib.optionalString homeConfigs.${homeName}.config.my.home.wm.niri.enable ''
-              cp --remove-destination ${
-                pkgs.writeText "${homeName}-browser.kdl"
-                  homeConfigs.${homeName}.config.xdg.configFile."niri/browser.kdl".text
-              } niri/browser.kdl
-              ${nixpkgs.lib.optionalString homeConfigs.${homeName}.config.my.home.noctalia.enable ''
-                cp ${./modules/home/programs/noctalia/niri.kdl} niri/noctalia.kdl
-              ''}
-              niri validate --config niri/config.kdl
-              rm -f niri/noctalia.kdl
-            ''
-          ) (builtins.attrNames homeConfigs)}
-          touch "$out"
-        '';
-
-        theme-switch =
-          pkgs.runCommand "theme-switch-check"
-            {
-              nativeBuildInputs = [
-                pkgs.bash
-                pkgs.coreutils
-                pkgs.findutils
-                (import ./modules/home/scripts/theme-switch.nix { inherit pkgs; })
-              ];
-            }
-            ''
-              bash ${./tests/theme-switch.sh}
-              touch "$out"
-            '';
-
-        assets-setup =
-          pkgs.runCommand "assets-setup-check"
-            {
-              nativeBuildInputs = [
-                pkgs.bash
-                pkgs.git
-                pkgs.coreutils
-                (import ./modules/home/scripts/assets-setup.nix {
-                  inherit pkgs;
-                  dotfilesDir = self;
-                })
-              ];
-            }
-            ''
-              bash ${./tests/assets-setup.sh}
-              touch "$out"
-            '';
-
-        formatting = treefmtEval.config.build.check self;
-
-        deadnix =
-          pkgs.runCommand "deadnix-check"
-            {
-              nativeBuildInputs = [ pkgs.deadnix ];
-            }
-            ''
-              deadnix --fail --no-lambda-pattern-names ${self}
-              touch "$out"
-            '';
-
-        statix =
-          pkgs.runCommand "statix-check"
-            {
-              nativeBuildInputs = [ pkgs.statix ];
-            }
-            ''
-              statix check --config ${self}/statix.toml ${self}
-              touch "$out"
-            '';
-      }
-      // nixpkgs.lib.mapAttrs' (
-        name: home: nixpkgs.lib.nameValuePair "home-${name}" home.activationPackage
-      ) homeConfigs;
     };
 }
