@@ -32,6 +32,10 @@
           source = ./tmux/tmux-sessionizer;
           executable = true;
         };
+        ".local/bin/vmrss" = {
+          source = ./vmrss.sh;
+          executable = true;
+        };
         ".config/tmux-sessionizer/tmux-sessionizer.conf" = {
           source = ./tmux/tmux-se.conf;
         };
