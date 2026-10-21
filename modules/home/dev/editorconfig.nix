@@ -1,6 +1,9 @@
+{ config, lib, ... }:
 {
-  home.file.".editorconfig".text = ''
-    [*]
-    max_line_length = 120
-  '';
+  home.file.".editorconfig" = lib.mkIf config.my.home.development.enable {
+    text = ''
+      [*]
+      max_line_length = 120
+    '';
+  };
 }
