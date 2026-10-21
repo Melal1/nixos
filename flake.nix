@@ -207,6 +207,12 @@
       formatter.${system} = treefmtEval.config.build.wrapper;
 
       checks.${system} = {
+        module-evaluation =
+          let
+            results = import ./tests/module-evaluation.nix { inherit self inputs; };
+          in
+          pkgs.writeText "module-evaluation-check" (builtins.toJSON results);
+
         shell-hooks = pkgs.runCommand "shell-hooks-check" { nativeBuildInputs = [ pkgs.bash ]; } (
           nixpkgs.lib.concatStringsSep "\n" (
             nixpkgs.lib.mapAttrsToList (
