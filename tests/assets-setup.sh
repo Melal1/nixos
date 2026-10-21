@@ -11,8 +11,17 @@ seed_home() {
     touch "$assets/wallpapers/default.jpg" "$assets/videos/rain2k.webm"
 }
 
+seed_theme_configs() {
+    local fixture_home="$1"
+    mkdir -p "$fixture_home/.config/"{niri/themes,noctalia/themes,noctalia/palettes}
+    touch "$fixture_home/.config/niri/config.kdl" "$fixture_home/.config/niri/themes/default.kdl"
+    touch "$fixture_home/.config/noctalia/config.toml" "$fixture_home/.config/noctalia/themes/black-mo.toml"
+    touch "$fixture_home/.config/noctalia/palettes/black-mo.json"
+}
+
 task_home="$TMPDIR/assets-home"
 seed_home "$task_home"
+seed_theme_configs "$task_home"
 mkdir -p "$task_home/Pictures/Wallpapers" "$task_home/Pictures/Wallpapers.bk"
 printf 'original\n' > "$task_home/Pictures/Wallpapers/personal.txt"
 printf 'earlier backup\n' > "$task_home/Pictures/Wallpapers.bk/earlier.txt"
@@ -29,12 +38,30 @@ test "$(cat "$task_home/Pictures/Wallpapers.bk.1/personal.txt")" = original
 test "$(readlink "$task_home/.config/kitty/current.conf")" = "$TMPDIR/chosen-kitty.conf"
 test "$(cat "$task_home/.config/ghostty/theme")" = 'custom ghostty theme'
 test "$(readlink "$task_home/.local/state/theme/media")" = "$task_home/.local/share/assets/videos/rain2k.webm"
+test "$(readlink "$task_home/.config/niri/default.kdl")" = "$task_home/.config/niri/themes/default.kdl"
+test "$(readlink "$task_home/.config/noctalia/default.toml")" = "$task_home/.config/noctalia/themes/black-mo.toml"
+test "$(readlink "$task_home/.config/noctalia/palettes/default.json")" = "$task_home/.config/noctalia/palettes/black-mo.json"
+
+# Selections must survive setup, including deliberately dangling runtime links.
+ln -sfn "$TMPDIR/chosen-niri.kdl" "$task_home/.config/niri/default.kdl"
+ln -sfn "$TMPDIR/chosen-noctalia.toml" "$task_home/.config/noctalia/default.toml"
+ln -sfn "$TMPDIR/chosen-palette.json" "$task_home/.config/noctalia/palettes/default.json"
 
 # Repeating setup must preserve the selected themes and must not create another backup.
 env HOME="$task_home" assets-setup
 test ! -e "$task_home/Pictures/Wallpapers.bk.2"
 test "$(readlink "$task_home/.config/kitty/current.conf")" = "$TMPDIR/chosen-kitty.conf"
 test "$(cat "$task_home/.config/ghostty/theme")" = 'custom ghostty theme'
+test "$(readlink "$task_home/.config/niri/default.kdl")" = "$TMPDIR/chosen-niri.kdl"
+test "$(readlink "$task_home/.config/noctalia/default.toml")" = "$TMPDIR/chosen-noctalia.toml"
+test "$(readlink "$task_home/.config/noctalia/palettes/default.json")" = "$TMPDIR/chosen-palette.json"
+
+# An unconfigured host receives no Noctalia or Niri files from setup.
+plain_home="$TMPDIR/assets-plain-home"
+seed_home "$plain_home"
+env HOME="$plain_home" assets-setup
+test ! -e "$plain_home/.config/noctalia"
+test ! -e "$plain_home/.config/niri"
 
 # A failed backup must stop setup before replacing or removing the original.
 failure_home="$TMPDIR/assets-failure-home"

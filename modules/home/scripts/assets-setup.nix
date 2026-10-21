@@ -33,6 +33,7 @@ pkgs.writeShellApplication {
   text = ''
 
     ASSETS_DIR="$HOME/.local/share/assets"
+    CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}"
     DOTFILES="${dotfilesDir}"
     DEFAULT_THEME="vague"
 
@@ -171,9 +172,22 @@ pkgs.writeShellApplication {
     symlink_absent "$DOTFILES/modules/home/programs/terminals/ghostty/themes/$DEFAULT_THEME" \
             "$HOME/.config/ghostty/theme"
 
+    # Seed only configured applications. These links remain runtime-owned.
+    if [ -f "$CONFIG_DIR/niri/config.kdl" ]; then
+      symlink_absent "$CONFIG_DIR/niri/themes/default.kdl" "$CONFIG_DIR/niri/default.kdl"
+    fi
+    if [ -f "$CONFIG_DIR/noctalia/config.toml" ]; then
+      symlink_absent "$CONFIG_DIR/noctalia/themes/black-mo.toml" "$CONFIG_DIR/noctalia/default.toml"
+      symlink_absent "$CONFIG_DIR/noctalia/palettes/black-mo.json" "$CONFIG_DIR/noctalia/palettes/default.json"
+    fi
+
     # --- 5. Theme indirection links (seeded once, owned by theme-switch afterwards)
     info "Theme state links"
-    symlink_absent "$ASSETS_DIR/wallpapers/default.jpg" "$HOME/.local/state/theme/wallpaper"
+    DEFAULT_WALLPAPER="$ASSETS_DIR/wallpapers/default.jpg"
+    if [ -f "$CONFIG_DIR/noctalia/config.toml" ] && [ -f "$ASSETS_DIR/wallpapers/black.jpg" ]; then
+      DEFAULT_WALLPAPER="$ASSETS_DIR/wallpapers/black.jpg"
+    fi
+    symlink_absent "$DEFAULT_WALLPAPER" "$HOME/.local/state/theme/wallpaper"
     symlink_absent "$ASSETS_DIR/videos/rain2k.webm"     "$HOME/.local/state/theme/video"
     symlink_absent "$ASSETS_DIR/wallpapers/default.jpg" "$HOME/.local/state/theme/media"
 

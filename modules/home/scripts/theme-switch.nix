@@ -9,6 +9,9 @@
 #   ~/.local/share/assets/themes/<name>/
 #     kitty        -> (kitty theme file in the dotfiles repo)
 #     ghostty      -> (ghostty theme file in the dotfiles repo)
+#     niri         -> (KDL theme fragment)
+#     noctalia     -> (TOML file with a [theme] section, custom_palette = "default")
+#     noctalia-palette -> (custom palette JSON)
 #     video        -> (video file in the assets repo)
 #     wallpaper    -> (single image in the assets repo)
 #     wallpapers/                # multi-wallpaper themes: dir of links
@@ -28,11 +31,11 @@ pkgs.writers.writeBashBin "theme-switch" ''
     set -u
 
     ASSETS_DIR="$HOME/.local/share/assets"
+    CONFIG_DIR="''${XDG_CONFIG_HOME:-$HOME/.config}"
     THEMES_DIR="$ASSETS_DIR/themes"
     STATE_DIR="$HOME/.local/state/theme"
 
     WALL_EXTS="jpg jpeg png bmp gif webp"
-    VID_EXTS="webm mp4 mkv"
 
     info()  { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
     ok()    { printf '\033[1;32m  ok\033[0m %s\n' "$*"; }
@@ -45,7 +48,8 @@ pkgs.writers.writeBashBin "theme-switch" ''
            theme-switch --list
 
     Themes are directories in $THEMES_DIR with slot-named
-    symlinks: kitty, ghostty, video, wallpaper (or a wallpapers/ dir).
+    symlinks: kitty, ghostty, niri, noctalia, noctalia-palette,
+    video, wallpaper (or a wallpapers/ dir). Missing slots are optional.
   EOF
       exit 1
     }
@@ -64,9 +68,17 @@ pkgs.writers.writeBashBin "theme-switch" ''
         warn "slot not readable, skipping: $slot"
         return 1
       fi
-      mkdir -p "$(dirname "$dest")"
-      ln -sfn "$(readlink -f "$slot")" "$dest"
-      ok "linked: $dest -> $(readlink -f "$slot")"
+      local target staging
+      target="$(readlink -f "$slot")" || return 1
+      mkdir -p "$(dirname "$dest")" || return 1
+      # Rename within the destination filesystem: readers always see a link.
+      staging="$(mktemp -d "$(dirname "$dest")/.theme-link.XXXXXX")" || return 1
+      if ! ln -s "$target" "$staging/link" || ! mv -Tf "$staging/link" "$dest"; then
+        rm -rf "$staging"
+        return 1
+      fi
+      rmdir "$staging"
+      ok "linked: $dest -> $target"
     }
 
     if [ $# -lt 1 ]; then
@@ -108,6 +120,21 @@ pkgs.writers.writeBashBin "theme-switch" ''
     fi
     if [ -e "$THEME_DIR/ghostty" ]; then
       link_slot "$THEME_DIR/ghostty" "$HOME/.config/ghostty/theme" || true
+    fi
+    if [ -f "$CONFIG_DIR/niri/config.kdl" ] && [ -e "$THEME_DIR/niri" ]; then
+      link_slot "$THEME_DIR/niri" "$CONFIG_DIR/niri/default.kdl" || true
+    fi
+    NOCTALIA_CHANGED=0
+    if [ -f "$CONFIG_DIR/noctalia/config.toml" ]; then
+      # Switch the palette first so reloading the theme observes the new colors.
+      if [ -e "$THEME_DIR/noctalia-palette" ]; then
+        link_slot "$THEME_DIR/noctalia-palette" "$CONFIG_DIR/noctalia/palettes/default.json" \
+          && NOCTALIA_CHANGED=1
+      fi
+      if [ -e "$THEME_DIR/noctalia" ]; then
+        link_slot "$THEME_DIR/noctalia" "$CONFIG_DIR/noctalia/default.toml" \
+          && NOCTALIA_CHANGED=1
+      fi
     fi
 
     # --- Static wallpaper ---------------------------------------------------------
@@ -161,24 +188,27 @@ pkgs.writers.writeBashBin "theme-switch" ''
 
     # --- Wallpaper (image or video) via skwd-wall ---------------------------------
     CHOSEN_MEDIA=""
+    # Retain the image selection even when this theme also has a video slot.
+    if [ -n "$CHOSEN_WALL" ]; then
+      link_slot "$CHOSEN_WALL" "$STATE_DIR/wallpaper" || true
+    fi
     if [ -e "$THEME_DIR/video" ]; then
       CHOSEN_MEDIA="$(readlink -f "$THEME_DIR/video")"
-      mkdir -p "$STATE_DIR"
-      ln -sfn "$CHOSEN_MEDIA" "$STATE_DIR/video"
+      link_slot "$CHOSEN_MEDIA" "$STATE_DIR/video" || true
       ok "video: $(basename "$CHOSEN_MEDIA")"
     elif [ -n "$CHOSEN_WALL" ]; then
       CHOSEN_MEDIA="$CHOSEN_WALL"
-      mkdir -p "$STATE_DIR"
-      ln -sfn "$CHOSEN_WALL" "$STATE_DIR/wallpaper"
       ok "wallpaper: $(basename "$CHOSEN_WALL")"
     fi
 
     if [ -n "$CHOSEN_MEDIA" ]; then
-      ln -sfn "$CHOSEN_MEDIA" "$STATE_DIR/media"
+      link_slot "$CHOSEN_MEDIA" "$STATE_DIR/media" || true
       if command -v skwd-helm >/dev/null && systemctl --user is-active --quiet skwd-walld; then
-        skwd-helm apply "$CHOSEN_MEDIA" \
-          && ok "skwd-wall applied" \
-          || warn "skwd-helm apply failed"
+        if skwd-helm apply "$CHOSEN_MEDIA"; then
+          ok "skwd-wall applied"
+        else
+          warn "skwd-helm apply failed"
+        fi
       else
         warn "skwd-walld is not active; wallpaper will apply at the next Niri login"
       fi
@@ -187,6 +217,15 @@ pkgs.writers.writeBashBin "theme-switch" ''
     # --- Live terminal reload -------------------------------------------------------
     pkill -SIGUSR1 kitty 2>/dev/null && ok "kitty reloaded (SIGUSR1)" || true
     pkill -SIGUSR2 ghostty 2>/dev/null && ok "ghostty reloaded (SIGUSR2)" || true
+    # Niri watches included files; Noctalia needs an explicit reload for a
+    # palette-only change because the stable palette name stays the same.
+    if [ "$NOCTALIA_CHANGED" -eq 1 ] && command -v noctalia >/dev/null; then
+      if noctalia msg config-reload >/dev/null 2>&1; then
+        ok "Noctalia reloaded"
+      else
+        warn "Noctalia is not running; theme applies at next startup"
+      fi
+    fi
 
     info "Done."
 ''

@@ -244,6 +244,21 @@
           touch "$out"
         '';
 
+        theme-switch =
+          pkgs.runCommand "theme-switch-check"
+            {
+              nativeBuildInputs = [
+                pkgs.bash
+                pkgs.coreutils
+                pkgs.findutils
+                (import ./modules/home/scripts/theme-switch.nix { inherit pkgs; })
+              ];
+            }
+            ''
+              bash ${./tests/theme-switch.sh}
+              touch "$out"
+            '';
+
         assets-setup =
           pkgs.runCommand "assets-setup-check"
             {
