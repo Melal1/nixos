@@ -1,6 +1,5 @@
 {
   pkgs,
-  config,
   lib,
   hostname,
   ...
@@ -8,7 +7,6 @@
 {
   programs = {
     fish = {
-      enable = true;
       plugins = [
         # Enable a plugin (here grc for colorized command output) from nixpkgs
         {
@@ -110,16 +108,6 @@
 
 
 
-      ''
-      + lib.optionalString config.programs.yazi.enable ''
-        function y
-          set tmp (mktemp -t "yazi-cwd.XXXXXX")
-          yazi $argv --cwd-file="$tmp"
-          if read -z cwd < "$tmp"; and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
-            builtin cd -- "$cwd"
-          end
-          rm -f -- "$tmp"
-        end
       '';
 
       preferAbbrs = true;

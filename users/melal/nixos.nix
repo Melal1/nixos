@@ -6,6 +6,8 @@
   ...
 }:
 {
+  programs.${user.shell}.enable = true;
+
   users.users.${user.name} = {
     isNormalUser = true;
     description = user.fullName;
@@ -14,7 +16,4 @@
     extraGroups = user.extraGroups ++ lib.optional config.programs.gamemode.enable "gamemode";
     # extraGroups = user.extraGroups ++ lib.optional config.my.hardware.androidWebcam.enable "adbusers";
   };
-}
-// lib.optionalAttrs (user.shell == "fish") {
-  programs.fish.enable = true;
 }

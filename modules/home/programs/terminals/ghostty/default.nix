@@ -49,6 +49,6 @@ lib.mkIf config.my.home.terminals.ghostty.enable {
       ];
     };
 
-    enableFishIntegration = true;
+    enableFishIntegration = config.programs.fish.enable;
   };
 }

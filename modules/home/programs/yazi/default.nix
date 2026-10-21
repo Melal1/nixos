@@ -1,8 +1,8 @@
+{ config, ... }:
 {
-
   programs.yazi = {
     enable = true;
-    enableFishIntegration = true;
+    enableFishIntegration = config.programs.fish.enable;
     shellWrapperName = "y";
     flavors = {
       onedark = ./flavors/onedark.yazi;
