@@ -1,9 +1,3 @@
-{ pkgs, ... }:
-let
-  packages = import ../../../../shells/package-groups.nix { inherit pkgs; };
-in
-{
-  environment.systemPackages = packages.cpp;
-  # Retain outputs such as headers even when they have no links in the system profile.
-  system.extraDependencies = map (package: package.outPath) packages.cpp;
-}
+# Rusty's global toolchain selections live in hosts/rusty/default.nix.
+# Extra host-only editor tools can be added here behind development.host.enable.
+{ }

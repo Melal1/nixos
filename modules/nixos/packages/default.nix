@@ -31,6 +31,7 @@ in
     ./cli.nix
     ./gui.nix
     ./dev/lsp.nix
+    ./dev/toolchains.nix
     ./fonts.nix
   ]
   ++ hostModules;

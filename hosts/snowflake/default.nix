@@ -98,6 +98,23 @@
     };
   };
 
+  my.development.toolchains = {
+    audio.enable = true;
+    avalonia.enable = true;
+    cpp.enable = true;
+    dotnet.enable = true;
+    dpp.enable = true;
+    fmt.enable = true;
+    go.enable = true;
+    lua.enable = true;
+    ncurses.enable = true;
+    nodejs22.enable = true;
+    py.enable = true;
+    py-science.enable = true;
+    qksh.enable = true;
+    rust.enable = true;
+  };
+
   my.programs = {
     nix-ld.enable = true;
     gpu-screen-recorder.enable = true;

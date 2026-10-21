@@ -47,6 +47,10 @@ let
       );
 in
 {
+  # Reuse exactly the same packages and output handling for individual selections.
+  inherit packagesFor;
+  names = builtins.attrNames shells;
+
   nonJava = packagesFor (lib.remove "javafx" (builtins.attrNames shells));
   cpp = packagesFor [
     "cpp"

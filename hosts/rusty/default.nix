@@ -55,6 +55,15 @@
     };
   };
 
+  my.development.toolchains = {
+    cpp.enable = true;
+    audio.enable = true;
+    dpp.enable = true;
+    fmt.enable = true;
+    ncurses.enable = true;
+    qksh.enable = true;
+  };
+
   my.programs = {
     nix-ld.enable = true;
     obs.enable = false;
