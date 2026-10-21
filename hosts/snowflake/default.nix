@@ -53,7 +53,6 @@
       "HDMI-A-1"
     ];
     hasBattery = false;
-    gpus = [ "amd" ];
   };
 
   my.virtualisation.mssql.enable = true;
@@ -64,6 +63,7 @@
     performance.enable = true;
     vial-qmk.enable = true;
     rgb.enable = true;
+    disablePcieWakeup.enable = true;
     androidWebcam = {
       enable = true;
       autoStart = false;
@@ -128,10 +128,6 @@
       ghostty.enable = false;
     };
   };
-
-  services.udev.extraRules = ''
-    ACTION=="add", SUBSYSTEM=="pci", DRIVER=="pcieport", ATTR{power/wakeup}="disabled"
-  '';
 
   # Host-specific packages coming from flake inputs
   environment.systemPackages =

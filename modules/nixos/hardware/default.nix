@@ -12,5 +12,6 @@
     ./vial-qmk.nix
     ./rgb.nix
     ./android-webcam.nix
+    ./disable-pcie-wakeup.nix
   ];
 }

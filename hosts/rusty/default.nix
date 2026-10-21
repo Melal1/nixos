@@ -11,10 +11,6 @@
   my.host = {
     displays = [ "eDP-1" ];
     hasBattery = true;
-    gpus = [
-      "intel"
-      "nvidia"
-    ];
   };
 
   my.virtualisation.mssql.enable = true;
