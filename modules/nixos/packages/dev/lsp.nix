@@ -33,15 +33,4 @@
       lua-language-server
 
     ]);
-  programs.nix-ld = {
-    enable = true;
-    libraries = with pkgs; [
-      libx11
-      qt6.qtbase
-      stdenv.cc.cc.lib
-      libglvnd
-      icu
-      zlib
-    ];
-  };
 }

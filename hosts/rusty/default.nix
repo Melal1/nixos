@@ -33,6 +33,7 @@
   };
 
   my.programs = {
+    nix-ld.enable = true;
     obs.enable = false;
     terminals = {
       kitty.enable = true;

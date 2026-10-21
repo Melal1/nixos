@@ -6,5 +6,6 @@
     ./steam.nix
     ./terminals.nix
     ./ipad-screen-mirror.nix
+    ./nix-ld.nix
   ];
 }
