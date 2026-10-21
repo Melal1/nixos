@@ -11,6 +11,7 @@
     ./lazygit
     ./nh.nix
     ./openrgb.nix
+    ./noctalia
   ];
 
   home.file.".config/tmux/tmux.conf" = {

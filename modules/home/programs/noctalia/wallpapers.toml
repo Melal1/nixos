@@ -1,0 +1,16 @@
+[wallpaper]
+# skwd-wall manages the desktop wallpaper.
+enabled = false
+fill_mode = "stretch"
+
+    [wallpaper.default]
+    path = "~/.local/state/theme/wallpaper"
+
+    [wallpaper.last]
+    path = "~/.local/state/theme/wallpaper"
+
+    [wallpaper.monitors.DP-1]
+    path = "~/.local/state/theme/wallpaper"
+
+    [wallpaper.monitors.HDMI-A-1]
+    path = "~/.local/state/theme/wallpaper"
