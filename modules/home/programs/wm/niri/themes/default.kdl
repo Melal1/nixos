@@ -1,0 +1,15 @@
+// Initial colors; theme-switch can select any assets/themes/<name>/niri slot.
+layout {
+    focus-ring {
+        active-color "#eef4ef"
+        inactive-color "#505050"
+    }
+    border {
+        active-color "#ffc87f"
+        inactive-color "#505050"
+        urgent-color "#9b0000"
+    }
+    shadow {
+        color "#0007"
+    }
+}

@@ -1,0 +1,9 @@
+// Loaded only when both Noctalia and Niri are enabled.
+spawn-at-startup "noctalia"
+
+binds {
+    Mod+R { spawn-sh "noctalia msg panel-toggle launcher"; }
+    Mod+X { spawn-sh "noctalia msg panel-toggle session"; }
+    Mod+N { spawn-sh "noctalia msg panel-toggle control-center"; }
+    Mod+V { spawn-sh "noctalia msg panel-toggle clipboard"; }
+}

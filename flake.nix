@@ -224,7 +224,23 @@
         );
 
         niri-config = pkgs.runCommand "niri-config-check" { nativeBuildInputs = [ pkgs.niri ]; } ''
-          niri validate --config ${./modules/home/programs/wm/niri/config.kdl}
+          mkdir -p niri
+          cp ${./modules/home/programs/wm/niri/config.kdl} niri/config.kdl
+          cp ${./modules/home/programs/wm/niri/themes/default.kdl} niri/default.kdl
+          ${nixpkgs.lib.concatMapStringsSep "\n" (
+            homeName:
+            nixpkgs.lib.optionalString homeConfigs.${homeName}.config.my.home.wm.niri.enable ''
+              cp --remove-destination ${
+                pkgs.writeText "${homeName}-browser.kdl"
+                  homeConfigs.${homeName}.config.xdg.configFile."niri/browser.kdl".text
+              } niri/browser.kdl
+              ${nixpkgs.lib.optionalString homeConfigs.${homeName}.config.my.home.noctalia.enable ''
+                cp ${./modules/home/programs/noctalia/niri.kdl} niri/noctalia.kdl
+              ''}
+              niri validate --config niri/config.kdl
+              rm -f niri/noctalia.kdl
+            ''
+          ) (builtins.attrNames homeConfigs)}
           touch "$out"
         '';
 

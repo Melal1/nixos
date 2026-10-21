@@ -55,5 +55,5 @@
     starship.enable = true;
   };
 
-  home.sessionVariables.BROWSER = "librewolf";
+  home.sessionVariables.BROWSER = "helium";
 }

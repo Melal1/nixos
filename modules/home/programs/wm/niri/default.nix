@@ -36,6 +36,30 @@ in
     home.file.".config/niri/config.kdl".source =
       config.lib.file.mkOutOfStoreSymlink "${niriDir}/config.kdl";
 
+    # Niri spawn does not expand shell variables. Set BROWSER from the Home
+    # Manager session value and expand it through spawn-sh in this fragment.
+    xdg.configFile."niri/browser.kdl".text = ''
+      environment {
+        BROWSER ${builtins.toJSON config.home.sessionVariables.BROWSER}
+      }
+      binds {
+        Mod+B hotkey-overlay-title="Open browser" { spawn-sh "$BROWSER"; }
+      }
+    '';
+
+    xdg.configFile."niri/noctalia.kdl" = lib.mkIf config.my.home.noctalia.enable {
+      source = ../../noctalia/niri.kdl;
+    };
+
+    # Runtime theme link: preserve a selection across Home Manager activations.
+    xdg.configFile."niri/themes/default.kdl".source = ./themes/default.kdl;
+    home.activation.niriTheme = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      dest=${lib.escapeShellArg "${config.xdg.configHome}/niri/default.kdl"}
+      if [ ! -e "$dest" ] && [ ! -L "$dest" ]; then
+        run ln -s ${lib.escapeShellArg "${config.xdg.configHome}/niri/themes/default.kdl"} "$dest"
+      fi
+    '';
+
     home.file.".local/bin/niri-autostart" = {
       executable = true;
       text = ''

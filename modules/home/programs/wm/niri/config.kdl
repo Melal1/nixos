@@ -1,5 +1,7 @@
 // Use automatic output settings until nwg-displays generates this file.
 include optional=true "monitor.kdl"
+include optional=true "browser.kdl"
+include optional=true "noctalia.kdl"
 
 
 // This config is in the KDL format: https://kdl.dev
@@ -252,12 +254,7 @@ layout {
 
 // This line starts waybar, a commonly used bar for Wayland compositors.
 
-// spawn-sh-at-startup "xwayland-satellite"
-// spawn-sh-at-startup "pkill prayer; sleep 0.5; prayer -r \"Saudi Arabia, Al Aziziyah\" -b --bar-12h"
-spawn-at-startup "quickshell"
 spawn-at-startup "niri-autostart"
-// spawn-sh-at-startup "pkill vicinae; sleep 0.5; vicinae server"
-// spawn-sh-at-startup "walls.sh"
 
 
 // To run a shell command (with variables, pipes, etc.), use spawn-sh-at-startup:
@@ -379,8 +376,8 @@ window-rule {
 
 // Example: enable rounded corners for all windows.
 // (This example rule is commented out with a "/-" in front.)
-/- window-rule {
-    geometry-corner-radius 20
+window-rule {
+    geometry-corner-radius 2
     clip-to-geometry true
 }
 
@@ -405,7 +402,6 @@ binds {
     Mod+Shift+W hotkey-overlay-title="Wallpaper Picker" { spawn "skwd-helm" "ui" "toggle"; }
     // Mod+D hotkey-overlay-title="Run an Application: fuzzel" { spawn "fuzzel"; }
     Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
-    Mod+B hotkey-overlay-title="Open browser" { spawn-sh "librewolf"; }
     Mod+SHIFT+B hotkey-overlay-title="Run helium" {spawn "helium";}
 
     // Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
@@ -581,10 +577,6 @@ binds {
 
     // Cycle through widths set in preset-column-widths.
     // Mod+R { switch-preset-column-width; } //TODO: Figure this
-    Mod+R { spawn-sh "quickshell ipc call pill toggle_surface launcher";}
-    Mod+X { spawn-sh "quickshell ipc call pill toggle_surface power";}
-    Mod+N { spawn-sh "quickshell ipc call pill toggle_surface link";}
-    Mod+Shift+N { spawn-sh "quickshell ipc call pill toggle_surface dnd";}
     // Cycling through the presets in reverse order is also possible.
     Mod+Shift+R { switch-preset-column-width-back; }
 
@@ -626,7 +618,6 @@ binds {
     Mod+Shift+Equal { set-window-height "+10%"; }
 
     // Move the focused window between the floating and the tiling layout.
-    Mod+V { spawn-sh "quickshell ipc call pill toggle_surface clipboard"; }
 
     Mod+Ctrl+V       { toggle-window-floating; }
     Mod+Shift+V { switch-focus-between-floating-and-tiling; }
@@ -666,3 +657,6 @@ binds {
     // moving the mouse or pressing any other key.
     Mod+Shift+P { power-off-monitors; }
 }
+
+// Theme colors override the defaults above. This link is owned by theme-switch.
+include optional=true "default.kdl"
