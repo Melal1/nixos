@@ -1,6 +1,8 @@
 _: prev:
 (import ../pkgs prev)
 // {
+  optimizeForArch = import ../lib/optimize-for-arch.nix;
+
   openblas =
     if prev.stdenv.hostPlatform.system == "i686-linux" then
       prev.openblas.overrideAttrs (_: {

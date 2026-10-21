@@ -23,6 +23,7 @@
   boot.loader.grub.useOSProber = true;
 
   my.host = {
+    arch = "znver3";
     displays = [
       "DP-1"
       "HDMI-A-1"
