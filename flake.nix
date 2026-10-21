@@ -12,6 +12,10 @@
       url = "github:lukasl-dev/pi.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    apple-fonts = {
+      url = "github:Lyndeno/apple-fonts.nix";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
 
     # /home/melal/Dev/projects/cpp/mrem checked out.
     # music-sep = {
@@ -33,10 +37,10 @@
       url = "github:liixini/skwd-wall/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    ditto = {
-      url = "github:arvingarciabtw/ditto";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # ditto = {
+    #   url = "github:arvingarciabtw/ditto";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     quickshell = {
       url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -48,10 +52,10 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
-    zen-browser = {
-      url = "github:0xc000022070/zen-browser-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    # zen-browser = {
+    #   url = "github:0xc000022070/zen-browser-flake";
+    #   inputs.nixpkgs.follows = "nixpkgs";
+    # };
     helium-flake = {
       url = "github:oxcl/nix-flake-helium-browser";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -60,16 +64,16 @@
       url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    spicetify-nix = {
-      url = "github:Gerg-L/spicetify-nix";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
     home-manager = {
       url = "github:nix-community/home-manager/release-26.05";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -165,7 +169,6 @@
             osConfig = self.nixosConfigurations.${hostName}.config;
           };
           modules = [
-            inputs.spicetify-nix.homeManagerModules.default
             (import (./users + "/${userName}/home.nix") { user = users.${userName}; })
             (./hosts + "/${hostName}/home.nix")
           ];

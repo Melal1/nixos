@@ -98,10 +98,7 @@
       sys = pkgs.stdenv.hostPlatform.system;
     in
     [
-      inputs.ditto.packages.${sys}.default
-      inputs.zen-browser.packages.${sys}.default
       inputs.helium-flake.packages.${sys}.default
-      inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
       inputs.tincan-cli.packages.${sys}.default
       inputs.timr-tui.packages.${sys}.linuxSound
     ];

@@ -4,7 +4,6 @@
     ./hardware-configuration.nix
     ../../modules/nixos
     ./kernel.nix
-    inputs.pi.nixosModules.default
   ];
 
   networking.hostName = "rusty";
@@ -34,7 +33,7 @@
   };
 
   my.programs = {
-    obs.enable = true;
+    obs.enable = false;
     terminals = {
       kitty.enable = true;
       foot.enable = true;
@@ -43,16 +42,12 @@
   };
 
   # Host-specific packages coming from flake inputs
-  environment.systemPackages =
-    let
-      sys = pkgs.stdenv.hostPlatform.system;
-    in
-    [
-      inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
-      inputs.zen-browser.packages.${sys}.default
-      inputs.ditto.packages.${sys}.default
-    ];
-  programs.pi.coding-agent = {
-    enable = true;
-  };
+  # environment.systemPackages =
+  #   let
+  #     sys = pkgs.stdenv.hostPlatform.system;
+  #   in
+  #   [
+  #     # inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
+  #     # inputs.zen-browser.packages.${sys}.default
+  #   ];
 }
