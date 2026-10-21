@@ -93,6 +93,7 @@
 
   my.programs = {
     nix-ld.enable = true;
+    noctalia.enable = true;
     gpu-screen-recorder.enable = true;
     easyeffects.enable = true;
     steam.enable = true;
