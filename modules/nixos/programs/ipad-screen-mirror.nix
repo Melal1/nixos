@@ -26,6 +26,11 @@ in
       };
     };
 
+    # Start discovery manually when mirroring: sudo systemctl start avahi-daemon.service
+    # Clear the socket target too, so socket traffic cannot start it at boot.
+    systemd.services.avahi-daemon.wantedBy = lib.mkForce [ ];
+    systemd.sockets.avahi-daemon.wantedBy = lib.mkForce [ ];
+
     networking.firewall.allowedTCPPorts = [
       7000
       7001
