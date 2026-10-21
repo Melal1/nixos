@@ -51,10 +51,6 @@
           source = ./open-github-tmux.sh;
           executable = true;
         };
-        ".local/bin/pomodoro" = {
-          source = ./pomodoro.fish;
-          executable = true;
-        };
       }
 
       (lib.mkIf (pkgs ? gh) {

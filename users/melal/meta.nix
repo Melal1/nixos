@@ -7,6 +7,7 @@
     "wheel"
     "networkmanager"
     "uinput"
+    "input"
     "adbusers"
     # "video" # Grants access to display hardware/video cards
     # "render" # Grants access to DRM render nodes (required for ROCm/AMD GPU compute)

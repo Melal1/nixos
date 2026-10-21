@@ -10,6 +10,8 @@ let
   noctaliaDir = "${config.xdg.configHome}/noctalia";
 in
 {
+  imports = [ ./plugins.nix ];
+
   options.my.home.noctalia.enable = lib.mkOption {
     type = lib.types.bool;
     default = noctaliaEnabled;

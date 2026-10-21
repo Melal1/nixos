@@ -1,7 +1,7 @@
 [include]
 # Load this entry point and its includes, rather than every root TOML twice.
 autoload = false
-files = [ "default.toml", "wallpapers/config.toml" ]
+files = [ "default.toml", "wallpapers/config.toml", "plugins.toml" ]
 
 [audio]
 enable_overdrive = true
@@ -10,8 +10,8 @@ enable_overdrive = true
 tint_intensity = 0.61999998614192009
 
 [bar.default]
-start = [ "workspaces", "weather" ]
-end = [ "audio_visualizer", "tray", "keyboard_layout" ]
+start = [ "cat", "workspaces", "weather" ]
+end = [ "bar", "audio_visualizer", "widget", "tray", "keyboard_layout" ]
 background_opacity = 0.80999998189508915
 font_family = "SF Pro Rounded"
 font_weight = 700
