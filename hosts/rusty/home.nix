@@ -1,6 +1,11 @@
 { ... }: {
   imports = [ ../../modules/home ];
 
+  my.home = {
+    desktop.enable = true;
+    media.enable = true;
+  };
+
   # Home Manager owns these per-user applications and their configuration.
   programs = {
     git.enable = true;

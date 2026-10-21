@@ -39,7 +39,6 @@ in
       unstable.xwayland-satellite
       xdg-desktop-portal-gtk
       nautilus
-      mpd-mpris
       cliphist
     ];
   };

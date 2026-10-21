@@ -1,5 +1,10 @@
-{ pkgs, ... }:
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+lib.mkIf config.programs.ncmpcpp.enable {
 
   home.file.".config/ncmpcpp/thumbnail" = {
     source = ./thumbnail.sh;
@@ -8,8 +13,10 @@
 
   programs.ncmpcpp = {
 
-    enable = true;
-    package = pkgs.ncmpcpp.override { visualizerSupport = true; };
+    package = pkgs.ncmpcpp.override {
+      visualizerSupport = true;
+      clockSupport = true;
+    };
     settings = {
       mpd_host = "127.0.0.1";
       mpd_port = 6600;
