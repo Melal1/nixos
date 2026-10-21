@@ -31,7 +31,6 @@
     systemPackages = with pkgs; [
       wget
       curl
-      git
     ];
   };
   nixpkgs.config.permittedInsecurePackages = [

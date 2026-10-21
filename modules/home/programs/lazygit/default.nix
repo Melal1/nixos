@@ -1,6 +1,13 @@
 {
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  home.packages = lib.mkIf config.programs.lazygit.enable [ pkgs.delta ];
+
   programs.lazygit = {
-    enable = true;
 
     settings = {
       git = {

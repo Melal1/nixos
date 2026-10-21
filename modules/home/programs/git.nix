@@ -1,6 +1,5 @@
-{
+_: {
   programs.git = {
-    enable = true;
     settings = {
       init.defaultbranch = "main";
       user = {

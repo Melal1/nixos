@@ -1,7 +1,6 @@
-{ config, ... }:
-{
+{ config, lib, ... }:
+lib.mkIf config.programs.nh.enable {
   programs.nh = {
-    enable = true;
     flake = "${config.home.homeDirectory}/.dotfiles/nixos";
     clean = {
       enable = true;

@@ -1,23 +1,13 @@
 {
-  config,
   lib,
-  unstable,
   ...
 }:
-let
-  cfg = config.my.programs.terminals;
-in
 {
+  # These are host defaults consumed by Home Manager. It owns installation and
+  # user configuration, including Foot's user service.
   options.my.programs.terminals = {
     kitty.enable = lib.mkEnableOption "Kitty terminal emulator";
     ghostty.enable = lib.mkEnableOption "Ghostty terminal emulator";
     foot.enable = lib.mkEnableOption "Foot terminal emulator";
-  };
-
-  config = {
-    environment.systemPackages =
-      lib.optional cfg.kitty.enable unstable.kitty
-      ++ lib.optional cfg.ghostty.enable unstable.ghostty
-      ++ lib.optional cfg.foot.enable unstable.foot;
   };
 }
