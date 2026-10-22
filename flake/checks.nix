@@ -47,7 +47,7 @@ in
           pkgs.writeText "module-evaluation-check" (builtins.toJSON results);
 
         profile-priority = import ../tests/profile-priority.nix {
-          inherit pkgs inputs;
+          inherit pkgs;
           home = homeConfigs."melal@snowflake";
         };
 

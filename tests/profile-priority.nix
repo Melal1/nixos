@@ -2,7 +2,6 @@
 # application contents with tiny probes. Duplicate outputs retain their identity.
 {
   pkgs,
-  inputs,
   home,
 }:
 let
@@ -22,7 +21,8 @@ let
         "quickshell"
         "quickshell-wrapped"
       ];
-      expected = inputs.quickshell-niri.packages.${pkgs.stdenv.hostPlatform.system}.quickshell;
+      expected = home.pkgs.quickshell;
+      minimumVariants = 1;
     };
   };
   identity =
@@ -41,15 +41,15 @@ let
     command: case:
     let
       selected = builtins.filter (p: builtins.elem (lib.getName p) case.names) cfg.home.packages;
+      minimumVariants = case.minimumVariants or 2;
       profile = pkgs.buildEnv {
         name = "${command}-priority-profile";
         paths = map (probe command) selected;
         pathsToLink = [ "/bin" ];
       };
     in
-    assert lib.assertMsg (
-      builtins.length (lib.unique (map identity selected)) >= 2
-    ) "The ${command} priority fixture must exercise multiple variants.";
+    assert lib.assertMsg (builtins.length (lib.unique (map identity selected)) >= minimumVariants)
+      "The ${command} priority fixture must contain at least ${toString minimumVariants} distinct package variants.";
     ''
       test "$(cat ${profile}/bin/${command})" = ${lib.escapeShellArg (identity case.expected)}
     '';

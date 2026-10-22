@@ -443,7 +443,8 @@ language servers on Snowflake.
 Stable/unstable package choices and relative priorities are retained.
 Snowflake keeps plain Python ahead of the science environment through its existing
 Noctalia dependency; use `nix develop .#py-science` for the scientific environment.
-The QML-enabled Quickshell remains ahead of the plain shell build, and existing
+The global Quickshell command comes from the plain `qksh` development environment.
+Niri no longer installs `qmlgolsp` or the separate `quickshell-niri` package.
 FFmpeg command precedence is unchanged. The priority helper is
 `modules/home/lib/after-home-packages.nix`.
 

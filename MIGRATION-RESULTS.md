@@ -108,6 +108,11 @@ before/after manifests and validation logs are saved under:
 
 `/home/melal/.cache/nixos-dev-groups-66k45wxu`
 
+The commit-group preparation snapshot, staged-tree validation and final check
+logs (including the plain Quickshell follow-up) are saved under:
+
+`/home/melal/.cache/nixos-grouped-commits-w20_2v7g`
+
 ## Startup and host dependencies
 
 | Component | Final startup owner and policy |
@@ -152,7 +157,8 @@ no automatic allocation framework was introduced.
 - Snowflake keeps plain Python ahead of its science environment, as the user
   selected. The science environment stays available with `nix develop .#py-science`.
   Stable FFmpeg from the existing Noctalia plugin stays ahead of the moved
-  unstable FFmpeg; the QML Quickshell stays ahead of the plain shell build.
+  unstable FFmpeg. Following the user's later Niri package removal, the global
+  Quickshell command comes from the plain `qksh` development environment.
 - Kitty expands `unix:$XDG_RUNTIME_DIR/kitty` and adds its instance PID. Systemd
   specifiers are not used in application configuration paths.
 - New HM generations link Niri to `modules/home/programs/wm/niri/session.kdl`
@@ -177,8 +183,9 @@ or committing. Commands use `--no-write-lock-file`. Nix evaluation/builds may fe
 sources and populate the store; no-build evaluation does not prohibit those writes.
 
 All ten focused checks, all 48 regression assertions and the full no-build flake
-evaluation passed for the nested development groups. Both NixOS hosts, canonical
-homes and aliases evaluate; no configuration was activated.
+evaluation passed again after the later Niri package removal and priority-check
+update. The no-build evaluation also used the Git-backed flake; no configuration
+was activated.
 
 After the NixOS consolidations, helper removals and package-file split, the
 `module-evaluation`, `user-scripts`, `profile-priority`, `deadnix`, `statix` and
@@ -203,6 +210,13 @@ retains all 28 existing distinct development outputs and adds 13; Snowflake keep
 exactly the same 78. Only Yarn/Watchman and their generated completions are removed
 from Rusty. The new SDKs, their runtime libraries and language-server paths are the only
 distinct additions.
+
+The commit-time follow-up on 2026-10-23 keeps the user's removal of `qmlgolsp` and
+the separate `quickshell-niri` package from Niri's profile additions. Plain
+Quickshell remains selected through the `qksh` development environment. Its
+profile check now verifies that package identity, while FFmpeg and Python still
+exercise competing package variants. This follow-up does not change project
+shell definitions and is separate from the language-group comparison above.
 
 | Validation | Result |
 | --- | --- |

@@ -24,8 +24,6 @@ in
     home.packages = fromSystem (
       with pkgs;
       [
-        inputs.qmlgolsp.packages.${stdenv.hostPlatform.system}.default
-        inputs.quickshell-niri.packages.${stdenv.hostPlatform.system}.quickshell
         wl-clipboard
         nwg-displays
         gnome-frog
