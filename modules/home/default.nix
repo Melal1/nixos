@@ -59,7 +59,6 @@
       media.enable = lib.mkDefault true;
       wm.niri.enable = lib.mkDefault true;
       skwd.enable = lib.mkDefault true;
-      development.enable = lib.mkDefault true;
       keyboardTools.enable = lib.mkDefault true;
       bluetoothClient.enable = lib.mkDefault true;
       scripts = {

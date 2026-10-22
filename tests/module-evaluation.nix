@@ -35,17 +35,49 @@ let
     ];
     io = [ ../modules/home/packages/io.nix ];
     databaseClients = [ ../modules/home/packages/database-clients.nix ];
-    development = [
-      ../modules/home/packages/development.nix
-      ../modules/home/packages/snowflake/development.nix
-    ];
   };
+  devParents = [
+    "cpp"
+    "csharp"
+    "python"
+    "javascript"
+    "lua"
+    "go"
+    "rust"
+    "java"
+    "nix"
+    "shell"
+    "json"
+    "xml"
+    "text"
+  ];
+  devChildren = {
+    cpp = [
+      "audio"
+      "dpp"
+      "fmt"
+      "ncurses"
+      "qksh"
+    ];
+    csharp = [ "avalonia" ];
+    python = [ "science" ];
+    java = [ "javafx" ];
+  };
+  allDevOff = lib.genAttrs devParents (
+    name:
+    {
+      enable = lib.mkForce false;
+    }
+    // lib.genAttrs (devChildren.${name} or [ ]) (_: {
+      enable = lib.mkForce false;
+    })
+  );
   homeOff = {
     disabledModules = lib.concatLists (builtins.attrValues packageModules);
     my.home = {
       desktop.enable = false;
       media.enable = false;
-      development.enable = false;
+      dev = allDevOff;
       wm.niri.enable = false;
       noctalia.enable = lib.mkForce false;
       skwd.enable = false;
@@ -115,17 +147,40 @@ let
   rustyNoNoctalia = rustyNoctalia.extendModules {
     modules = [ { my.home.noctalia.enable = lib.mkForce false; } ];
   };
-  noToolchains = lib.genAttrs (builtins.attrNames home.config.my.home.development.toolchains) (_: {
-    enable = lib.mkForce false;
-  });
+  devOnly =
+    selection:
+    packageOnly.extendModules {
+      modules = [
+        ../modules/home/dev
+        { my.home.dev = selection; }
+      ];
+    };
+  devDefaults = devOnly { };
+  cppOnly = devOnly { cpp.enable = true; };
+  csharpOnly = devOnly { csharp.enable = true; };
+  pythonBundleOnly = devOnly { python.enable = true; };
+  dppOnly = devOnly { cpp.dpp.enable = true; };
+  avaloniaOnly = devOnly { csharp.avalonia.enable = true; };
   pythonOnly = homeFor base {
-    my.home.development.toolchains = noToolchains // {
-      py.enable = lib.mkForce true;
+    my.home.dev = lib.recursiveUpdate allDevOff {
+      python.enable = lib.mkForce true;
     };
   };
-  pythonPackages = (import ../shells/package-groups.nix { inherit (pythonOnly) pkgs; }).packagesFor [
-    "py"
+  shellPackages = import ../shells/package-groups.nix { inherit (home) pkgs; };
+  dppShell = self.devShells.x86_64-linux.dpp;
+  dppShellPackages = (dppShell.nativeBuildInputs or [ ]) ++ (dppShell.buildInputs or [ ]);
+  hasDppShellInput = package: lib.any (input: input.drvPath == package.drvPath) dppShellPackages;
+  cppEditorPackages = with home.pkgs; [
+    vscode-extensions.ms-vscode.cpptools
+    clang-tools
+    gdb
   ];
+  csharpEditorPackages = with home.pkgs; [
+    roslyn-ls
+    netcoredbg
+  ];
+  includes = instance: expected: lib.all (p: hasPackage p instance.config.home.packages) expected;
+  excludes = instance: forbidden: !lib.any (p: hasPackage p instance.config.home.packages) forbidden;
   nixLdOff = base.extendModules { modules = [ { my.programs.nix-ld.enable = lib.mkForce false; } ]; };
   noWebcamHost = base.extendModules {
     modules = [ { my.hardware.androidWebcam.enable = lib.mkForce false; } ];
@@ -175,11 +230,6 @@ let
     databaseClients = [
       unstable.lazysql
       home.pkgs.pgmodeler
-    ];
-    development = [
-      home.pkgs.nil
-      home.pkgs.typescript-language-server
-      home.pkgs.bear
     ];
   };
   matrix = lib.concatMap (
@@ -485,7 +535,162 @@ let
       && !lib.any (p: hasPackage p (packages noWebcamHost)) tools
       && !hasPackage noWebcamHost.config.boot.kernelPackages.v4l2loopback noWebcamHost.config.boot.extraModulePackages;
     single-toolchain-selection =
-      map toString (toolchainRoots pythonOnly) == map (p: p.outPath) pythonPackages;
+      map toString (toolchainRoots pythonOnly) == map (p: p.outPath) (shellPackages.packagesFor [ "py" ])
+      && includes pythonOnly [
+        home.pkgs.pyright
+        home.pkgs.ruff
+        home.pkgs.mypy
+      ];
+    development-defaults-off =
+      lib.all (
+        name:
+        !devDefaults.config.my.home.dev.${name}.enable
+        && lib.all (child: !devDefaults.config.my.home.dev.${name}.${child}.enable) (
+          devChildren.${name} or [ ]
+        )
+      ) devParents
+      && toolchainRoots devDefaults == [ ]
+      && !(devDefaults.config.home.file ? ".editorconfig")
+      && !(devDefaults.options.my.home.dev ? lsp)
+      && lib.all (name: !(devDefaults.options.my.home.dev.${name} ? lsp)) devParents;
+    development-language-bundles =
+      includes cppOnly (
+        cppEditorPackages
+        ++ [
+          home.pkgs.gcc
+          home.pkgs.bear
+          home.pkgs.cmake-language-server
+        ]
+      )
+      && cppOnly.config.home.sessionVariables ? CODELLDB_PATH
+      && includes csharpOnly (
+        csharpEditorPackages
+        ++ [
+          home.pkgs.dotnet-sdk_10
+          home.pkgs.csharpier
+        ]
+      )
+      && includes pythonBundleOnly [
+        home.pkgs.python313
+        home.pkgs.uv
+        home.pkgs.pyright
+        home.pkgs.ruff
+        home.pkgs.mypy
+      ]
+      && lib.all (instance: instance.config.home.file ? ".editorconfig") [
+        cppOnly
+        csharpOnly
+        pythonBundleOnly
+      ];
+    development-dpp-without-parent =
+      !dppOnly.config.my.home.dev.cpp.enable
+      && dppOnly.config.my.home.dev.cpp.dpp.enable
+      && includes dppOnly (
+        with home.pkgs;
+        [
+          gcc
+          gnumake
+          cmake
+          pkg-config
+          dpp
+        ]
+      )
+      && excludes dppOnly cppEditorPackages
+      && map toString (toolchainRoots dppOnly) == map (p: p.outPath) (shellPackages.packagesFor [ "dpp" ])
+      && !(dppOnly.config.home.sessionVariables ? CODELLDB_PATH)
+      && !(dppOnly.config.home.file ? ".editorconfig");
+    development-avalonia-without-parent =
+      !avaloniaOnly.config.my.home.dev.csharp.enable
+      && avaloniaOnly.config.my.home.dev.csharp.avalonia.enable
+      && includes avaloniaOnly (
+        [ home.pkgs.dotnet-sdk_10 ]
+        # mkShell chooses headers and runtime libraries, not default bin outputs.
+        ++
+          lib.concatMap
+            (package: [
+              package.dev
+              package.out
+            ])
+            (
+              with home.pkgs;
+              [
+                fontconfig
+                libGL
+                libxkbcommon
+                icu
+                openssl
+              ]
+            )
+      )
+      && excludes avaloniaOnly csharpEditorPackages
+      &&
+        map toString (toolchainRoots avaloniaOnly)
+        == map (p: p.outPath) (shellPackages.packagesFor [ "avalonia" ])
+      && !(avaloniaOnly.config.home.file ? ".editorconfig");
+    dpp-shell-independent =
+      lib.all hasDppShellInput (
+        with home.pkgs;
+        [
+          gcc
+          gnumake
+          cmake
+          pkg-config
+          dpp
+        ]
+      )
+      && !lib.any hasDppShellInput cppEditorPackages
+      && excludes noUserFeatures [
+        home.pkgs.gcc
+        home.pkgs.dpp
+      ];
+    development-host-selections =
+      lib.all
+        (
+          instance:
+          lib.all (name: instance.config.my.home.dev.${name}.enable) [
+            "cpp"
+            "csharp"
+            "python"
+            "lua"
+            "java"
+            "nix"
+            "shell"
+            "json"
+            "xml"
+            "text"
+          ]
+          && lib.all (name: instance.config.my.home.dev.cpp.${name}.enable) devChildren.cpp
+          && !instance.config.my.home.dev.java.javafx.enable
+        )
+        [
+          home
+          rusty
+        ]
+      && lib.all (name: home.config.my.home.dev.${name}.enable) [
+        "javascript"
+        "go"
+        "rust"
+      ]
+      && home.config.my.home.dev.python.science.enable
+      && home.config.my.home.dev.csharp.avalonia.enable
+      && lib.all (name: !rusty.config.my.home.dev.${name}.enable) [
+        "javascript"
+        "go"
+        "rust"
+      ]
+      && !rusty.config.my.home.dev.python.science.enable
+      && !rusty.config.my.home.dev.csharp.avalonia.enable
+      && excludes rusty [
+        home.pkgs.yarn
+        home.pkgs.watchman
+      ]
+      && includes home [
+        home.pkgs.yarn
+        home.pkgs.watchman
+        home.pkgs.typescript-language-server
+        home.pkgs.gopls
+        home.pkgs.rust-analyzer
+      ];
     nix-ld-independent =
       nixLdOff.config.programs.nix-ld.enable == false
       && hasPackage home.pkgs.nil (homeFor nixLdOff { }).config.home.packages;

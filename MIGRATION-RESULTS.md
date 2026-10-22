@@ -42,10 +42,14 @@ upstream source/documentation rather than inferred from systemd syntax.
   and enabled/configured on Snowflake. Its personal TOML is now
   `modules/home/hosts/snowflake/noctalia-config.toml`; either host can select a separate
   configuration. Host-override examples are covered by evaluation-only fixtures.
-- Development settings and selected toolchains remain separate from editor
-  package imports. `modules/home/dev/toolchains.nix` roots the same development outputs
-  through `home.extraDependencies`. Project shells and hooks are unchanged.
-  Stable/unstable choices, overrides and relative priorities are preserved by
+- Development is selected through nested `my.home.dev` language modules. Each
+  parent bundles its SDK/toolchain and editor tools, including its language server;
+  C++ libraries, Avalonia, Python science and JavaFX have nested selections.
+  The old development package lists and `my.home.development` switches are removed.
+  Selected project-shell outputs are deduplicated and rooted by
+  `modules/home/dev/toolchain-packages.nix`; editor additions remain separate from
+  those roots. Existing project shells, hooks and package provenance are retained.
+  Stable/unstable choices and priorities still use
   `modules/home/lib/after-home-packages.nix`.
 - Hardware, filesystems, drivers, permissions, Niri/Ly/PAM/portals, audio services,
   networking/firewalls, Steam/GameMode, nix-ld, shared fonts, SQL deployment and
@@ -98,6 +102,11 @@ The source snapshot before consolidating the active tree at `modules/home/`
 and removing the temporary top-level home tree is saved under:
 
 `/home/melal/.cache/nixos-home-location-gu3hy44b`
+
+The source snapshot before introducing nested development groups and their
+before/after manifests and validation logs are saved under:
+
+`/home/melal/.cache/nixos-dev-groups-66k45wxu`
 
 ## Startup and host dependencies
 
@@ -167,9 +176,9 @@ Validation uses `path:$PWD` so untracked new files are included without staging
 or committing. Commands use `--no-write-lock-file`. Nix evaluation/builds may fetch
 sources and populate the store; no-build evaluation does not prohibit those writes.
 
-All ten focused checks and the full no-build flake evaluation passed again
-after consolidating the active tree at `modules/home/`. Both canonical home
-activation packages and NixOS host outputs evaluate without activation.
+All ten focused checks, all 48 regression assertions and the full no-build flake
+evaluation passed for the nested development groups. Both NixOS hosts, canonical
+homes and aliases evaluate; no configuration was activated.
 
 After the NixOS consolidations, helper removals and package-file split, the
 `module-evaluation`, `user-scripts`, `profile-priority`, `deadnix`, `statix` and
@@ -177,27 +186,28 @@ After the NixOS consolidations, helper removals and package-file split, the
 both hosts and canonical homes. The actual system UXPlay launcher also built
 successfully, including its Bash syntax and ShellCheck checks; it was not run.
 
-The single-user consolidation replaces alternate-user fixtures with Melal-only
-package-list, host-override and custom MPD data-directory fixtures. Tests cover an
-ordinary Foot font and media/shell preference overrides, independent Noctalia
-configuration / disablement, account and alias preservation, and all existing
-service/security boundaries.
-Before/after evaluation preserves application package paths and priorities,
-development roots, pinned inputs, account fields, state versions, session
-variables, actual terminal/media settings and Noctalia selections. Both NixOS
-system derivation paths and user services/sockets/timers match the snapshot,
-including Avahi/firewall and manual webcam, mirroring, MSSQL and nix-serve policies.
-Only the intended repository paths change: `vhm`, `xpkg`, future Niri/Noctalia
-links and the theme-seeding helper now use `modules/home/`. The top-level home
-tree is removed. All existing assets and four live links remain unchanged.
+Regression fixtures cover Melal host overrides, private media paths, package-list
+imports and service/hardware boundaries. Development fixtures additionally cover
+bundled parent tools, default-off selections, independent DPP/Avalonia children,
+Python-only output rooting and the actual minimal DPP shell. The updated result
+contains 48 assertions.
 
-The consolidated tree passes all ten focused checks below, including all 44
-regression assertions.
+The development regrouping deliberately adds C#, Python and Lua SDK/toolchains on
+Rusty and JDK 21 on both hosts. Rusty's Yarn and Watchman are removed as requested;
+Snowflake's Go and Rust selections now include gopls and rust-analyzer. Before/after
+evaluation confirms all 15 existing project-shell derivations,
+package inventories and hooks are identical. Both complete system objects,
+accounts, state versions, 16 pinned inputs and runtime service settings match the
+snapshot. Every retained application path keeps its original priority. Rusty
+retains all 28 existing distinct development outputs and adds 13; Snowflake keeps
+exactly the same 78. Only Yarn/Watchman and their generated completions are removed
+from Rusty. The new SDKs, their runtime libraries and language-server paths are the only
+distinct additions.
 
 | Validation | Result |
 | --- | --- |
 | `nix flake check "path:$PWD" --no-build --no-write-lock-file` | Passed: both NixOS outputs, canonical homes, aliases, checks, shells and packages evaluate |
-| `module-evaluation` | Built successfully; all 44 regression assertions pass, including ordinary terminal/media/Fish host overrides, package imports, custom media paths, account preservation, hardware ownership and startup policies |
+| `module-evaluation` | Built successfully; all 48 regression assertions pass, including ordinary terminal/media/Fish host overrides, package imports, custom media paths, account preservation, hardware ownership and startup policies |
 | `niri-config` | Built successfully; both canonical homes, disabled applications and Rusty with alternate Noctalia validate |
 | `assets-setup`, `theme-switch` | Built successfully; local fixtures cover idempotence, selected-link preservation, backup collisions and failure handling |
 | `shell-hooks`, `user-scripts` | Built successfully; development shell hooks, generated Fish/startup scripts and helper script syntax pass |
@@ -205,15 +215,17 @@ regression assertions.
 | Formatting | Full treefmt check built successfully; direct pinned `nixfmt --check` also passes for every Nix file |
 | `profile-priority` | Built successfully; tiny buildEnv probes using actual profile metadata verify Python, FFmpeg and Quickshell command precedence without building those applications |
 | System UXPlay launcher | Built successfully with Bash syntax and ShellCheck validation; no receiver or service was started |
-| Package-list simplification | Before/after evaluation matches every package path, priority and development root for both NixOS hosts and both canonical homes; unconditional common and host files are selected by each host’s imports |
+| Development grouping | Comparison passed: only the approved SDK/language-tool additions and Rusty Yarn/Watchman removals; all 15 shells, existing development outputs and retained package priorities are preserved |
 | `git diff --check` | Passed |
 | Preservation checks | Original documents, lock, legacy assets and live links are unchanged; evaluated account fields match the pre-consolidation baseline |
 
 The initial and migrated evaluated package sets were compared by store path.
-Every existing application path is retained except generated session-variable
-files, the duplicate system Home Manager CLI, and raw UXPlay now referenced by
-its wrapper. Previously selected toolchain roots are all retained: 28 on Rusty
-and 78 on Snowflake, plus HM's generated completion dependencies. The pinned
+The original migration retained existing application paths except generated
+session-variable files, the duplicate system Home Manager CLI, and raw UXPlay now
+referenced by its wrapper. The later requested development grouping also removes
+Yarn and Watchman from Rusty and adds the SDKs/language tools described above.
+Previously selected toolchain roots are all retained: 28 on Rusty and 78 on
+Snowflake, plus HM's generated completion dependencies. The pinned
 OBS and CPU-optimized Noctalia constructions are preserved.
 
 Full system/home application closures were not compiled. In particular, no

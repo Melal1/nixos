@@ -81,19 +81,19 @@ choices remain separate from NixOS hardware prerequisites.
 Each host explicitly imports its chosen lists from:
 
 ```text
-modules/home/packages/{cli,gui,io,database-clients,development}.nix
+modules/home/packages/{cli,gui,io,database-clients}.nix
 modules/home/packages/rusty/{cli,gui}.nix
-modules/home/packages/snowflake/{cli,gui,development}.nix
+modules/home/packages/snowflake/{cli,gui}.nix
 ```
 
 Every package-only file is unconditional. Remove an import from one host to
 remove that list’s contribution on that machine. There is no package-group enable
 option or default package bundle. Database clients do not require a local server.
-Development package lists are independent of the development settings switch.
+Development environments are selected by language under `my.home.dev`.
 
 | Home Manager option | Responsibility |
 | --- | --- |
-| `my.home.development.enable` | Debugger paths, EditorConfig and selected toolchains |
+| `my.home.dev.<language>.enable` | SDK/toolchain, bundled language tools and editor integration |
 | `my.home.desktop.enable` | GTK/Qt, cursor and dconf preferences |
 | `my.home.media.enable` | MPD, ncmpcpp, playerctld and playback helpers |
 | `programs.kitty/foot/ghostty.enable` | Terminal installation, configuration and files |
@@ -376,42 +376,79 @@ nix build .#easydotnet
 
 ## Development environments
 
-`shells/` is unchanged. Enter environments with `nix develop .#<shell>`; their
-`shellHook` variables and library paths apply only inside those environments.
-User profiles retain all previously selected development commands outside shells.
+Each language has a Home Manager option under `my.home.dev`. Its parent option
+installs the SDK/compiler, language tools, formatter/debugger where selected,
+and language server together. There is no separate LSP switch. Libraries and
+frameworks live under their language:
 
 ```nix
 # modules/home/hosts/<host>/default.nix
-imports = [ ../../packages/development.nix ];
-my.home.development.enable = true;
-my.home.development.toolchains = {
-  cpp.enable = true;
-  py.enable = true;
-  dotnet.enable = false;
+my.home.dev = {
+  cpp = {
+    enable = true;
+    dpp.enable = true;
+    audio.enable = true;
+  };
+  csharp = {
+    enable = true;
+    avalonia.enable = true;
+  };
+  python = {
+    enable = true;
+    science.enable = true;
+  };
 };
 ```
 
-Each toolchain defaults off and uses `shells/package-groups.nix`, preserving package
-provenance, priorities and selected outputs. Headers and development outputs are
-rooted through `home.extraDependencies` rather than `system.extraDependencies`.
-Within toolchain lists, scientific Python retains priority over the plain
-interpreter, and the desktop's QML-enabled Quickshell retains priority over the
-plain development-shell build. Snowflake's existing Noctalia Discord dependency
-keeps plain Python ahead of the relocated science environment in the full user
-profile, as explicitly selected during migration; use `nix develop .#py-science`
-for that environment. `modules/home/lib/after-home-packages.nix` preserves existing HM features
-ahead of moved package lists while keeping the lists' relative priorities. This
-also retains the user-profile FFmpeg selection without colliding with unstable
-FFmpeg. Common editor tools live in `modules/home/packages/development.nix`,
-and extra desktop editor tools live in
-`modules/home/packages/snowflake/development.nix`. Both package files are
-unconditional: importing a list installs its tools independently of
-`my.home.development.enable`. That option controls editor configuration, debugger
-paths and selected toolchains.
+Available parent groups are `cpp`, `csharp`, `python`, `javascript`, `lua`, `go`,
+`rust`, `java`, `nix`, `shell`, `json`, `xml` and `text`. C++ also offers `fmt`,
+`ncurses` and `qksh`; Java offers `javafx`. Every selection defaults off and each
+host explicitly chooses its groups. EditorConfig and the existing tree-sitter
+utility accompany enabled parent groups; the C++ group owns its debugger path.
+
+Nested selections work independently of the parent option. For example,
+`cpp.dpp.enable = true` supplies DPP and its required compiler/build dependencies;
+`cpp.enable = true` adds the full personal C++ setup, including its LSP and debugger.
+Similarly, Avalonia alone supplies its .NET SDK and native libraries; the C#
+parent adds Roslyn and the general C# tools. Python science can also be selected
+without the general Python editor setup.
+
+Project shells remain independent of Home Manager selections:
+
+```bash
+nix develop .#cpp
+nix develop .#dpp
+nix develop .#avalonia
+```
+
+All existing shell names, package definitions and hooks are preserved. The DPP
+shell explicitly selects GCC, Make, CMake, pkg-config, DPP, opusfile, liboggz and
+fmt; it does not add clangd or GDB. Existing general C++ and .NET shells retain
+their own tooling. Entering a shell does not enable a Home Manager option.
+
+The Home Manager modules reuse `shells/package-groups.nix` for SDKs and libraries,
+adding their editor tools in `modules/home/dev/`. Selected shell outputs are
+collected once, deduplicated and rooted through `home.extraDependencies`, including
+headers and development outputs. Installing those packages globally does not
+execute a shell's hooks or export its `LD_LIBRARY_PATH` / `DOTNET_ROOT` throughout
+the session. Those environments apply inside `nix develop`.
+
+Rusty enables C++, C#, Java, Python and Lua, plus Nix/shell/JSON/XML/text tooling.
+Its former standalone Yarn and Watchman selections are removed as requested.
+Snowflake also enables JavaScript, Go and Rust, Avalonia and scientific Python.
+Both keep their existing C++ library selections. The added Rusty SDKs and the
+Java SDK on both hosts are deliberate user choices; Go and Rust now bundle their
+language servers on Snowflake.
+
+Stable/unstable package choices and relative priorities are retained.
+Snowflake keeps plain Python ahead of the science environment through its existing
+Noctalia dependency; use `nix develop .#py-science` for the scientific environment.
+The QML-enabled Quickshell remains ahead of the plain shell build, and existing
+FFmpeg command precedence is unchanged. The priority helper is
+`modules/home/lib/after-home-packages.nix`.
 
 For separately pinned projects, keep project flakes and use `.envrc` with
-`use flake`, followed by `direnv allow`. Installing packages in a user profile
-does not apply a development shell's environment hooks.
+`use flake`, followed by `direnv allow`.
 
 ## On-demand LAN cache
 

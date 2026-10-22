@@ -8,10 +8,8 @@
     ../../packages/gui.nix
     ../../packages/io.nix
     ../../packages/database-clients.nix
-    ../../packages/development.nix
     ../../packages/snowflake/cli.nix
     ../../packages/snowflake/gui.nix
-    ../../packages/snowflake/development.nix
   ];
 
   my.home = {
@@ -59,21 +57,33 @@
     };
   };
 
-  my.home.development.toolchains = {
-    audio.enable = true;
-    avalonia.enable = true;
-    cpp.enable = true;
-    dotnet.enable = true;
-    dpp.enable = true;
-    fmt.enable = true;
-    go.enable = true;
+  my.home.dev = {
+    cpp = {
+      enable = true;
+      audio.enable = true;
+      dpp.enable = true;
+      fmt.enable = true;
+      ncurses.enable = true;
+      qksh.enable = true;
+    };
+    csharp = {
+      enable = true;
+      avalonia.enable = true;
+    };
+    java.enable = true;
+    python = {
+      enable = true;
+      science.enable = true;
+    };
     lua.enable = true;
-    ncurses.enable = true;
-    nodejs22.enable = true;
-    py.enable = true;
-    py-science.enable = true;
-    qksh.enable = true;
+    javascript.enable = true;
+    go.enable = true;
     rust.enable = true;
+    nix.enable = true;
+    shell.enable = true;
+    json.enable = true;
+    xml.enable = true;
+    text.enable = true;
   };
 
   my.home.openrgb.enable = true;
