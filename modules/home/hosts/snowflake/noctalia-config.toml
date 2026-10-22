@@ -1,0 +1,236 @@
+[include]
+# Load this entry point and its includes, rather than every root TOML twice.
+autoload = false
+files = [ "default.toml", "wallpapers/config.toml", "plugins.toml" ]
+
+[audio]
+enable_overdrive = true
+
+[backdrop]
+tint_intensity = 0.61999998614192009
+
+[bar.default]
+start = [ "cat", "workspaces", "weather" ]
+end = [ "bar", "audio_visualizer", "widget", "tray", "keyboard_layout" ]
+background_opacity = 0.80999998189508915
+font_family = "SF Pro Rounded"
+font_weight = 700
+margin_ends = 300
+padding = 27
+radius = 32
+radius_top_left = 0
+radius_top_right = 0
+thickness = 38
+widget_spacing = 9
+
+    [bar.default.dead_zone.actions]
+    back = "annotate"
+    left = "none"
+    middle = "none"
+    right = "none"
+
+    [bar.default.monitor.HDMI-A-1]
+    enabled = false
+
+[calendar]
+
+[control_center]
+show_session_button = false
+show_shortcut_labels = false
+sidebar_section = "none"
+
+    [control_center.calendar]
+    show_events_card = false
+
+    [[control_center.shortcuts]]
+    type = "bluetooth"
+
+    [[control_center.shortcuts]]
+    type = "caffeine"
+
+    [[control_center.shortcuts]]
+    type = "nightlight"
+
+    [[control_center.shortcuts]]
+    type = "notification"
+
+    [[control_center.shortcuts]]
+    type = "power_profile"
+
+[desktop_widgets]
+enabled = false
+
+[dock]
+active_monitor_only = true
+active_opacity = 0.52999998815357685
+auto_hide = true
+cross_axis_padding = 0
+enabled = true
+item_spacing = 14
+magnification_scale = 1.6000000089406967
+main_axis_padding = 27
+radius = 43
+radius_bottom_left = 0
+radius_bottom_right = 0
+reserve_space = false
+show_dots = true
+show_instance_count = false
+
+[keybinds]
+down = [ "Down", "Ctrl+j", "Ctrl+n" ]
+left = [ "Left", "Ctrl+h" ]
+right = [ "Right", "Ctrl+l" ]
+up = [ "Up", "Ctrl+k", "Ctrl+p" ]
+
+[location]
+auto_locate = true
+
+[lockscreen]
+blurred_desktop = true
+
+[lockscreen_widgets]
+enabled = false
+schema_version = 2
+widget_order = [ "lockscreen-login-box@DP-1", "lockscreen-login-box@HDMI-A-1" ]
+
+    [lockscreen_widgets.grid]
+    cell_size = 16
+    major_interval = 4
+    visible = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@DP-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 1280.0
+    cy = 1258.0
+    output = "DP-1"
+    placement_height = 1440.0
+    placement_width = 2560.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@DP-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_password_reveal = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+    [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1"]
+    box_height = 196.0
+    box_width = 810.0
+    cx = 960.0
+    cy = 898.0
+    output = "HDMI-A-1"
+    placement_height = 1080.0
+    placement_width = 1920.0
+    rotation = 0.0
+    type = "login_box"
+
+        [lockscreen_widgets.widget."lockscreen-login-box@HDMI-A-1".settings]
+        background_color = "surface_variant"
+        background_opacity = 0.88
+        background_radius = 12.0
+        center_password_text = false
+        input_opacity = 1.0
+        input_radius = 6.0
+        layout = "regular"
+        show_caps_lock = true
+        show_keyboard_layout = true
+        show_login_button = true
+        show_media = true
+        show_password_reveal = true
+        show_session_buttons = true
+        show_unlock_hint = true
+        show_weather = true
+
+[notification]
+follow_focused_output = true
+max_visible = 4
+
+[osd]
+follow_focused_output = true
+offset_y = 0
+position = "bottom_center"
+position_vertical = "bottom_center"
+
+[plugin_settings."noctalia/screen_recorder"]
+frame_rate = 30
+hide_inactive = true
+replay_duration = 3600
+replay_enabled = true
+
+[shell]
+app_icon_color = "on_error"
+avatar_path = "~/Pictures/Pfp/82eb36640687f3d80910be19ddf46758.jpg"
+button_borders = false
+clipboard_confirm_clear_history = false
+font_family = "SF Pro Display"
+niri_overview_type_to_launch_enabled = true
+polkit_agent = true
+screen_time_enabled = true
+show_close_buttons = false
+
+    [shell.animation]
+    speed = 0.85000001266598701
+
+    [shell.launcher]
+    pinned = [ "com.obsproject.Studio" ]
+    width = 650
+
+    [shell.panel]
+    launcher_placement = "attached"
+
+    [shell.window_switcher]
+    show_all_outputs = false
+    show_app_icon = false
+    show_caption = false
+    show_count = false
+    style = "compact"
+
+[system.monitor]
+cpu_poll_seconds = 1
+gpu_poll_seconds = 1
+memory_poll_seconds = 1
+
+[widget.audio_visualizer]
+bands = 46
+interactive = false
+mirrored = false
+scale = 0.90000000000000002
+show_when_idle = true
+width = 181
+
+[widget.clock]
+font_scale = 1.1799999999999999
+font_weight = 700
+format = "{: %l:%M %P}"
+scale = 1.1500000000000001
+
+[widget.keyboard_layout]
+glyph = "keyboard-filled"
+
+[widget.launcher]
+enabled = false
+
+[widget.tray]
+drawer = true
+drawer_columns = 4
+drawer_item_size = 22.0
+
+[widget.workspaces]
+active_pill_size = 2.3999999999999999
+focused_output_only = true
+hide_when_empty = true
+show_all_outputs = true
+show_labels = false

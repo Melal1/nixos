@@ -1,28 +1,44 @@
 {
   config,
   lib,
-  osConfig ? null,
+  inputs,
+  pkgs,
   ...
 }:
 let
   cfg = config.my.home.noctalia;
-  noctaliaEnabled = osConfig != null && (osConfig.my.programs.noctalia.enable or false);
   noctaliaDir = "${config.xdg.configHome}/noctalia";
 in
 {
   imports = [ ./plugins.nix ];
 
-  options.my.home.noctalia.enable = lib.mkOption {
-    type = lib.types.bool;
-    default = noctaliaEnabled;
-    description = "Manage Noctalia user configuration; defaults to the system feature's enable option.";
+  options.my.home.noctalia = {
+    enable = lib.mkEnableOption "the Noctalia shell, configuration and selected plugins";
+    optimize_for_arch = lib.mkOption {
+      type = lib.types.bool;
+      default = true;
+      description = "Build the shell for the host CPU using pkgs.optimizeForArch.";
+    };
+    package = lib.mkOption {
+      type = lib.types.package;
+      default = pkgs.optimizeForArch {
+        package = inputs.noctalia.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        inherit (cfg) optimize_for_arch;
+      };
+      description = "Noctalia shell package.";
+    };
+    configFile = lib.mkOption {
+      type = lib.types.str;
+      default = "${config.my.home.dotfilesDir}/modules/home/programs/noctalia/minimal-config.toml";
+      description = "Mutable main TOML file in the user's checkout.";
+    };
   };
 
   # WM modules attach their own integration only when both features are enabled.
   config = lib.mkIf cfg.enable {
+    home.packages = [ cfg.package ];
     xdg.configFile = {
-      "noctalia/config.toml".source =
-        config.lib.file.mkOutOfStoreSymlink "${config.my.home.dotfilesDir}/modules/home/programs/noctalia/noctalia-config.toml";
+      "noctalia/config.toml".source = config.lib.file.mkOutOfStoreSymlink cfg.configFile;
       "noctalia/themes/black-mo.toml".source = ./themes/black-mo.toml;
       "noctalia/wallpapers/config.toml".source = ./wallpapers.toml;
       "noctalia/palettes/black-mo.json".source = ./black-mo.json;

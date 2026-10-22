@@ -9,7 +9,7 @@ let
 in
 {
   options.my.programs.gpu-screen-recorder = {
-    enable = lib.mkEnableOption "GPU Screen Recorder with GTK and UI frontends";
+    enable = lib.mkEnableOption "GPU Screen Recorder and its privileged KMS wrapper";
   };
 
   config = lib.mkIf cfg.enable {
@@ -17,11 +17,5 @@ in
       enable = true;
       package = unstable.gpu-screen-recorder;
     };
-
-    environment.systemPackages = [
-      unstable.gpu-screen-recorder-gtk
-      unstable.gpu-screen-recorder-ui
-      unstable.gpu-screen-recorder-notification
-    ];
   };
 }

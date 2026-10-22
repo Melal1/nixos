@@ -11,7 +11,7 @@
 
     settings = {
       git = {
-        pagers = [
+        pagers = lib.mkDefault [
           {
             colorArg = "always";
             pager = "delta --dark --paging=never --syntax-theme base16-256 -s --wrap-max-lines=10";

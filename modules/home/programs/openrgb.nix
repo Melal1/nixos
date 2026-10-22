@@ -2,23 +2,11 @@
   config,
   lib,
   pkgs,
-  osConfig ? null,
   ...
 }:
-let
-  rgbEnabled =
-    if osConfig != null && (osConfig ? my.hardware.rgb.enable) then
-      osConfig.my.hardware.rgb.enable
-    else
-      false;
-in
 {
   options.my.home.openrgb = {
-    enable = lib.mkOption {
-      type = lib.types.bool;
-      default = rgbEnabled;
-      description = "Autostart OpenRGB client minimized to tray";
-    };
+    enable = lib.mkEnableOption "the OpenRGB tray client (requires a host OpenRGB server)";
   };
 
   config = lib.mkIf config.my.home.openrgb.enable {

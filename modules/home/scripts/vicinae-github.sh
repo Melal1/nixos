@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-USERNAME="melal1"
+USERNAME="@githubUsername@"
 API="https://api.github.com/users/${USERNAME}/repos?per_page=100&sort=updated"
 
 json="$(curl -fsSL "$API")"

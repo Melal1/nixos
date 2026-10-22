@@ -1,121 +1,146 @@
-# NixOS & Home Manager Configuration
+# Melal’s NixOS & Home Manager Configuration
 
-This repository contains my declarative NixOS and standalone Home Manager configuration.
+This repository configures one user, Melal, across Rusty and Snowflake using
+NixOS and standalone Home Manager.
 
-## Directory Structure
+## Ownership and composition
 
-- `flake.nix`: Flake-parts entry point. Declares inputs, supported systems, packages, development shells and treefmt integration.
-- `flake/`: Flake-parts modules for output assembly.
-  - `hosts.nix`: Auto-discovers hosts and users; `mkHost`/`mkHome` build NixOS and standalone Home Manager configurations, including the single-user hostname aliases.
-  - `checks.nix`: Validation checks and canonical Home Manager activation builds. Keeps the existing `formatting` check name; the treefmt module supplies the formatter.
-- `hosts/`: One directory per machine, named after the flake output.
-  - `hosts/snowflake/`: Desktop machine. `hardware-configuration.nix` + a thin list of `my.*` toggles.
-  - `hosts/rusty/`: Laptop machine.
-  - `hosts/<name>/meta.nix`: Per-host metadata (`users`) read by the flake.
-- `modules/`: Shared modules, all host-agnostic.
-  - `modules/nixos/`: System modules. Features are gated behind `my.*` enable options.
-  - `modules/home/`: Home Manager modules (programs, shell, dev, scripts).
-  - `modules/nixos/packages/<hostname>/`: Host package lists; every `.nix` file is imported automatically for that host and the existing lists respect their package group's enable option.
-- `pkgs/`: Custom packages (`easydotnet`), exposed via the overlay and as flake outputs.
-- `overlays/`: Nixpkgs overlays.
-- `lib/`: Reusable Nix helpers; the overlay exposes `pkgs.optimizeForArch`.
-- `shells/`: Development environments (`nix develop .#py`, `.#cpp`, `.#qksh`, `.#avalonia`, ...).
-- `users/`: User account declarations (e.g. `melal`).
+NixOS owns hardware, the Melal account and login shell, permissions, networking,
+firewalls, privileged wrappers and shared services. All active Home Manager
+configuration, personal preferences, package lists, scripts and assets live in
+`modules/home/`.
 
-Heavy media assets (wallpapers, videos, profile pictures) and standalone configs (quickshell, neovim) live in their own dedicated repositories and are automatically wired up by the `assets-setup` script.
-
-## Adding a new machine
-
-1. Create `hosts/<name>/` with:
-   - `meta.nix` — `{ users = [ "melal" ]; }` (accounts must exist under `users/`)
-   - `hardware-configuration.nix`
-   - `default.nix` — set `networking.hostName`, toggle `my.*` options
-   - `home.nix` — import `../../modules/home`, set `my.home.*` options and host-specific session variables such as `BROWSER`
-2. Track the new files with Git — the flake picks the host up automatically.
-
-Host-specific system settings, such as `snowflake`'s GRUB OS probing, belong in `hosts/<name>/default.nix`. Shared modules do not branch on host names.
-
-## Host features and package groups
-
-Each package group has independent shared and host switches, both defaulting to
-false. Both existing hosts explicitly enable both scopes for every group in
-`hosts/<name>/default.nix`, preserving their existing selections.
-
-```nix
-my.packages = {
-  cli = {
-    shared.enable = true;
-    host.enable = false;
-  };
-  gui = {
-    shared.enable = false;
-    host.enable = true;
-  };
-};
+```text
+modules/home/
+├── default.nix                 # Melal’s identity and common defaults
+├── hosts/
+│   ├── rusty/default.nix       # Package choices and host overrides
+│   └── snowflake/
+│       ├── default.nix
+│       └── noctalia-config.toml
+├── packages/                   # Unconditional common and host package lists
+├── programs/                   # App configuration and assets
+├── shell/
+├── scripts/
+├── dev/
+└── lib/
 ```
 
-| Group | `shared.enable` controls | `host.enable` controls |
+The flake discovers `hosts/<host>/default.nix`, builds that NixOS configuration,
+and combines `modules/home/default.nix` with `modules/home/hosts/<host>/default.nix` for Melal.
+Every machine must have both entrypoints. Canonical homes are `melal@rusty` and
+`melal@snowflake`; the `rusty` and `snowflake` aliases remain available. There is
+no user discovery or user-membership metadata. The explicit account module is
+`modules/nixos/system/melal.nix`.
+
+`pkgs/`, `overlays/` and project `shells/` remain shared flake infrastructure.
+Home Manager reads `osConfig` for genuine host capabilities and CPU architecture.
+The lock file and NixOS/Home Manager state versions (`24.11`) are unchanged.
+
+`modules/home/` is the single active Home Manager tree; there is no top-level
+`home/` directory. Shared assets remain unchanged at their existing paths.
+The distinct old Niri `programs/wm/niri/config.kdl`, Noctalia
+`programs/noctalia/noctalia-config.toml`, and former user TOML are retained for
+live and rollback references. New generations use Niri's `session.kdl` and the
+selected host's Noctalia TOML. Keep the old targets until their references have
+been migrated and checked.
+See [MIGRATION-RESULTS.md](MIGRATION-RESULTS.md) for validation and staged activation.
+
+## Adding a machine
+
+1. Create `hosts/<host>/default.nix` and its hardware configuration, importing
+   `../../modules/nixos`. Select host capabilities there; the shared system
+   modules declare Melal’s existing account and grants.
+2. Create `modules/home/hosts/<host>/default.nix`. Import the package lists wanted on that
+   machine and add its application choices, settings and data files.
+3. Track new files before using a Git flake. During uncommitted work,
+   `path:$PWD` includes new files without staging them.
+
+## Common defaults and host overrides
+
+Common personal choices use `lib.mkDefault`. A host can use an ordinary assignment
+to disable a common application or change a preference. Import order does not
+override conflicting Nix definitions; host overrides do not need `mkForce` when
+replacing a common default.
+
+For example, a host can select a different Foot font without changing the other
+machine or losing its remaining terminal settings:
+
+```nix
+programs.foot.settings.main.font = "CaskaydiaCove Nerd Font:style=SemiBold:size=16";
+```
+
+Both real hosts retain size 14. Noctalia remains enabled only on Snowflake;
+Rusty can enable it separately and choose its own TOML through
+`my.home.noctalia.configFile`. Snowflake’s editable TOML lives in
+`modules/home/hosts/snowflake/noctalia-config.toml`. Common feature defaults and host
+choices remain separate from NixOS hardware prerequisites.
+
+## Personal packages and features
+
+Each host explicitly imports its chosen lists from:
+
+```text
+modules/home/packages/{cli,gui,io,database-clients,development}.nix
+modules/home/packages/rusty/{cli,gui}.nix
+modules/home/packages/snowflake/{cli,gui,development}.nix
+```
+
+Every package-only file is unconditional. Remove an import from one host to
+remove that list’s contribution on that machine. There is no package-group enable
+option or default package bundle. Database clients do not require a local server.
+Development package lists are independent of the development settings switch.
+
+| Home Manager option | Responsibility |
+| --- | --- |
+| `my.home.development.enable` | Debugger paths, EditorConfig and selected toolchains |
+| `my.home.desktop.enable` | GTK/Qt, cursor and dconf preferences |
+| `my.home.media.enable` | MPD, ncmpcpp, playerctld and playback helpers |
+| `programs.kitty/foot/ghostty.enable` | Terminal installation, configuration and files |
+| `programs.direnv.enable` and `programs.direnv.nix-direnv.enable` | User direnv integration |
+| `my.home.scripts.enable` | Dependency-wrapped helpers and repository preferences |
+
+Git, Fastfetch, Yazi, Lazygit, Nh and Starship use their upstream program options.
+`my.home.keyboardTools` and `my.home.bluetoothClient` select personal clients;
+they do not grant host-device access. Fish helpers supply their own dependencies,
+including when the general CLI list is omitted. The `h-r` abbreviation selects
+`melal@<host>`.
+
+NixOS retains shared fonts, an administrative package baseline, Rusty’s network
+and power diagnostics, MSSQL/Podman, nix-serve, Steam/GameMode, nix-ld,
+PipeWire/WirePlumber, Niri/Ly, portals, keyring, PAM and hardware permissions.
+Their existing storage, secrets, grants and lifecycle policies are preserved.
+
+### Applications with host prerequisites
+
+| Feature | NixOS | Home Manager and startup |
 | --- | --- | --- |
-| `cli` | Shared CLI utilities | The host's `cli.nix` list and CLI input packages |
-| `gui` | Shared desktop applications and browser helpers | The host's `gui.nix` list and GUI input packages |
-| `io` | Shared device/audio utilities | The host's `io.nix` list |
-| `development` | Shared editor tools, language servers, formatters and debuggers | Host-only editor tools and individually selected global toolchains |
-| `fonts` | Font packages, fontconfig and the Apple fonts overlay | A host's `fonts.nix` list, if present (neither current host has one) |
+| UXPlay | `my.programs.ipad-screen-mirror.enable`: manual `uxplay` launcher, system Avahi publishing, mDNS and receiver firewall | No separate HM option; receiver startup remains manual |
+| EasyEffects | PipeWire and `programs.dconf.enable` | `services.easyeffects.enable`: graphical-session unit; replaces the Niri launch |
+| OBS | Existing audio/graphics/device support | `programs.obs-studio.enable`: same plugins; `my.home.obs.gstreamer.enable` selects the GStreamer wrapper |
+| GPU Screen Recorder | `my.programs.gpu-screen-recorder.enable`: recorder and KMS capability wrapper | `my.home.gpu-screen-recorder.enable`, optional `.autostart`: frontends and Niri launch |
+| OpenRGB | Hardware server and permissions | `my.home.openrgb.enable`: tray-client unit |
+| Noctalia | Explicit NetworkManager, Bluetooth, UPower and power-profiles-daemon backends | `my.home.noctalia.enable`: shell/config/plugins; starts through Niri |
+| Skwd | Graphical-session prerequisites | `my.home.skwd.enable`: one graphical-session unit with the original model and backend environment |
+| Android webcam | `my.hardware.androidWebcam.enable`: kernel module, modprobe settings, scrcpy, v4l-utils and android-tools; Snowflake keeps `autoStart = false` | No separate HM option |
+| QMK | Udev rules and account grants | Selected clients; no extra permissions |
 
-The former `my.packages.<group>.enable` options have been replaced by these two
-scope switches. Every host package file is still imported automatically; new
-lists should gate their contents with the matching `<group>.host.enable`.
-Shared lists use `<group>.shared.enable`.
+Snowflake keeps its automatic graphical applications; Rusty does not inherit
+Snowflake's shell, recording or audio-effects selections. EasyEffects now receives
+HM's service supervision and graphical-session stop behavior. Noctalia still has
+no enabled systemd unit. `mpd-mpris` remains installed without an automatic launcher.
 
-`pgmodeler` requires shared GUI and an enabled database feature. `pavucontrol`
-requires shared I/O and at least one GUI scope. Snowflake's Helium follows host
-GUI, while Tincan and Timr follow host CLI. TypeScript language servers, Prettier
-and ESLint now belong to Snowflake's host development list; Watchman, Yarn, Bear
-and Tree-sitter belong to shared development tools.
+### Private media resources
 
-These groups control their own contributions. An enabled feature can still
-install a package it needs independently of a package group. Base system tools
-(`wget`, `curl`), the configured login shell, PipeWire, direnv and NixOS
-system defaults remain independent of these package switches. Cache settings
-remain unconditional and install no packages.
-
-### Home Manager features and package ownership
-
-`hosts/<name>/home.nix` enables the current user features explicitly:
-
-| Option | Controls | Default |
-| --- | --- | --- |
-| `my.home.desktop.enable` | GTK/Qt styling, dconf preferences and cursor theme | false |
-| `my.home.media.enable` | MPD, ncmpcpp, playerctld, MPC, playerctl, MPD MPRIS and playback notifications | false |
-| `my.home.development.enable` | EditorConfig and the debugger path in session variables | Follows shared development |
-
-Both existing hosts enable desktop styling and media. Git, Fastfetch, Yazi,
-Lazygit, nh and Starship use their native `programs.<name>.enable` options
-and are explicitly enabled in both host Home Manager files. Disabling nh also
-removes its cleanup timer. Disabling shared development removes the default
-Home Manager debugger reference, so that reference cannot retain the debugger
-package after the group is disabled. An explicit `my.home.development.enable`
-override remains available for standalone user configurations.
-
-Home Manager owns installation of Git, Kitty, Foot, Ghostty, Yazi, Lazygit,
-ncmpcpp, Fastfetch and Starship. Their duplicate NixOS package-list entries
-have been removed. `my.programs.terminals.<name>.enable` sets a host default
-for Home Manager; Home Manager installs and configures that terminal, including Foot's
-user service. Apply the Home Manager configuration when changing these choices.
-`programs.git.enable` controls both Git's installation and configuration. Set
-it to false and apply Home Manager to remove its user installation. Removing
-the previous system installation also requires applying the NixOS configuration.
-
-`users/<name>/meta.nix` selects the login shell once. NixOS enables
-`programs.${user.shell}.enable` for system shell integration. The user's Home
-Manager module defaults the same option to true with `lib.mkDefault`,
-so hosts can override it without repeating the default enable setting.
-
-The login shell stays system-owned; Home Manager's Fish module also references
-the same Fish build as required by the upstream module. Fish is not repeated in
-the shared CLI package list. Disabling Home Manager's Fish option removes its
-user configuration and installation, while NixOS retains the selected Fish
-login shell. Identical outputs share one store path.
+MPD keeps its existing data directory and socket activation. It listens only on
+`$XDG_DATA_HOME/mpd/socket` (normally `~/.local/share/mpd/socket`), with a user-only
+socket mode. The pinned HM module's additional TCP listener is explicitly removed.
+`MPD_HOST`, ncmpcpp and the notification helper use that same absolute socket.
+The visualizer FIFO is `$XDG_DATA_HOME/mpd/visualizer.fifo`, shared with ncmpcpp.
+Existing MPD state and music stay in place. External TCP clients need to use the
+Unix socket; the unused upstream port option still reads 6600 but no TCP listener
+is configured. Kitty expands `$XDG_RUNTIME_DIR` in its socket path and adds its
+instance PID. Process checks and terminal reload signals are scoped to the user.
 
 ### Independent nix-ld compatibility
 
@@ -127,13 +152,13 @@ selected separately. NixOS's native `programs.nix-ld.enable` also remains usable
 
 | Feature | Global default | Snowflake | Rusty |
 | --- | --- | --- | --- |
-| `my.programs.noctalia.enable` | false | true | false |
+| `my.home.noctalia.enable` (HM) | false | true | false |
 | `my.services.nix-serve.enable` | false | true, interface `enp4s0` | false |
 | `my.hardware.disablePcieWakeup.enable` | false | true | false |
 | `my.programs.ipad-screen-mirror.enable` | false | true | false |
 
-Noctalia uses its existing flake package and recommended services.
-`my.programs.noctalia.optimize_for_arch` defaults to true and appends
+Noctalia uses its existing flake package; its host backends are selected independently in NixOS.
+`my.home.noctalia.optimize_for_arch` defaults to true and appends
 `-march=<arch> -O3` while retaining existing compiler flags. Snowflake sets
 `my.host.arch = "znver3"` once; hosts with different CPUs should set a
 matching compiler architecture. The fallback is the host platform's compiler
@@ -141,10 +166,10 @@ architecture, or `x86-64`. Set `optimize_for_arch = false` to use the original
 package without an override. Noctalia uses the shared `pkgs.optimizeForArch`
 helper described below.
 
-Home Manager's `my.home.noctalia.enable` defaults to the system Noctalia option.
+Home Manager's `my.home.noctalia.enable` defaults to false and is selected by Melal on Snowflake.
 It links the main TOML directly into this checkout, like Niri, so editing
 `~/.config/noctalia/config.toml` edits
-`modules/home/programs/noctalia/noctalia-config.toml` immediately. It also manages
+`modules/home/hosts/snowflake/noctalia-config.toml` immediately. It also manages
 the separate theme and wallpaper files, `black-mo.json`, and a generated,
 read-only `~/.config/noctalia/plugins.toml`.
 Each WM attaches its integration when both it and Noctalia are enabled; the Niri
@@ -166,7 +191,7 @@ The parent `my.home.noctalia.enable` gates their files, packages and activation.
 | `pomodoro.enable` | `thepunkoff/pomodoro` | FFmpeg, including ffplay |
 | `timer.enable` | `noctalia/timer` | None |
 
-For example, in a host's Home Manager configuration:
+For example, in a user's host override:
 
 ```nix
 my.home.noctalia.plugins = {
@@ -189,7 +214,7 @@ supplies plugin IDs, dependencies, widget types and dependency executable paths.
 Personal settings and styling belong in the host's Home Manager configuration;
 Snowflake keeps its Pomodoro durations, Discord and Bongocat styling there.
 Bar layout lives under `[bar.default]` in the editable main
-`modules/home/programs/noctalia/noctalia-config.toml`, linked as
+`modules/home/hosts/snowflake/noctalia-config.toml`, linked as
 `~/.config/noctalia/config.toml`. Edit its `start`, `center` and `end` lists
 directly; layout changes need no Home Manager switch. These lists are not
 generated or filtered by Nix, so remove a plugin's widget name there when
@@ -201,11 +226,11 @@ configuration. It keeps its keyboard device path under
 should select their own device paths and grant the user input-device access.
 The existing user belongs to the `input` group.
 
-Dependencies are installed through Home Manager, including when the system
-CLI/GUI groups are disabled. Disabling a plugin removes its own package
-additions; packages selected by other features or groups remain available.
+Dependencies are installed through Home Manager, including when the shared
+CLI/GUI lists are not imported. Disabling a plugin removes its own package
+additions; packages selected by other features or lists remain available.
 The standalone nix-search-tv, fzf and Discord selections in the shared package
-groups remain independent.
+lists remain independent.
 
 Noctalia downloads missing enabled plugins on startup. If it is already running
 during activation, Home Manager reloads its configuration and refreshes the
@@ -246,13 +271,36 @@ NVIDIA. The PCIe workaround preserves the original udev rule and disables wake
 events from PCIe port bridges, which can prevent devices behind them from
 waking the system.
 
-iPad mirroring keeps UxPlay, its firewall ports and Avahi discovery available.
-Avahi's service and socket have no boot targets. Start discovery when needed:
+UXPlay still requires the **system Avahi daemon running** and the **NixOS
+firewall configuration**. The NixOS `my.programs.ipad-screen-mirror` module owns
+the receiver launcher, its arguments, Avahi and firewall rules.
+`services.avahi.enable = true` configures the shared daemon;
+cleared service/socket `wantedBy` lists keep it out of boot targets. Neither
+setting proves the daemon is currently running. Existing D-Bus activation policy
+is unchanged. An administrator starts discovery when needed; the user starts the
+receiver separately:
 
 ```bash
 sudo systemctl start avahi-daemon.service
 uxplay
 ```
+
+The launcher checks system Avahi readiness and exits clearly when it is missing.
+It never starts privileged services. There is no UXPlay user unit, `sudo` inside
+activation, or dependency pretending that a user unit can order a system unit.
+`publish.userServices` allows advertisements through the shared daemon; it does
+not isolate Avahi by user. UXPlay itself runs under the normal user account.
+
+`my.programs.ipad-screen-mirror.port` defaults to 7000 and opens TCP/UDP
+7000–7002. The launcher uses the same option and passes `-p 7000` by default;
+the module configures Avahi publishing, mDNS and the receiver firewall rules.
+The user confirmed no external receiver settings need preservation. Additional
+arguments remain usable, but overriding ports requires corresponding host firewall
+changes. See the
+[pinned UXPlay documentation](https://github.com/FDH2/UxPlay/blob/v1.73.7/README.md).
+For simultaneous receivers, allocate disjoint port triples and distinct receiver
+names/device identities deliberately; the current setup has one configured user
+and does not implement multiple-instance allocation.
 
 ### Optimizing other packages from source
 
@@ -315,10 +363,10 @@ sudo nixos-rebuild switch --flake .#<hostname>
 To build and apply a Home Manager configuration (standalone):
 
 ```bash
-home-manager switch --flake .#<user>@<hostname>
+home-manager switch --flake .#melal@<hostname>
 ```
 
-The `.#<hostname>` Home Manager alias is also available when a host has exactly one configured user.
+The `.#<hostname>` Home Manager alias also selects Melal's home on that machine.
 
 To build the custom package:
 
@@ -328,61 +376,42 @@ nix build .#easydotnet
 
 ## Development environments
 
-Development environments are defined in `shells/`. Each environment also has a
-`my.development.toolchains.<shell>.enable` option for installing its packages
-globally. All default to false and take effect only while
-`my.packages.development.host.enable` is true. Their definitions reuse the shell
-packages through `shells/package-groups.nix`.
+`shells/` is unchanged. Enter environments with `nix develop .#<shell>`; their
+`shellHook` variables and library paths apply only inside those environments.
+User profiles retain all previously selected development commands outside shells.
 
 ```nix
-my.packages.development = {
-  shared.enable = true; # Shared language servers, formatters and debugger tools.
-  host.enable = true;   # Host editor tools and selected global environments.
-};
-my.development.toolchains = {
+# modules/home/hosts/<host>/default.nix
+imports = [ ../../packages/development.nix ];
+my.home.development.enable = true;
+my.home.development.toolchains = {
   cpp.enable = true;
   py.enable = true;
-  py-science.enable = false;
   dotnet.enable = false;
 };
 ```
 
-Only selected environments contribute packages and retained outputs. Scientific
-Python, Node.js, .NET/Avalonia, Rust, Go, Lua, JavaFX, Qt/QML and C/C++ companion
-environments can be selected independently. Environments remain available via
-`nix develop` regardless of their global installation switches.
+Each toolchain defaults off and uses `shells/package-groups.nix`, preserving package
+provenance, priorities and selected outputs. Headers and development outputs are
+rooted through `home.extraDependencies` rather than `system.extraDependencies`.
+Within toolchain lists, scientific Python retains priority over the plain
+interpreter, and the desktop's QML-enabled Quickshell retains priority over the
+plain development-shell build. Snowflake's existing Noctalia Discord dependency
+keeps plain Python ahead of the relocated science environment in the full user
+profile, as explicitly selected during migration; use `nix develop .#py-science`
+for that environment. `modules/home/lib/after-home-packages.nix` preserves existing HM features
+ahead of moved package lists while keeping the lists' relative priorities. This
+also retains the user-profile FFmpeg selection without colliding with unstable
+FFmpeg. Common editor tools live in `modules/home/packages/development.nix`,
+and extra desktop editor tools live in
+`modules/home/packages/snowflake/development.nix`. Both package files are
+unconditional: importing a list installs its tools independently of
+`my.home.development.enable`. That option controls editor configuration, debugger
+paths and selected toolchains.
 
-To preserve current behavior, Snowflake explicitly selects every non-Java
-shell; Rusty selects `cpp`, `audio`, `dpp`, `fmt`, `ncurses`, and `qksh`. These are
-host choices and can now be reduced one environment at a time.
-
-Enter an environment from this checkout with `nix develop .#<name>`, or from a project directory with:
-
-```bash
-nix develop ~/.dotfiles/nixos#cpp
-nix develop ~/.dotfiles/nixos#cpp --command fish
-```
-
-Shell hooks do not replace your shell automatically, so commands and direnv activation can use them too.
-
-| Shell | Environment |
-| --- | --- |
-| `cpp` | C/C++ tools, fmt, and nlohmann/json |
-| `audio` | C/C++ environment plus libsndfile, ONNX Runtime, and PortAudio |
-| `dpp`, `fmt`, `ncurses` | Focused C/C++ library environments |
-| `qksh` | Quickshell and Qt/QML build dependencies |
-| `py` | Python 3.13, uv, and native libraries for PyPI wheels |
-| `py-science` | Python with requests, NumPy, Matplotlib, OpenCV, soundfile, and PyQt6 |
-| `nodejs22` | Node.js 22, Bun, and TypeScript |
-| `javafx` | JDK 21, Gradle, and JavaFX 21 |
-| `dotnet`, `avalonia` | .NET 10 development; Avalonia adds its native runtime libraries |
-| `rust`, `go`, `lua` | Language-specific toolchains |
-
-Select global environments in `hosts/<name>/default.nix`. Add extra host editor tools to `modules/nixos/packages/<hostname>/development.nix`; shared editor tools remain in `dev/lsp.nix`. CLI package lists contain general command-line tools.
-
-The host configurations explicitly retain the selected package outputs, including headers, through system generations; shell-specific settings such as Avalonia's `LD_LIBRARY_PATH` still apply when entering the shell. On Snowflake, the scientific Python environment supplies the default Python commands; the `py` shell uses plain Python 3.13 from the same locked package set. The desktop's QML-enabled Quickshell keeps priority over the plain build used by the `qksh` development shell.
-
-For projects needing independently pinned versions, keep a `flake.nix` and `flake.lock` in the project itself. `direnv` and `nix-direnv` are enabled; a project `.envrc` containing `use flake` activates its default development shell after `direnv allow`.
+For separately pinned projects, keep project flakes and use `.envrc` with
+`use flake`, followed by `direnv allow`. Installing packages in a user profile
+does not apply a development shell's environment hooks.
 
 ## On-demand LAN cache
 
@@ -445,17 +474,17 @@ nix fmt
 nix flake check
 ```
 
-The flake checks formatting, dead code, Nix linting, every development shell's Bash hook syntax, Niri with each home's generated browser/Noctalia fragments, asset bootstrap behavior, theme switching, module feature combinations, and each canonical Home Manager activation package. Home Manager checks build the generation without activating it. NixOS configurations are evaluated without switching the running system.
+The flake checks formatting, dead code, Nix linting, every development shell's Bash hook syntax, Niri with each home's generated browser/Noctalia fragments, asset bootstrap behavior, theme switching, generated user-script syntax, profile command priorities, module feature combinations, and each canonical Home Manager activation package. Home Manager checks build the generation without activating it. NixOS configurations are evaluated without switching the running system.
 
-The `module-evaluation` check covers all shared/host combinations for each
-package group, independent nix-ld, individual toolchain selection, disabled Home
-Manager features and Noctalia integrations, application package ownership, and
-architecture inheritance/overrides. It evaluates configuration without compiling
+The `module-evaluation` check covers canonical homes and aliases, package/feature
+disablement, independent host capabilities, manual service policies, per-host overrides,
+UXPlay dependencies/ports, private media paths, package provenance and overrides,
+and development output rooting. It evaluates configuration without compiling
 the selected applications. Run those assertions directly with:
 
 ```bash
 nix eval --json --impure --expr '
-  let f = builtins.getFlake (toString ./.);
+  let f = builtins.getFlake ("path:" + toString ./.);
   in import ./tests/module-evaluation.nix { self = f; inputs = f.inputs; }
 '
 ```
@@ -489,7 +518,7 @@ When replacing an existing asset destination, setup moves it to `.bk`, `.bk.1`, 
 
 Niri automatically configures outputs until `nwg-displays` creates `~/.config/niri/monitor.kdl`. The include is optional, and existing monitor configurations remain editable. Niri also starts and supervises `xwayland-satellite` on demand.
 
-The default browser is Firefox on `rusty` and LibreWolf on `snowflake`. Home Manager generates Niri's browser binding and environment from `home.sessionVariables.BROWSER`; `Mod+B` expands `$BROWSER` at launch.
+The selected browser is Helium on both hosts; LibreWolf remains available. Home Manager generates Niri's browser binding and environment from `home.sessionVariables.BROWSER`; `Mod+B` expands `$BROWSER` at launch.
 
 ## Themes & wallpapers
 

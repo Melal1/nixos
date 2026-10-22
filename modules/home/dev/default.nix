@@ -2,18 +2,15 @@
   config,
   lib,
   pkgs,
-  osConfig ? null,
   ...
 }:
 {
-  options.my.home.development.enable = lib.mkOption {
-    type = lib.types.bool;
-    default = osConfig != null && (osConfig.my.packages.development.shared.enable or false);
-    description = "Editor configuration and debugger paths; follows the system's shared development tools by default.";
-  };
+  options.my.home.development.enable =
+    lib.mkEnableOption "editor configuration, debugger paths and selected global toolchains";
 
   imports = [
     ./editorconfig.nix
+    ./toolchains.nix
   ];
 
   config = lib.mkIf config.my.home.development.enable {

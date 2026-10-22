@@ -1,16 +1,12 @@
 {
   config,
   lib,
-  osConfig ? null,
+  pkgs,
   ...
 }:
 
 let
-  gsrEnabled =
-    if osConfig != null && (osConfig ? my.programs.gpu-screen-recorder.enable) then
-      osConfig.my.programs.gpu-screen-recorder.enable
-    else
-      false;
+  gsrEnabled = config.my.home.gpu-screen-recorder.enable;
 
   containsMpv =
     packages:
@@ -23,18 +19,15 @@ let
       ]
     ) packages;
 
-  hasMpv =
-    config.programs.mpv.enable
-    || containsMpv config.home.packages
-    || (osConfig != null && containsMpv osConfig.environment.systemPackages);
+  hasMpv = config.programs.mpv.enable || containsMpv config.home.packages;
 in
 {
   home.file.".local/bin/mpv-mix" = lib.mkIf (gsrEnabled && hasMpv) {
     executable = true;
 
     text = ''
-      #!/usr/bin/env bash
-      mpv --lavfi-complex="[aid1][aid2]amix=inputs=2[ao]" "$1"
+      #!${pkgs.bash}/bin/bash
+      exec ${lib.getExe pkgs.mpv} --lavfi-complex="[aid1][aid2]amix=inputs=2[ao]" "$1"
     '';
   };
 

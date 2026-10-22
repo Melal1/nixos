@@ -1,4 +1,4 @@
-{ inputs, pkgs, ... }:
+{ pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -28,55 +28,17 @@
     niri.enable = true;
   };
 
-  my.packages = {
-    cli = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    gui = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    io = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    development = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    fonts = {
-      shared.enable = true;
-      host.enable = true;
-    };
-  };
-
-  my.development.toolchains = {
-    cpp.enable = true;
-    audio.enable = true;
-    dpp.enable = true;
-    fmt.enable = true;
-    ncurses.enable = true;
-    qksh.enable = true;
-  };
+  my.packages.fonts.shared.enable = true;
 
   my.programs = {
     nix-ld.enable = true;
-    obs.enable = false;
-    terminals = {
-      kitty.enable = true;
-      foot.enable = true;
-      ghostty.enable = false;
-    };
+
   };
 
-  # Host-specific packages coming from flake inputs
-  # environment.systemPackages =
-  #   let
-  #     sys = pkgs.stdenv.hostPlatform.system;
-  #   in
-  #   [
-  #     # inputs.antigravity-nix.packages.${sys}.google-antigravity-cli
-  #     # inputs.zen-browser.packages.${sys}.default
-  #   ];
+  # Host diagnostics and network administration remain available system-wide.
+  environment.systemPackages = with pkgs; [
+    acpi
+    iw
+    linux-wifi-hotspot
+  ];
 }

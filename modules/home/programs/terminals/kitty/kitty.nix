@@ -4,65 +4,64 @@
   unstable,
   ...
 }:
-lib.mkIf config.my.home.terminals.kitty.enable {
+lib.mkIf config.programs.kitty.enable {
   programs.kitty = {
-    enable = true;
-    package = unstable.kitty;
+    package = lib.mkDefault unstable.kitty;
     font = {
-      name = "CaskaydiaCove Nerd Font";
-      size = 18;
+      name = lib.mkDefault "CaskaydiaCove Nerd Font";
+      size = lib.mkDefault 18;
     };
     settings = {
-      bold_font = "auto";
-      italic_font = "auto";
-      bold_italic_font = "auto";
+      bold_font = lib.mkDefault "auto";
+      italic_font = lib.mkDefault "auto";
+      bold_italic_font = lib.mkDefault "auto";
       # allow_remote_control = "yes";
 
-      input_delay = "0"; # Reduces input buffering
-      sync_to_monitor = "no"; # Prevents vsync-induced input lag
+      input_delay = lib.mkDefault "0"; # Reduces input buffering
+      sync_to_monitor = lib.mkDefault "no"; # Prevents vsync-induced input lag
 
-      disable_ligatures = "cursor";
-      undercurl_style = "thin-dense";
-      mouse_hide_wait = "-1.0";
-      url_color = "#FFFFFF";
-      url_style = "curly";
-      show_hyperlink_targets = "yes";
-      active_border_color = "none";
+      disable_ligatures = lib.mkDefault "cursor";
+      undercurl_style = lib.mkDefault "thin-dense";
+      mouse_hide_wait = lib.mkDefault "-1.0";
+      url_color = lib.mkDefault "#FFFFFF";
+      url_style = lib.mkDefault "curly";
+      show_hyperlink_targets = lib.mkDefault "yes";
+      active_border_color = lib.mkDefault "none";
 
-      shell_integration = "no-cursor";
-      cursor_shape = "block";
-      cursor_beam_thickness = "2";
-      cursor_shape_unfocused = "underline";
-      cursor_blink_interval = "0.6";
-      cursor_stop_blinking_after = "40.0";
-      cursor_trail = "10";
-      cursor_trail_start_threshold = "0";
-      cursor_trail_decay = "0.01 0.15";
-      window_padding_width = "1";
+      shell_integration = lib.mkDefault "no-cursor";
+      cursor_shape = lib.mkDefault "block";
+      cursor_beam_thickness = lib.mkDefault "2";
+      cursor_shape_unfocused = lib.mkDefault "underline";
+      cursor_blink_interval = lib.mkDefault "0.6";
+      cursor_stop_blinking_after = lib.mkDefault "40.0";
+      cursor_trail = lib.mkDefault "10";
+      cursor_trail_start_threshold = lib.mkDefault "0";
+      cursor_trail_decay = lib.mkDefault "0.01 0.15";
+      window_padding_width = lib.mkDefault "1";
 
-      wheel_scroll_multiplier = "10.0";
+      wheel_scroll_multiplier = lib.mkDefault "10.0";
       open_url_with = "$BROWSER";
-      copy_on_select = "no";
-      paste_actions = "no-op";
-      strip_trailing_spaces = "smart";
+      copy_on_select = lib.mkDefault "no";
+      paste_actions = lib.mkDefault "no-op";
+      strip_trailing_spaces = lib.mkDefault "smart";
       # input_delay = "1";
       # sync_to_monitor = "yes";
       allow_remote_control = "socket-only";
-      listen_on = "unix:/tmp/kitty";
-      enable_audio_bell = "yes";
+      listen_on = "unix:$XDG_RUNTIME_DIR/kitty";
+      enable_audio_bell = lib.mkDefault "yes";
     };
     keybindings = {
-      "ctrl+shift+q" = "no_op";
-      "ctrl+shift+g" = "no_op";
-      "ctrl+shift+3" = "mouse_select_command_output";
-      "ctrl+shift+1" = "clear_selection";
-      "f5" = "load_config_file";
-      "ctrl+shift+2" = "show_last_visited_command_output";
-      "ctrl+shift+k" = "scroll_page_up";
-      "ctrl+shift+j" = "scroll_page_down";
-      "ctrl+j" = "scroll_line_down";
+      "ctrl+shift+q" = lib.mkDefault "no_op";
+      "ctrl+shift+g" = lib.mkDefault "no_op";
+      "ctrl+shift+3" = lib.mkDefault "mouse_select_command_output";
+      "ctrl+shift+1" = lib.mkDefault "clear_selection";
+      "f5" = lib.mkDefault "load_config_file";
+      "ctrl+shift+2" = lib.mkDefault "show_last_visited_command_output";
+      "ctrl+shift+k" = lib.mkDefault "scroll_page_up";
+      "ctrl+shift+j" = lib.mkDefault "scroll_page_down";
+      "ctrl+j" = lib.mkDefault "scroll_line_down";
       # "ctrl+k" = "scroll_line_up";
-      "ctrl+shift+c" = "copy_and_clear_or_interrupt";
+      "ctrl+shift+c" = lib.mkDefault "copy_and_clear_or_interrupt";
     };
     extraConfig = ''
       # Include the theme file

@@ -4,54 +4,53 @@
   unstable,
   ...
 }:
-lib.mkIf config.my.home.terminals.foot.enable {
+lib.mkIf config.programs.foot.enable {
   programs.foot = {
-    enable = true;
-    package = unstable.foot;
+    package = lib.mkDefault unstable.foot;
 
-    server.enable = true;
+    server.enable = lib.mkDefault true;
 
     settings = {
       main = {
-        font = "CaskaydiaCove Nerd Font:style=SemiBold:size=14";
+        font = lib.mkDefault "CaskaydiaCove Nerd Font:style=SemiBold:size=14";
       };
 
       "colors-dark" = {
-        foreground = "cdcdcd";
-        background = "141415";
-        selection-foreground = "cdcdcd";
-        selection-background = "878787";
-        alpha = 0.8;
+        foreground = lib.mkDefault "cdcdcd";
+        background = lib.mkDefault "141415";
+        selection-foreground = lib.mkDefault "cdcdcd";
+        selection-background = lib.mkDefault "878787";
+        alpha = lib.mkDefault 0.8;
 
-        regular0 = "252530";
-        regular1 = "d8647e";
-        regular2 = "7fa563";
-        regular3 = "f3be7c";
-        regular4 = "6e94b2";
-        regular5 = "bb9dbd";
-        regular6 = "aeaed1";
-        regular7 = "cdcdcd";
+        regular0 = lib.mkDefault "252530";
+        regular1 = lib.mkDefault "d8647e";
+        regular2 = lib.mkDefault "7fa563";
+        regular3 = lib.mkDefault "f3be7c";
+        regular4 = lib.mkDefault "6e94b2";
+        regular5 = lib.mkDefault "bb9dbd";
+        regular6 = lib.mkDefault "aeaed1";
+        regular7 = lib.mkDefault "cdcdcd";
 
-        bright0 = "606079";
-        bright1 = "e08398";
-        bright2 = "99b782";
-        bright3 = "f5cb96";
-        bright4 = "8ba9c1";
-        bright5 = "c9b1ca";
-        bright6 = "bebeda";
-        bright7 = "d7d7d7";
+        bright0 = lib.mkDefault "606079";
+        bright1 = lib.mkDefault "e08398";
+        bright2 = lib.mkDefault "99b782";
+        bright3 = lib.mkDefault "f5cb96";
+        bright4 = lib.mkDefault "8ba9c1";
+        bright5 = lib.mkDefault "c9b1ca";
+        bright6 = lib.mkDefault "bebeda";
+        bright7 = lib.mkDefault "d7d7d7";
       };
 
       cursor = {
-        style = "block";
+        style = lib.mkDefault "block";
       };
 
       key-bindings = {
-        clipboard-copy = "Control+Shift+c";
-        clipboard-paste = "Control+Shift+v";
-        font-increase = "Control+equal Control+plus Control+Shift+equal Control+Shift+plus";
-        font-decrease = "Control+minus";
-        font-reset = "Control+0";
+        clipboard-copy = lib.mkDefault "Control+Shift+c";
+        clipboard-paste = lib.mkDefault "Control+Shift+v";
+        font-increase = lib.mkDefault "Control+equal Control+plus Control+Shift+equal Control+Shift+plus";
+        font-decrease = lib.mkDefault "Control+minus";
+        font-reset = lib.mkDefault "Control+0";
       };
     };
   };

@@ -1,4 +1,4 @@
-{ ... }:
+{ config, lib, ... }:
 {
   imports = [
     ./terminals
@@ -11,10 +11,15 @@
     ./lazygit
     ./nh.nix
     ./openrgb.nix
+    ./hardware-clients.nix
+    ./gpu-screen-recorder.nix
+    ./easyeffects.nix
+    ./obs.nix
+    ./skwd.nix
     ./noctalia
   ];
 
-  home.file.".config/tmux/tmux.conf" = {
+  home.file.".config/tmux/tmux.conf" = lib.mkIf config.my.home.scripts.enable {
     source = ./config/tmux.conf;
   };
 }

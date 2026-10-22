@@ -1,15 +1,15 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   programs.yazi = {
     enableFishIntegration = config.programs.fish.enable;
-    shellWrapperName = "y";
+    shellWrapperName = lib.mkDefault "y";
     flavors = {
-      onedark = ./flavors/onedark.yazi;
-      rose-pine = ./flavors/rose-pine.yazi;
+      onedark = lib.mkDefault ./flavors/onedark.yazi;
+      rose-pine = lib.mkDefault ./flavors/rose-pine.yazi;
     };
     theme = {
       flavor = {
-        dark = "onedark";
+        dark = lib.mkDefault "onedark";
       };
     };
 

@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -19,8 +18,5 @@
     };
     # services.blueman.enable = true;
 
-    environment.systemPackages = [
-      pkgs.bluetui
-    ];
   };
 }

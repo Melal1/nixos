@@ -2,14 +2,10 @@
   config,
   lib,
   pkgs,
-  inputs,
   unstable,
   ...
 }:
 
-let
-  sys = pkgs.stdenv.hostPlatform.system;
-in
 {
   config = lib.mkIf config.my.desktop.niri.enable {
     programs.niri.enable = true;
@@ -34,12 +30,9 @@ in
     };
 
     environment.systemPackages = with pkgs; [
-      inputs.qmlgolsp.packages.${sys}.default
-      inputs.quickshell-niri.packages.${sys}.quickshell
       unstable.xwayland-satellite
       xdg-desktop-portal-gtk
       nautilus
-      cliphist
     ];
   };
 }

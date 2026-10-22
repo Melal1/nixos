@@ -1,0 +1,3 @@
+[include]
+autoload = false
+files = [ "default.toml", "wallpapers/config.toml", "plugins.toml" ]

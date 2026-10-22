@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./wayland/common.nix
     ./wayland/niri.nix
   ];
 

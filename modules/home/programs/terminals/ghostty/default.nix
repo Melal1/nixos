@@ -4,16 +4,15 @@
   unstable,
   ...
 }:
-lib.mkIf config.my.home.terminals.ghostty.enable {
+lib.mkIf config.programs.ghostty.enable {
   programs.ghostty = {
-    enable = true;
-    package = unstable.ghostty;
+    package = lib.mkDefault unstable.ghostty;
     systemd.enable = false;
     settings = {
       # theme = "vague";
-      font-size = 14;
-      font-family = "CaskaydiaCove Nerd Font";
-      font-style = "SemiBold";
+      font-size = lib.mkDefault 14;
+      font-family = lib.mkDefault "CaskaydiaCove Nerd Font";
+      font-style = lib.mkDefault "SemiBold";
       # font-style-bold = "Bold";
       # font-style-italic = "SemiBold Italic";
       # font-style-bold-italic = "Bold Italic";
@@ -23,19 +22,19 @@ lib.mkIf config.my.home.terminals.ghostty.enable {
       # window-theme = "system";
       # confirm-close-surface = false;
       # resize-overlay = "never";
-      quit-after-last-window-closed = true;
-      quit-after-last-window-closed-delay = "10m";
-      gtk-single-instance = "detect";
+      quit-after-last-window-closed = lib.mkDefault true;
+      quit-after-last-window-closed-delay = lib.mkDefault "10m";
+      gtk-single-instance = lib.mkDefault "detect";
       # adjust-cell-width = 0;
       # adjust-cell-height = "+10%";
       # bold-color = "bright";
       # mouse-hide-while-typing = true;
       # mouse-scroll-multiplier = 2;
-      cursor-style = "block";
-      window-vsync = false;
+      cursor-style = lib.mkDefault "block";
+      window-vsync = lib.mkDefault false;
       config-file = "${config.home.homeDirectory}/.config/ghostty/theme";
 
-      keybind = [
+      keybind = lib.mkDefault [
         "ctrl+shift+v=paste_from_clipboard"
         "ctrl+shift+c=copy_to_clipboard"
         "ctrl+shift+comma=reload_config"

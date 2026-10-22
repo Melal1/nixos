@@ -1,8 +1,9 @@
+{ lib, ... }:
 {
   programs.starship = {
-    enableTransience = true;
+    enableTransience = lib.mkDefault true;
     settings = {
-      format =
+      format = lib.mkDefault (
         "$os"
         + "$username"
         + "$hostname"
@@ -18,44 +19,45 @@
         + "$line_break"
         + "$jobs"
         + "$container"
-        + "$character";
+        + "$character"
+      );
 
-      right_format = ""; # Disable the right_format since we're using fill
+      right_format = lib.mkDefault ""; # Disable the right_format since we're using fill
 
-      add_newline = false;
+      add_newline = lib.mkDefault false;
       fill = {
-        symbol = " ";
+        symbol = lib.mkDefault " ";
       };
       os = {
-        format = "[$symbol]($style) ";
-        disabled = true;
+        format = lib.mkDefault "[$symbol]($style) ";
+        disabled = lib.mkDefault true;
         symbols = {
-          NixOS = "󱄅 ";
+          NixOS = lib.mkDefault "󱄅 ";
         };
       };
 
       nix_shell = {
-        format = "[󱄅 $name]($style) ";
+        format = lib.mkDefault "[󱄅 $name]($style) ";
       };
 
       directory = {
-        format = " ($style)[$path]($style) [$read_only]($read_only_style)";
+        format = lib.mkDefault " ($style)[$path]($style) [$read_only]($read_only_style)";
       };
 
       git_branch = {
-        format = "[$symbol($branch)]($style) ";
-        symbol = "  ";
+        format = lib.mkDefault "[$symbol($branch)]($style) ";
+        symbol = lib.mkDefault "  ";
       };
 
       git_status = {
-        renamed = "󰑎 ";
+        renamed = lib.mkDefault "󰑎 ";
       };
 
       git_metrics = {
-        added_style = "bright-green bold";
-        deleted_style = "bright-red bold";
-        format = "([󰞱$added ]($added_style) )([-$deleted]($deleted_style) )";
-        disabled = false;
+        added_style = lib.mkDefault "bright-green bold";
+        deleted_style = lib.mkDefault "bright-red bold";
+        format = lib.mkDefault "([󰞱$added ]($added_style) )([-$deleted]($deleted_style) )";
+        disabled = lib.mkDefault false;
       };
     };
   };

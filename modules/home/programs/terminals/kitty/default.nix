@@ -4,7 +4,7 @@
     ./kitty.nix
   ];
 
-  config = lib.mkIf config.my.home.terminals.kitty.enable {
+  config = lib.mkIf config.programs.kitty.enable {
     home.file.".config/kitty/themes" = {
       source = ./themes;
       recursive = true; # copy everything inside

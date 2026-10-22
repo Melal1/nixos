@@ -14,65 +14,32 @@ let
     config.allowUnfree = true;
   };
 
-  # Hosts are auto-discovered from hosts/<name>/meta.nix.
-  # Adding a machine = creating hosts/<name>/ with meta.nix + default.nix + home.nix.
+  # Each host has a NixOS entrypoint and a corresponding Melal home module.
   hosts =
     let
       dirs = builtins.readDir ../hosts;
-      isHost = name: type: type == "directory" && builtins.pathExists (../hosts + "/${name}/meta.nix");
+      isHost = name: type: type == "directory" && builtins.pathExists (../hosts + "/${name}/default.nix");
     in
-    nixpkgs.lib.mapAttrs (name: _: import (../hosts + "/${name}/meta.nix")) (
-      nixpkgs.lib.filterAttrs isHost dirs
-    );
-
-  # User definitions are auto-discovered from users/<name>/meta.nix.
-  # A host's meta.nix decides which of these accounts it actually has.
-  users =
-    let
-      dirs = builtins.readDir ../users;
-      isUser =
-        name: type:
-        type == "directory"
-        && builtins.pathExists (../users + "/${name}/meta.nix")
-        && builtins.pathExists (../users + "/${name}/nixos.nix")
-        && builtins.pathExists (../users + "/${name}/home.nix");
-    in
-    nixpkgs.lib.mapAttrs (name: _: (import (../users + "/${name}/meta.nix")) // { inherit name; }) (
-      nixpkgs.lib.filterAttrs isUser dirs
-    );
-
-  hostUsers =
-    hostName: host:
-    map (
-      userName:
-      if builtins.hasAttr userName users then
-        userName
-      else
-        throw "hosts/${hostName}/meta.nix references unknown user '${userName}'"
-    ) (host.users or [ ]);
+    builtins.attrNames (nixpkgs.lib.filterAttrs isHost dirs);
 
   mkHost =
-    name: host:
+    name:
     nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit inputs unstable;
         hostname = name;
       };
       modules = [
-        inputs.skwd-wall.nixosModules.default
         {
           nixpkgs.hostPlatform = system;
           nixpkgs.overlays = overlays;
         }
         (../hosts + "/${name}")
-      ]
-      ++ map (userName: import (../users + "/${userName}/nixos.nix") { user = users.${userName}; }) (
-        hostUsers name host
-      );
+      ];
     };
 
   mkHome =
-    hostName: userName:
+    hostName:
     home-manager.lib.homeManagerConfiguration {
       inherit pkgs;
       extraSpecialArgs = {
@@ -81,36 +48,27 @@ let
         osConfig = self.nixosConfigurations.${hostName}.config;
       };
       modules = [
-        (import (../users + "/${userName}/home.nix") { user = users.${userName}; })
-        (../hosts + "/${hostName}/home.nix")
+        ../modules/home
+        (../modules/home + "/hosts/${hostName}")
       ];
     };
 
-  homeConfigs = nixpkgs.lib.foldl' (
-    configs: hostName:
-    configs
-    // builtins.listToAttrs (
-      map (userName: {
-        name = "${userName}@${hostName}";
-        value = mkHome hostName userName;
-      }) (hostUsers hostName hosts.${hostName})
-    )
-  ) { } (builtins.attrNames hosts);
+  homeConfigs = builtins.listToAttrs (
+    map (hostName: {
+      name = "melal@${hostName}";
+      value = mkHome hostName;
+    }) hosts
+  );
 
-  # Keep #<hostname> working where a host has exactly one configured user.
-  singleUserHosts = nixpkgs.lib.filterAttrs (
-    hostName: host: builtins.length (hostUsers hostName host) == 1
-  ) hosts;
-  legacyHomeConfigs = builtins.mapAttrs (
-    hostName: host: homeConfigs."${builtins.head (hostUsers hostName host)}@${hostName}"
-  ) singleUserHosts;
+  # Preserve the short #<hostname> aliases alongside #melal@<hostname>.
+  legacyHomeConfigs = nixpkgs.lib.genAttrs hosts (hostName: homeConfigs."melal@${hostName}");
 in
 {
   # Share canonical homes with checks without repeating the hostname aliases.
   _module.args.homeConfigs = homeConfigs;
 
   flake = {
-    nixosConfigurations = builtins.mapAttrs mkHost hosts;
+    nixosConfigurations = nixpkgs.lib.genAttrs hosts mkHost;
     homeConfigurations = homeConfigs // legacyHomeConfigs;
   };
 }

@@ -1,8 +1,6 @@
 {
   config,
-  inputs,
   lib,
-  pkgs,
   ...
 }:
 {
@@ -51,69 +49,18 @@
     niri.enable = true;
   };
 
-  my.packages = {
-    cli = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    gui = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    io = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    development = {
-      shared.enable = true;
-      host.enable = true;
-    };
-    fonts = {
-      shared.enable = true;
-      host.enable = true;
-    };
-  };
-
-  my.development.toolchains = {
-    audio.enable = true;
-    avalonia.enable = true;
-    cpp.enable = true;
-    dotnet.enable = true;
-    dpp.enable = true;
-    fmt.enable = true;
-    go.enable = true;
-    lua.enable = true;
-    ncurses.enable = true;
-    nodejs22.enable = true;
-    py.enable = true;
-    py-science.enable = true;
-    qksh.enable = true;
-    rust.enable = true;
-  };
+  my.packages.fonts.shared.enable = true;
 
   my.programs = {
     nix-ld.enable = true;
-    noctalia.enable = true;
     gpu-screen-recorder.enable = true;
-    easyeffects.enable = true;
     steam.enable = true;
     ipad-screen-mirror.enable = true;
-    obs.enable = true;
-    terminals = {
-      kitty.enable = true;
-      foot.enable = true;
-      ghostty.enable = false;
-    };
+
   };
 
-  # Host-specific packages coming from flake inputs
-  environment.systemPackages =
-    let
-      sys = pkgs.stdenv.hostPlatform.system;
-    in
-    lib.optional config.my.packages.gui.host.enable inputs.helium-flake.packages.${sys}.default
-    ++ lib.optionals config.my.packages.cli.host.enable [
-      inputs.tincan-cli.packages.${sys}.default
-      inputs.timr-tui.packages.${sys}.linuxSound
-    ];
+  # Shared audio/session and shell backends are independent host capabilities.
+  programs.dconf.enable = true;
+  services.upower.enable = true;
+  services.power-profiles-daemon.enable = lib.mkIf (!config.services.tuned.enable) true;
 }

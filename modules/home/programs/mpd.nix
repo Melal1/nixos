@@ -20,21 +20,29 @@
     services.playerctld.enable = true;
     services.mpd = {
       enable = true;
-      musicDirectory = "${config.home.homeDirectory}/Audio";
+      musicDirectory = lib.mkDefault "${config.home.homeDirectory}/Audio";
       network.startWhenNeeded = true;
+      network.listenAddress = "${config.services.mpd.dataDir}/socket";
       extraConfig = ''
-        port  "6600"
-                audio_output {
-                  type "pipewire"
-                  name "My PipeWire Output"
-                }
-                audio_output {
-              type                    "fifo"
-              name                    "my_fifo"
-              path                    "/tmp/mpd.fifo"
-              format                  "44100:16:2"
-          }
+              audio_output {
+                type "pipewire"
+                name "My PipeWire Output"
+              }
+              audio_output {
+            type                    "fifo"
+            name                    "my_fifo"
+            path                    "${config.services.mpd.dataDir}/visualizer.fifo"
+            format                  "44100:16:2"
+        }
       '';
+    };
+
+    # Pinned HM adds TCP plus %t/mpd/socket. Keep socket activation, replacing
+    # both listeners with the same private Unix socket used by MPD and clients.
+    systemd.user.sockets.mpd.Socket = {
+      ListenStream = lib.mkForce [ config.services.mpd.network.listenAddress ];
+      SocketMode = "0600";
+      DirectoryMode = "0700";
     };
   };
 }

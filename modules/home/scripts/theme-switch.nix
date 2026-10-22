@@ -27,7 +27,15 @@
 # through skwd-wall, then reloads kitty (SIGUSR1) and ghostty (SIGUSR2).
 { pkgs }:
 
-pkgs.writers.writeBashBin "theme-switch" ''
+pkgs.writeShellScriptBin "theme-switch" ''
+    export PATH=${
+      pkgs.lib.makeBinPath [
+        pkgs.coreutils
+        pkgs.findutils
+        pkgs.procps
+        pkgs.systemd
+      ]
+    }:$PATH
     set -u
 
     ASSETS_DIR="$HOME/.local/share/assets"
@@ -215,8 +223,8 @@ pkgs.writers.writeBashBin "theme-switch" ''
     fi
 
     # --- Live terminal reload -------------------------------------------------------
-    pkill -SIGUSR1 kitty 2>/dev/null && ok "kitty reloaded (SIGUSR1)" || true
-    pkill -SIGUSR2 ghostty 2>/dev/null && ok "ghostty reloaded (SIGUSR2)" || true
+    pkill -u "$(id -u)" -x -SIGUSR1 kitty 2>/dev/null && ok "kitty reloaded (SIGUSR1)" || true
+    pkill -u "$(id -u)" -x -SIGUSR2 ghostty 2>/dev/null && ok "ghostty reloaded (SIGUSR2)" || true
     # Niri watches included files; Noctalia needs an explicit reload for a
     # palette-only change because the stable palette name stays the same.
     if [ "$NOCTALIA_CHANGED" -eq 1 ] && command -v noctalia >/dev/null; then

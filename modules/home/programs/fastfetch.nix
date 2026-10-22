@@ -1,21 +1,22 @@
+{ lib, ... }:
 {
   programs.fastfetch = {
 
     settings = {
       logo = {
-        type = "small";
+        type = lib.mkDefault "small";
         # source = "~/.config/settings/ascii/rose.txt"; # Uncomment if you want to use a custom logo
         padding = {
-          top = 1;
-          right = 6;
+          top = lib.mkDefault 1;
+          right = lib.mkDefault 6;
         };
       };
 
       display = {
-        separator = " ›  ";
+        separator = lib.mkDefault " ›  ";
       };
 
-      modules = [
+      modules = lib.mkDefault [
         "break"
 
         {
