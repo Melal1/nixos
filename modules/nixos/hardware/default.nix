@@ -3,7 +3,7 @@
 {
   imports = [
     ./bluetooth.nix
-    ./batteryOpt.nix
+    ./battery.nix
     ./performance.nix
     ./gpu/amd.nix
     ./gpu/intel.nix

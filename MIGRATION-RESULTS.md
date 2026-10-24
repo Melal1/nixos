@@ -54,6 +54,13 @@ upstream source/documentation rather than inferred from systemd syntax.
 - Hardware, filesystems, drivers, permissions, Niri/Ly/PAM/portals, audio services,
   networking/firewalls, Steam/GameMode, nix-ld, shared fonts, SQL deployment and
   nix-serve remain NixOS responsibilities, including administrative tools.
+- The former `modules/nixos/host.nix` is split by responsibility. Package CPU
+  targeting lives in `modules/nixos/packages/optimization.nix` as
+  `my.packages.optimization.arch`; battery presence and optimization live in
+  `modules/nixos/hardware/battery.nix` as `my.hardware.battery.present` and
+  `my.hardware.battery.optimization.enable`. The unused display inventory is removed. Rusty keeps
+  its battery services, power settings and Niri brightness controls; Snowflake
+  keeps `znver3`. The optimization helper still changes only selected packages.
 - Android webcam support remains consolidated in NixOS, including v4l2loopback,
   modprobe settings, scrcpy, v4l-utils and android-tools. Snowflake keeps
   `autoStart = false`. Shared I/O still selects android-tools independently,
@@ -65,6 +72,12 @@ upstream source/documentation rather than inferred from systemd syntax.
   media paths, existing script preferences, CPU optimization and OBS plugins /
   GStreamer wrapping are preserved. Noctalia’s host networking, Bluetooth and
   power backends remain explicit NixOS capabilities.
+- Skwd and GPU Screen Recorder own their Niri startup commands in their respective
+  application modules. Niri declares the mergeable
+  `my.home.wm.niri.startupCommands` option and assembles the script. Wallpaper
+  restoration precedes the recorder UI launch; existing conditions, backgrounding
+  and process checks are preserved. The Skwd daemon uses its existing
+  graphical-session service.
 - `modules/home/` is the single active Home Manager tree; the temporary top-level
   home tree was removed. Shared assets remain unchanged at their existing paths.
   The distinct legacy Niri `programs/wm/niri/config.kdl`, Noctalia
@@ -113,6 +126,16 @@ logs (including the plain Quickshell follow-up) are saved under:
 
 `/home/melal/.cache/nixos-grouped-commits-w20_2v7g`
 
+The snapshot before splitting the host metadata module, its original uncommitted
+diff and before/after evaluation manifests are saved under:
+
+`/home/melal/.cache/nixos-host-split-e692vw4y`
+
+The snapshot before moving application startup commands, its original uncommitted
+diff, generated-script comparisons and validation logs are saved under:
+
+`/home/melal/.cache/nixos-startup-ownership-clam0ff8`
+
 ## Startup and host dependencies
 
 | Component | Final startup owner and policy |
@@ -148,8 +171,7 @@ no automatic allocation framework was introduced.
 - `h-r` selects `melal@<host>`. The `#rusty` and `#snowflake` HM aliases remain
   available for the fixed single user.
 - Both hosts use `BROWSER=helium`; LibreWolf stays available. Niri's browser keys
-  use this selection. Previously referenced Swaylock and Orca commands now have
-  explicit packages; NixOS's existing Niri PAM support remains in place.
+  use this selection. NixOS's existing Niri PAM support remains in place.
 - MPD, `MPD_HOST`, ncmpcpp and the notification helper agree on
   `~/.local/share/mpd/socket` (or the configured MPD data directory). The visualizer
   uses `~/.local/share/mpd/visualizer.fifo`. MPD state and music are retained.
@@ -182,9 +204,9 @@ Validation uses `path:$PWD` so untracked new files are included without staging
 or committing. Commands use `--no-write-lock-file`. Nix evaluation/builds may fetch
 sources and populate the store; no-build evaluation does not prohibit those writes.
 
-All ten focused checks, all 48 regression assertions and the full no-build flake
-evaluation passed again after the later Niri package removal and priority-check
-update. The no-build evaluation also used the Git-backed flake; no configuration
+All ten focused checks and all 53 regression assertions passed after the startup
+ownership cleanup. The earlier Niri package removal and priority-check update also
+passed the full no-build evaluation using the Git-backed flake. No configuration
 was activated.
 
 After the NixOS consolidations, helper removals and package-file split, the
@@ -196,8 +218,12 @@ successfully, including its Bash syntax and ShellCheck checks; it was not run.
 Regression fixtures cover Melal host overrides, private media paths, package-list
 imports and service/hardware boundaries. Development fixtures additionally cover
 bundled parent tools, default-off selections, independent DPP/Avalonia children,
-Python-only output rooting and the actual minimal DPP shell. The updated result
-contains 48 assertions.
+Python-only output rooting and the actual minimal DPP shell. The host-module
+split adds coverage for removed options, the battery optimization guard and
+preserved per-host battery services/brightness keys. Startup fixtures cover merged
+application commands and their ordering, independent application/autostart
+opt-outs, and omission of the script when Niri is disabled. The updated result
+contains 53 assertions.
 
 The development regrouping deliberately adds C#, Python and Lua SDK/toolchains on
 Rusty and JDK 21 on both hosts. Rusty's Yarn and Watchman are removed as requested;
@@ -218,10 +244,23 @@ profile check now verifies that package identity, while FFmpeg and Python still
 exercise competing package variants. This follow-up does not change project
 shell definitions and is separate from the language-group comparison above.
 
+The host-module split was compared with a pre-split snapshot carrying the same
+concurrent user edits. Both complete system derivations and the normalized
+architecture, battery, brightness, package, account and runtime settings match
+exactly; all homes and 15 project shells remain unchanged. The concurrent package,
+locale and bootloader edits are preserved separately from this refactor.
+
+The startup ownership cleanup preserves every generated command, package path and
+execution order. Rusty's script is byte-identical; Snowflake's has one additional
+blank line between the Skwd and recorder blocks. Both complete system derivations,
+package inventories/priorities, services and all 15 shells match the pre-cleanup
+snapshot. The user's current Niri package/binding removals and explanatory theme
+comments are preserved.
+
 | Validation | Result |
 | --- | --- |
 | `nix flake check "path:$PWD" --no-build --no-write-lock-file` | Passed: both NixOS outputs, canonical homes, aliases, checks, shells and packages evaluate |
-| `module-evaluation` | Built successfully; all 48 regression assertions pass, including ordinary terminal/media/Fish host overrides, package imports, custom media paths, account preservation, hardware ownership and startup policies |
+| `module-evaluation` | Built successfully; all 53 regression assertions pass, including startup merging/order/opt-outs, battery/brightness preservation, ordinary terminal/media/Fish host overrides, package imports, custom media paths, account preservation, hardware ownership and startup policies |
 | `niri-config` | Built successfully; both canonical homes, disabled applications and Rusty with alternate Noctalia validate |
 | `assets-setup`, `theme-switch` | Built successfully; local fixtures cover idempotence, selected-link preservation, backup collisions and failure handling |
 | `shell-hooks`, `user-scripts` | Built successfully; development shell hooks, generated Fish/startup scripts and helper script syntax pass |

@@ -8,11 +8,6 @@
 
   networking.hostName = "rusty";
 
-  my.host = {
-    displays = [ "eDP-1" ];
-    hasBattery = true;
-  };
-
   my.virtualisation.mssql.enable = true;
 
   my.hardware = {
@@ -20,7 +15,10 @@
     gpu.nvidia.enable = true;
     gpu.intel.enable = true;
     touchpad.enable = true;
-    batteryOpt.enable = true;
+    battery = {
+      present = true;
+      optimization.enable = true;
+    };
     vial-qmk.enable = true;
   };
 
@@ -35,7 +33,6 @@
 
   };
 
-  # Host diagnostics and network administration remain available system-wide.
   environment.systemPackages = with pkgs; [
     acpi
     iw

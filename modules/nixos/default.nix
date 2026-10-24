@@ -1,6 +1,5 @@
 {
   imports = [
-    ./host.nix
     ./system
     ./ui
     ./packages

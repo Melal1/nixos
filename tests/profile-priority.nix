@@ -8,9 +8,23 @@ let
   inherit (pkgs) lib;
   cfg = home.config;
   cases = {
+    "ld.bfd" = {
+      names = [
+        "gcc-wrapper"
+        "clang-wrapper"
+      ];
+      expected = home.pkgs.gcc;
+    };
     ffmpeg = {
       names = [ "ffmpeg" ];
       expected = home.pkgs.ffmpeg;
+    };
+    lua = {
+      names = [
+        "lua"
+        "luajit"
+      ];
+      expected = home.pkgs.lua;
     };
     python = {
       names = [ "python3" ];

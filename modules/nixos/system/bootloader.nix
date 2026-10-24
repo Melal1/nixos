@@ -10,7 +10,7 @@
         enable = true;
         device = "nodev";
         efiSupport = true;
-        efiInstallAsRemovable = true;
+        efiInstallAsRemovable = false;
       };
     };
   };

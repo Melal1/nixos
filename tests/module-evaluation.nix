@@ -3,6 +3,7 @@
 let
   lib = inputs.nixpkgs.lib;
   base = self.nixosConfigurations.snowflake;
+  rustyHost = self.nixosConfigurations.rusty;
   home = self.homeConfigurations."melal@snowflake";
   rusty = self.homeConfigurations."melal@rusty";
   unstable = import inputs.nixpkgs-unstable {
@@ -24,6 +25,10 @@ let
     };
   noFiles = prefix: files: !lib.any (lib.hasPrefix prefix) (builtins.attrNames files);
   passes = instance: lib.all (entry: entry.assertion) instance.config.assertions;
+  startupScript = instance: instance.config.home.file.".local/bin/niri-autostart".text;
+  precedes =
+    first: second: text:
+    lib.hasInfix second text && lib.hasInfix first (builtins.head (lib.splitString second text));
   packageModules = {
     cli = [
       ../modules/home/packages/cli.nix
@@ -97,6 +102,8 @@ let
   noNoctalia = homeFor base { my.home.noctalia.enable = lib.mkForce false; };
   noNiri = homeFor base { my.home.wm.niri.enable = false; };
   noGsr = homeFor base { my.home.gpu-screen-recorder.enable = lib.mkForce false; };
+  noGsrAutostart = homeFor base { my.home.gpu-screen-recorder.autostart = lib.mkForce false; };
+  noSkwd = homeFor base { my.home.skwd.enable = false; };
   noMedia = homeFor base { my.home.media.enable = false; };
   noEasyEffects = homeFor base { services.easyeffects.enable = lib.mkForce false; };
   # Package lists can be selected without importing Melal's common features.
@@ -119,6 +126,7 @@ let
     services.mpd.dataDir = "/home/melal/.local/state/mpd-fixture";
   };
   hostOverrides = homeFor base {
+    my.home.wm.niri.startupCommands = ": startup-fixture";
     programs.foot.settings.main.font = "CaskaydiaCove Nerd Font:style=SemiBold:size=16";
     services.mpd.musicDirectory = "/home/melal/Music-fixture";
     programs.ncmpcpp.settings.visualizer_type = "spectrum";
@@ -189,7 +197,12 @@ let
     modules = [ { my.programs.ipad-screen-mirror.enable = lib.mkForce false; } ];
   };
   noUxplay = homeFor noMirrorHost { };
-  changedArch = base.extendModules { modules = [ { my.host.arch = lib.mkForce "x86-64-v3"; } ]; };
+  noBatteryRusty = rustyHost.extendModules {
+    modules = [ { my.hardware.battery.present = lib.mkForce false; } ];
+  };
+  changedArch = base.extendModules {
+    modules = [ { my.packages.optimization.arch = lib.mkForce "x86-64-v3"; } ];
+  };
   changedArchHome = homeFor changedArch { };
   rawNoctalia =
     (homeFor base { my.home.noctalia.optimize_for_arch = false; }).config.my.home.noctalia.package;
@@ -469,6 +482,29 @@ let
       && !(noEasyEffects.config.systemd.user.services ? easyeffects)
       && !(noUserFeatures.config.systemd.user.services ? skwd-walld)
       && !(noUserFeatures.config.systemd.user.services ? openrgb-client);
+    niri-startup-command-merge =
+      precedes "skwd-helm apply" "gsr-ui" (startupScript home)
+      && precedes "skwd-helm apply" ": startup-fixture" (startupScript hostOverrides)
+      && precedes ": startup-fixture" "gsr-ui" (startupScript hostOverrides);
+    niri-startup-opt-outs =
+      !(noNiri.config.home.file ? ".local/bin/niri-autostart")
+      && noNiri.config.my.home.skwd.enable
+      && hasPackage unstable.gpu-screen-recorder-ui noNiri.config.home.packages
+      && !lib.hasInfix "gsr-ui" (startupScript noGsr)
+      && noGsrAutostart.config.my.home.gpu-screen-recorder.enable
+      && includes noGsrAutostart (
+        with unstable;
+        [
+          gpu-screen-recorder-gtk
+          gpu-screen-recorder-ui
+          gpu-screen-recorder-notification
+        ]
+      )
+      && !lib.hasInfix "gsr-ui" (startupScript noGsrAutostart)
+      && lib.hasInfix "skwd-helm apply" (startupScript noGsrAutostart)
+      && !lib.hasInfix "skwd-helm apply" (startupScript noSkwd)
+      && lib.hasInfix "gsr-ui" (startupScript noSkwd)
+      && !(noSkwd.config.systemd.user.services ? skwd-walld);
     uxplay-host-policy =
       base.config.services.avahi.enable
       && base.config.services.avahi.publish.enable
@@ -697,6 +733,43 @@ let
     filesystem-tools-system-owned =
       base.config.boot.supportedFilesystems.ntfs && hasPackage base.pkgs.ntfs3g (packages base);
     fonts-remain-system-owned = hasPackage base.pkgs.sf-pro base.config.fonts.packages;
+    legacy-host-options-removed =
+      lib.all
+        (
+          host:
+          !(host.options.my ? host)
+          && !(host.options.my.hardware ? batteryOpt)
+          && host.options.my.packages.optimization ? arch
+          && host.options.my.hardware.battery ? present
+          && host.options.my.hardware.battery.optimization ? enable
+        )
+        [
+          base
+          rustyHost
+        ];
+    battery-optimization-requires-battery = passes base && passes rustyHost && !passes noBatteryRusty;
+    battery-and-brightness-preserved =
+      rustyHost.config.my.hardware.battery.present
+      && rustyHost.config.my.hardware.battery.optimization.enable
+      && !base.config.my.hardware.battery.present
+      && !base.config.my.hardware.battery.optimization.enable
+      && rustyHost.config.services.auto-cpufreq.enable
+      && rustyHost.config.services.upower.enable
+      &&
+        rustyHost.config.services.auto-cpufreq.settings.battery == {
+          governor = "powersave";
+          turbo = "never";
+        }
+      &&
+        rustyHost.config.services.auto-cpufreq.settings.charger == {
+          governor = "performance";
+          turbo = "auto";
+        }
+      && builtins.elem "mem_sleep_default=deep" rustyHost.config.boot.kernelParams
+      && !base.config.services.auto-cpufreq.enable
+      && lib.hasInfix "XF86MonBrightnessUp" rusty.config.xdg.configFile."niri/applications.kdl".text
+      && lib.hasInfix "XF86MonBrightnessDown" rusty.config.xdg.configFile."niri/applications.kdl".text
+      && !lib.hasInfix "XF86MonBrightness" home.config.xdg.configFile."niri/applications.kdl".text;
     host-architecture-propagates =
       lib.hasInfix "-march=x86-64-v3 -O3" optimized.NIX_CFLAGS_COMPILE
       && lib.hasInfix "-march=x86-64-v3 -O3" optimizedHome.NIX_CFLAGS_COMPILE

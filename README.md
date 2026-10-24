@@ -121,9 +121,18 @@ Their existing storage, secrets, grants and lifecycle policies are preserved.
 | GPU Screen Recorder | `my.programs.gpu-screen-recorder.enable`: recorder and KMS capability wrapper | `my.home.gpu-screen-recorder.enable`, optional `.autostart`: frontends and Niri launch |
 | OpenRGB | Hardware server and permissions | `my.home.openrgb.enable`: tray-client unit |
 | Noctalia | Explicit NetworkManager, Bluetooth, UPower and power-profiles-daemon backends | `my.home.noctalia.enable`: shell/config/plugins; starts through Niri |
-| Skwd | Graphical-session prerequisites | `my.home.skwd.enable`: one graphical-session unit with the original model and backend environment |
+| Skwd | Graphical-session prerequisites | `my.home.skwd.enable`: graphical-session daemon plus its own Niri wallpaper-restoration fragment |
 | Android webcam | `my.hardware.androidWebcam.enable`: kernel module, modprobe settings, scrcpy, v4l-utils and android-tools; Snowflake keeps `autoStart = false` | No separate HM option |
 | QMK | Udev rules and account grants | Selected clients; no extra permissions |
+
+Applications contribute Niri login commands through
+`my.home.wm.niri.startupCommands`, a text option that merges contributions with
+newlines. Niri supplies the script header and assembles those commands into
+`~/.local/bin/niri-autostart`. Skwd owns wallpaper restoration; GPU Screen Recorder
+owns its optional UI launch. Their `mkBefore` / `mkAfter` definitions preserve that
+order. Skwd's daemon uses its graphical-session service, while the recorder UI
+starts at Niri login when both its feature and `autostart` are enabled. Disabling
+Niri omits the generated startup script.
 
 Snowflake keeps its automatic graphical applications; Rusty does not inherit
 Snowflake's shell, recording or audio-effects selections. EasyEffects now receives
@@ -160,7 +169,7 @@ selected separately. NixOS's native `programs.nix-ld.enable` also remains usable
 Noctalia uses its existing flake package; its host backends are selected independently in NixOS.
 `my.home.noctalia.optimize_for_arch` defaults to true and appends
 `-march=<arch> -O3` while retaining existing compiler flags. Snowflake sets
-`my.host.arch = "znver3"` once; hosts with different CPUs should set a
+`my.packages.optimization.arch = "znver3"` once; hosts with different CPUs should set a
 matching compiler architecture. The fallback is the host platform's compiler
 architecture, or `x86-64`. Set `optimize_for_arch = false` to use the original
 package without an override. Noctalia uses the shared `pkgs.optimizeForArch`
@@ -271,6 +280,14 @@ NVIDIA. The PCIe workaround preserves the original udev rule and disables wake
 events from PCIe port bridges, which can prevent devices behind them from
 waking the system.
 
+Battery settings live in `modules/nixos/hardware/battery.nix`. Rusty selects
+`my.hardware.battery.present = true` and
+`my.hardware.battery.optimization.enable = true`, preserving auto-cpufreq,
+UPower and deep sleep. Optimization requires a present battery. Snowflake leaves
+both options at their false defaults. Niri continues to use battery presence to
+include brightness controls; no display inventory is needed. Monitor settings
+remain in Niri's optional `monitor.kdl`.
+
 UXPlay still requires the **system Avahi daemon running** and the **NixOS
 firewall configuration**. The NixOS `my.programs.ipad-screen-mirror` module owns
 the receiver launcher, its arguments, Avahi and firewall rules.
@@ -308,12 +325,13 @@ and does not implement multiple-instance allocation.
 overlay. Set the architecture once in `hosts/<name>/default.nix`:
 
 ```nix
-my.host.arch = "znver3";
+my.packages.optimization.arch = "znver3";
 ```
 
-The host module binds `pkgs.optimizeForArch` to that option, and Home Manager
-inherits the same default through `osConfig`. Apply it to any source package
-whose C/C++ build honors `NIX_CFLAGS_COMPILE`, without repeating the architecture:
+`modules/nixos/packages/optimization.nix` binds `pkgs.optimizeForArch` to that
+option, and Home Manager inherits the same default through `osConfig`. Apply it
+to any source package whose C/C++ build honors `NIX_CFLAGS_COMPILE`, without
+repeating the architecture:
 
 ```nix
 { pkgs, unstable, ... }:
@@ -331,10 +349,10 @@ whose C/C++ build honors `NIX_CFLAGS_COMPILE`, without repeating the architectur
 ```
 
 An optional `arch = "x86-64"` argument overrides the host default for one call.
-Hosts without an explicit `my.host.arch` use the host platform's compiler
+Hosts without an explicit `my.packages.optimization.arch` use the host platform's compiler
 architecture, falling back to `x86-64`. Standalone use of the pure helper outside
 a host configuration still takes an explicit `arch` argument. The Noctalia-only
-architecture option has been removed; Noctalia uses `my.host.arch` too.
+architecture option has been removed; Noctalia uses `my.packages.optimization.arch` too.
 
 The helper appends `-march=<arch> -O3`, preserving existing flags whether the
 package stores them in `NIX_CFLAGS_COMPILE` or `env.NIX_CFLAGS_COMPILE`. It sets
@@ -602,4 +620,4 @@ theme-switch vague river       # pick a wallpaper by (sub)name
 theme-switch vague --random    # pick a random wallpaper from the theme
 ```
 
-`skwd-walld` provides unified image and video wallpaper rendering in Niri. `theme-switch` applies the selected media with `skwd-helm`, and Niri restores it at login. Press `Mod+Shift+W` to open the skwd-wall picker. Terminal reload signals are sent to Kitty (SIGUSR1) and Ghostty (SIGUSR2). Niri watches its included theme file; Noctalia receives `noctalia msg config-reload` after a theme or palette change.
+`skwd-walld` provides unified image and video wallpaper rendering in Niri. `theme-switch` applies the selected media with `skwd-helm`, and Skwd's Niri startup fragment restores it at login. Terminal reload signals are sent to Kitty (SIGUSR1) and Ghostty (SIGUSR2). Niri watches its included theme file; Noctalia receives `noctalia msg config-reload` after a theme or palette change.

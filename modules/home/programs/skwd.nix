@@ -25,6 +25,11 @@ in
     };
   };
   config = lib.mkIf cfg.enable {
+    my.home.wm.niri.startupCommands = lib.mkBefore ''
+      WALL="$HOME/.local/state/theme/media"
+      [ -e "$WALL" ] || WALL="$HOME/.local/state/theme/wallpaper"
+      [ -e "$WALL" ] && ${suite.default}/bin/skwd-helm apply "$WALL" &
+    '';
     home.packages = [
       suite.default
       cfg.modelPackage

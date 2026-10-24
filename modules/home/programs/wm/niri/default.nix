@@ -1,9 +1,7 @@
 {
   config,
-  inputs,
   lib,
   pkgs,
-  unstable,
   osConfig ? null,
   ...
 }:
@@ -11,9 +9,15 @@ let
   cfg = config.my.home;
   fromSystem = import ../../../lib/after-home-packages.nix lib;
   niriDir = "${cfg.dotfilesDir}/modules/home/programs/wm/niri";
-  hasBacklight = osConfig != null && (osConfig.my.host.hasBattery or false);
+  hasBattery = osConfig != null && (osConfig.my.hardware.battery.present or false);
 in
 {
+  options.my.home.wm.niri.startupCommands = lib.mkOption {
+    type = lib.types.lines;
+    default = "";
+    description = "Shell commands contributed by applications to run from the Niri startup script.";
+  };
+
   config = lib.mkIf cfg.wm.niri.enable {
     assertions = [
       {
@@ -28,12 +32,11 @@ in
         nwg-displays
         gnome-frog
         cliphist
-        swaylock
-        orca
-        procps
+        # orca
+        # procps
         wireplumber
       ]
-      ++ lib.optional hasBacklight pkgs.brightnessctl
+      ++ lib.optional hasBattery pkgs.brightnessctl
     );
 
     home.file.".config/niri/config.kdl".source =
@@ -55,16 +58,13 @@ in
       binds {
         ${lib.optionalString config.programs.foot.enable ''Mod+Q hotkey-overlay-title="Open foot" { spawn "foot"; }''}
         ${lib.optionalString config.programs.kitty.enable ''Mod+Shift+Q hotkey-overlay-title="Open kitty" { spawn "kitty"; }''}
-        ${lib.optionalString cfg.skwd.enable ''Mod+Shift+W hotkey-overlay-title="Wallpaper Picker" { spawn "skwd-helm" "ui" "toggle"; }''}
-        Super+Alt+L hotkey-overlay-title="Lock the Screen: swaylock" { spawn "swaylock"; }
-        Super+Alt+S allow-when-locked=true hotkey-overlay-title=null { spawn-sh "pkill -u $(id -u) -x orca || exec orca"; }
         ${lib.optionalString cfg.media.enable ''
           XF86AudioPlay allow-when-locked=true { spawn "playerctl" "play-pause"; }
           XF86AudioStop allow-when-locked=true { spawn "playerctl" "stop"; }
           XF86AudioPrev allow-when-locked=true { spawn "playerctl" "previous"; }
           XF86AudioNext allow-when-locked=true { spawn "playerctl" "next"; }
         ''}
-        ${lib.optionalString hasBacklight ''
+        ${lib.optionalString hasBattery ''
           XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "+10%"; }
           XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "--class=backlight" "set" "10%-"; }
         ''}
@@ -73,6 +73,11 @@ in
     xdg.configFile."niri/noctalia.kdl" = lib.mkIf cfg.noctalia.enable {
       source = ../../noctalia/niri.kdl;
     };
+
+    # this looks bit confusing , what it does is :
+    # it make a niri/themes/default.kdl symlink to the file on the store ( unmutable ) , then after that it checks does
+    # niri/default.kdl exist ? if yes then do nothing if no then link it to the unmutable link so it act as default .
+
     xdg.configFile."niri/themes/default.kdl".source = ./themes/default.kdl;
     home.activation.niriTheme = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       dest=${lib.escapeShellArg "${config.xdg.configHome}/niri/default.kdl"}
@@ -92,18 +97,7 @@ in
           ]
         }:$PATH
       ''
-      + lib.optionalString cfg.skwd.enable ''
-        WALL="$HOME/.local/state/theme/media"
-        [ -e "$WALL" ] || WALL="$HOME/.local/state/theme/wallpaper"
-        [ -e "$WALL" ] && ${
-          inputs.skwd-wall.packages.${pkgs.stdenv.hostPlatform.system}.default
-        }/bin/skwd-helm apply "$WALL" &
-      ''
-      + lib.optionalString (cfg.gpu-screen-recorder.enable && cfg.gpu-screen-recorder.autostart) ''
-        if ! pgrep -u "$UID" -x gsr-ui > /dev/null; then
-          ${unstable.gpu-screen-recorder-ui}/bin/gsr-ui &
-        fi
-      '';
+      + cfg.wm.niri.startupCommands;
     };
   };
 }

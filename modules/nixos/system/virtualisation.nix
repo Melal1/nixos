@@ -47,7 +47,7 @@ in
         enable = true;
         enableOnBoot = cfg.docker.autoStart;
       };
-      # Don't even wake up via socket activation unless autoStart is on
+
       systemd.sockets.docker.wantedBy = lib.mkIf (!cfg.docker.autoStart) (lib.mkForce [ ]);
       environment.systemPackages = [ pkgs.docker-compose ];
     })

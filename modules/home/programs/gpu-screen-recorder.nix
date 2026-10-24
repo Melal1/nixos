@@ -14,6 +14,13 @@ in
     autostart = lib.mkEnableOption "the GPU Screen Recorder UI overlay at Niri login";
   };
   config = lib.mkIf cfg.enable {
+    my.home.wm.niri.startupCommands = lib.mkAfter (
+      lib.optionalString cfg.autostart ''
+        if ! pgrep -u "$UID" -x gsr-ui > /dev/null; then
+          ${unstable.gpu-screen-recorder-ui}/bin/gsr-ui &
+        fi
+      ''
+    );
     assertions = [
       {
         assertion = osConfig == null || (osConfig.programs.gpu-screen-recorder.enable or false);

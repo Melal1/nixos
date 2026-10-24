@@ -12,9 +12,15 @@ let
         # interpreter available without pulling optional documentation builds.
         if package.outPath == pkgs.python313.outPath then
           builtins.removeAttrs (lib.lowPrio package) [ "doc" ]
+        # Prefer GCC's shared linker commands while keeping Clang available.
+        else if package.outPath == pkgs.clang.outPath then
+          lib.setPrio ((pkgs.gcc.meta.priority or lib.meta.defaultPriority) + 1) package
+        # Prefer Lua's generic executable and headers over LuaJIT's compatibility files.
+        else if package.outPath == pkgs.luajit.outPath then
+          lib.setPrio ((pkgs.lua.meta.priority or lib.meta.defaultPriority) + 1) package
         # Keep the desktop's QML-enabled Quickshell preferred over the shell build.
-        else if package.outPath == pkgs.quickshell.outPath then
-          lib.lowPrio package
+        # else if package.outPath == pkgs.quickshell.outPath then
+        #   lib.lowPrio package
         else
           package
       )
@@ -28,11 +34,11 @@ let
             lib.concatMap
               (
                 package:
-                # mkShell selects dev outputs for many libraries. Keep those
+                # mkshell selects dev outputs for many libraries. keep those
                 # headers as well as the package's usual installed outputs.
                 [ package ]
-                ++ lib.optional ((package.outputName or "") == "dev") (
-                  (package.out or package) // { outputSpecified = false; }
+                ++ lib.optional ((package.outputname or "") == "dev") (
+                  (package.out or package) // { outputspecified = false; }
                 )
               )
               (
