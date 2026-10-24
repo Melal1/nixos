@@ -14,7 +14,10 @@ configuration, personal preferences, package lists, scripts and assets live in
 modules/home/
 ├── default.nix                 # Melal’s identity and common defaults
 ├── hosts/
-│   ├── rusty/default.nix       # Package choices and host overrides
+│   ├── noctalia.nix            # Shared personal Noctalia/plugin defaults
+│   ├── rusty/
+│   │   ├── default.nix         # Package choices and host overrides
+│   │   └── noctalia-config.toml
 │   └── snowflake/
 │       ├── default.nix
 │       └── noctalia-config.toml
@@ -70,11 +73,11 @@ machine or losing its remaining terminal settings:
 programs.foot.settings.main.font = "CaskaydiaCove Nerd Font:style=SemiBold:size=16";
 ```
 
-Both real hosts retain size 14. Noctalia remains enabled only on Snowflake;
-Rusty can enable it separately and choose its own TOML through
-`my.home.noctalia.configFile`. Snowflake’s editable TOML lives in
-`modules/home/hosts/snowflake/noctalia-config.toml`. Common feature defaults and host
-choices remain separate from NixOS hardware prerequisites.
+Both real hosts retain size 14 and enable Noctalia. Each host selects its editable
+TOML through `my.home.noctalia.configFile`, under
+`modules/home/hosts/<hostname>/noctalia-config.toml`. Rusty starts with Snowflake's
+appearance settings and omits Discord Voice from its plugins and bar. Common
+feature defaults and host choices remain separate from NixOS hardware prerequisites.
 
 ## Personal packages and features
 
@@ -161,7 +164,7 @@ selected separately. NixOS's native `programs.nix-ld.enable` also remains usable
 
 | Feature | Global default | Snowflake | Rusty |
 | --- | --- | --- | --- |
-| `my.home.noctalia.enable` (HM) | false | true | false |
+| `my.home.noctalia.enable` (HM) | false | true | true |
 | `my.services.nix-serve.enable` | false | true, interface `enp4s0` | false |
 | `my.hardware.disablePcieWakeup.enable` | false | true | false |
 | `my.programs.ipad-screen-mirror.enable` | false | true | false |
@@ -169,16 +172,18 @@ selected separately. NixOS's native `programs.nix-ld.enable` also remains usable
 Noctalia uses its existing flake package; its host backends are selected independently in NixOS.
 `my.home.noctalia.optimize_for_arch` defaults to true and appends
 `-march=<arch> -O3` while retaining existing compiler flags. Snowflake sets
-`my.packages.optimization.arch = "znver3"` once; hosts with different CPUs should set a
-matching compiler architecture. The fallback is the host platform's compiler
+`my.packages.optimization.arch = "znver3"` once; Rusty's 11th-generation Intel Core
+i5 G7 uses `"tigerlake"`. Other hosts should set a matching compiler architecture.
+The fallback is the host platform's compiler
 architecture, or `x86-64`. Set `optimize_for_arch = false` to use the original
 package without an override. Noctalia uses the shared `pkgs.optimizeForArch`
 helper described below.
 
-Home Manager's `my.home.noctalia.enable` defaults to false and is selected by Melal on Snowflake.
+Home Manager's `my.home.noctalia.enable` defaults to false and is selected by Melal
+on both Snowflake and Rusty through `modules/home/hosts/noctalia.nix`.
 It links the main TOML directly into this checkout, like Niri, so editing
 `~/.config/noctalia/config.toml` edits
-`modules/home/hosts/snowflake/noctalia-config.toml` immediately. It also manages
+`modules/home/hosts/<hostname>/noctalia-config.toml` immediately. It also manages
 the separate theme and wallpaper files, `black-mo.json`, and a generated,
 read-only `~/.config/noctalia/plugins.toml`.
 Each WM attaches its integration when both it and Noctalia are enabled; the Niri
@@ -188,8 +193,10 @@ there is no active Spicetify configuration or locked input.
 
 ### Noctalia plugins
 
-Each `my.home.noctalia.plugins.<name>.enable` defaults to false. Snowflake
-explicitly enables the five plugins below; Rusty leaves them disabled.
+Each `my.home.noctalia.plugins.<name>.enable` defaults to false. Both hosts import
+the shared personal preset in `modules/home/hosts/noctalia.nix`, enabling Bongocat,
+Nix Search, Pomodoro and Timer with matching settings. Snowflake also enables
+Discord Voice; Rusty explicitly disables it and omits its `bar` widget.
 The parent `my.home.noctalia.enable` gates their files, packages and activation.
 
 | Plugin option | Noctalia plugin ID | Packages selected when enabled |
@@ -220,19 +227,18 @@ The main TOML imports this file; keep those generated keys out of the main file
 because Noctalia gives an including file's own values precedence.
 Each plugin has `settings` and `widgets` attribute sets. The shared module
 supplies plugin IDs, dependencies, widget types and dependency executable paths.
-Personal settings and styling belong in the host's Home Manager configuration;
-Snowflake keeps its Pomodoro durations, Discord and Bongocat styling there.
+Common Pomodoro durations and Bongocat styling live in the shared personal preset;
+Snowflake keeps its Discord preferences in its own Home Manager configuration.
 Bar layout lives under `[bar.default]` in the editable main
-`modules/home/hosts/snowflake/noctalia-config.toml`, linked as
+`modules/home/hosts/<hostname>/noctalia-config.toml`, linked as
 `~/.config/noctalia/config.toml`. Edit its `start`, `center` and `end` lists
 directly; layout changes need no Home Manager switch. These lists are not
 generated or filtered by Nix, so remove a plugin's widget name there when
 disabling that plugin. Saved GUI bar overrides still take precedence over
 the editable TOML until cleared manually in `settings.toml`.
-Snowflake keeps its Discord widget preferences in its host Home Manager
-configuration. It keeps its keyboard device path under
-`my.home.noctalia.plugins.bongocat.widgets.cat.input_devices`. Other hosts
-should select their own device paths and grant the user input-device access.
+The shared Bongocat preset selects the Corne keyboard through
+`my.home.noctalia.plugins.bongocat.widgets.cat.input_devices`. A host can override
+that list for a different keyboard and grant the user input-device access.
 The existing user belongs to the `input` group.
 
 Dependencies are installed through Home Manager, including when the shared

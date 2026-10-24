@@ -37,8 +37,8 @@ let
                 # mkshell selects dev outputs for many libraries. keep those
                 # headers as well as the package's usual installed outputs.
                 [ package ]
-                ++ lib.optional ((package.outputname or "") == "dev") (
-                  (package.out or package) // { outputspecified = false; }
+                ++ lib.optional ((package.outputName or "") == "dev") (
+                  (package.out or package) // { outputSpecified = false; }
                 )
               )
               (

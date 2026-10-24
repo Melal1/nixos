@@ -8,6 +8,10 @@
 
   networking.hostName = "rusty";
 
+  my.packages.optimization.arch = "tigerlake";
+
+  programs.dconf.enable = true;
+
   my.virtualisation.mssql.enable = true;
 
   my.hardware = {

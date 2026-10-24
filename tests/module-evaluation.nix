@@ -368,26 +368,81 @@ let
       && cfg.programs.fish.shellAbbrs.h-r == home.config.programs.fish.shellAbbrs.h-r
       && cfg.programs.fish.shellAliases.vi == home.config.programs.fish.shellAliases.vi;
     host-specific-noctalia =
-      !rusty.config.my.home.noctalia.enable
+      rusty.config.my.home.noctalia.enable
       && home.config.my.home.noctalia.enable
       && rustyNoctalia.config.my.home.noctalia.enable
+      &&
+        rusty.config.my.home.noctalia.configFile
+        == "${rusty.config.my.home.dotfilesDir}/modules/home/hosts/rusty/noctalia-config.toml"
+      && rusty.config.my.home.noctalia.configFile != home.config.my.home.noctalia.configFile
       && rustyNoctalia.config.my.home.noctalia.configFile == alternateNoctaliaConfig
       && home.config.my.home.noctalia.configFile != alternateNoctaliaConfig
       &&
         toString rustyNoctalia.config.xdg.configFile."noctalia/config.toml".source
         == toString (rustyNoctalia.config.lib.file.mkOutOfStoreSymlink alternateNoctaliaConfig)
-      && hasPackage rustyNoctalia.config.my.home.noctalia.package rustyNoctalia.config.home.packages
-      && rustyNoctalia.config.xdg.configFile ? "niri/noctalia.kdl"
-      && lib.hasInfix ''spawn-at-startup "noctalia"'' (
-        builtins.readFile rustyNoctalia.config.xdg.configFile."niri/noctalia.kdl".source
-      )
-      && noFiles "noctalia/" rusty.config.xdg.configFile
-      && !(rusty.config.xdg.configFile ? "niri/noctalia.kdl")
+      &&
+        lib.all
+          (
+            instance:
+            instance.config.xdg.configFile ? "noctalia/config.toml"
+            && instance.config.xdg.configFile ? "noctalia/plugins.toml"
+            && hasPackage instance.config.my.home.noctalia.package instance.config.home.packages
+            && instance.config.xdg.configFile ? "niri/noctalia.kdl"
+            && lib.hasInfix ''spawn-at-startup "noctalia"'' (
+              builtins.readFile instance.config.xdg.configFile."niri/noctalia.kdl".source
+            )
+          )
+          [
+            home
+            rusty
+            rustyNoctalia
+          ]
       && noFiles "noctalia/" rustyNoNoctalia.config.xdg.configFile
       && !(rustyNoNoctalia.config.xdg.configFile ? "niri/noctalia.kdl")
       && !(rustyNoNoctalia.config.home.activation ? noctaliaTheme)
       && !(rustyNoNoctalia.config.home.activation ? noctaliaPlugins)
       && !hasPackage rustyNoctalia.config.my.home.noctalia.package rustyNoNoctalia.config.home.packages;
+    noctalia-shared-plugin-preferences =
+      lib.all
+        (
+          name:
+          rusty.config.my.home.noctalia.plugins.${name}.enable
+          && rusty.config.my.home.noctalia.plugins.${name} == home.config.my.home.noctalia.plugins.${name}
+        )
+        [
+          "bongocat"
+          "nix-search"
+          "timer"
+          "pomodoro"
+        ]
+      && home.config.my.home.noctalia.plugins.discord-voice.enable
+      && !rusty.config.my.home.noctalia.plugins.discord-voice.enable;
+    noctalia-appearance-without-discord =
+      let
+        snowflakeSettings = builtins.fromTOML (
+          builtins.readFile ../modules/home/hosts/snowflake/noctalia-config.toml
+        );
+        rustySettings = builtins.fromTOML (
+          builtins.readFile ../modules/home/hosts/rusty/noctalia-config.toml
+        );
+        rustyBar = rustySettings.bar.default;
+      in
+      builtins.elem "bar" snowflakeSettings.bar.default.end
+      && !builtins.elem "bar" (rustyBar.start ++ (rustyBar.center or [ ]) ++ rustyBar.end)
+      &&
+        rustySettings == lib.recursiveUpdate snowflakeSettings {
+          bar.default.end = lib.remove "bar" snowflakeSettings.bar.default.end;
+        };
+    rusty-noctalia-host-support =
+      rustyHost.config.my.packages.optimization.arch == "tigerlake"
+      && lib.hasInfix "-march=tigerlake -O3" rusty.config.my.home.noctalia.package.NIX_CFLAGS_COMPILE
+      && rustyHost.config.programs.dconf.enable
+      && rustyHost.config.programs.niri.enable
+      && rustyHost.config.networking.networkmanager.enable
+      && rustyHost.config.hardware.bluetooth.enable
+      && rustyHost.config.services.upower.enable
+      && rustyHost.config.services.auto-cpufreq.enable
+      && !rustyHost.config.services.power-profiles-daemon.enable;
     private-media-resources =
       lib.all
         (

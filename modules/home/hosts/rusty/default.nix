@@ -1,5 +1,7 @@
+{ config, lib, ... }:
 {
   imports = [
+    ../noctalia.nix
     ../../packages/cli.nix
     ../../packages/gui.nix
     ../../packages/io.nix
@@ -7,6 +9,12 @@
     ../../packages/rusty/cli.nix
     ../../packages/rusty/gui.nix
   ];
+
+  my.home.noctalia = {
+    configFile = lib.mkDefault "${config.my.home.dotfilesDir}/modules/home/hosts/rusty/noctalia-config.toml";
+    plugins.discord-voice.enable = false;
+  };
+
   my.home.dev = {
     cpp = {
       enable = true;
