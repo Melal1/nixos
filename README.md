@@ -288,8 +288,10 @@ waking the system.
 
 Battery settings live in `modules/nixos/hardware/battery.nix`. Rusty selects
 `my.hardware.battery.present = true` and
-`my.hardware.battery.optimization.enable = true`, preserving auto-cpufreq,
-UPower and deep sleep. Optimization requires a present battery. Snowflake leaves
+`my.hardware.battery.optimization.enable = true`, enabling power-profiles-daemon
+for Noctalia's power controls while preserving UPower and deep sleep. Auto-cpufreq
+is disabled; its battery and charger settings remain configured for future use.
+Optimization requires a present battery. Snowflake leaves
 both options at their false defaults. Niri continues to use battery presence to
 include brightness controls; no display inventory is needed. Monitor settings
 remain in Niri's optional `monitor.kdl`.

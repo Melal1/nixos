@@ -9,7 +9,7 @@ in
       default = false;
       description = "Whether this host has a battery.";
     };
-    optimization.enable = lib.mkEnableOption "battery optimisation (auto-cpufreq, deep sleep)";
+    optimization.enable = lib.mkEnableOption "battery optimisation (power-profiles-daemon, deep sleep)";
   };
 
   config = lib.mkMerge [
@@ -22,7 +22,8 @@ in
       ];
     }
     (lib.mkIf cfg.optimization.enable {
-      services.auto-cpufreq.enable = true;
+      services.auto-cpufreq.enable = false;
+      services.power-profiles-daemon.enable = true;
       services.upower.enable = true;
       services.auto-cpufreq.settings = {
         battery = {

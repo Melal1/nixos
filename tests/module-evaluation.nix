@@ -441,8 +441,8 @@ let
       && rustyHost.config.networking.networkmanager.enable
       && rustyHost.config.hardware.bluetooth.enable
       && rustyHost.config.services.upower.enable
-      && rustyHost.config.services.auto-cpufreq.enable
-      && !rustyHost.config.services.power-profiles-daemon.enable;
+      && !rustyHost.config.services.auto-cpufreq.enable
+      && rustyHost.config.services.power-profiles-daemon.enable;
     private-media-resources =
       lib.all
         (
@@ -808,7 +808,8 @@ let
       && rustyHost.config.my.hardware.battery.optimization.enable
       && !base.config.my.hardware.battery.present
       && !base.config.my.hardware.battery.optimization.enable
-      && rustyHost.config.services.auto-cpufreq.enable
+      && !rustyHost.config.services.auto-cpufreq.enable
+      && rustyHost.config.services.power-profiles-daemon.enable
       && rustyHost.config.services.upower.enable
       &&
         rustyHost.config.services.auto-cpufreq.settings.battery == {
