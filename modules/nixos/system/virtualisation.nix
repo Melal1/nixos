@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -10,25 +9,17 @@ in
 {
   options.my.virtualisation = {
     mssql.enable = lib.mkEnableOption "Microsoft SQL Server container (podman backend)";
-    databaseEnabled = lib.mkOption {
-      type = lib.types.bool;
-      readOnly = true;
-      description = "Whether any configured database service is enabled";
-    };
     docker.enable = lib.mkEnableOption "Docker daemon";
     docker.autoStart = lib.mkEnableOption "Start Docker on boot";
   };
 
   config = lib.mkMerge [
     {
-      my.virtualisation.databaseEnabled = cfg.mssql.enable || config.services.postgresql.enable;
       virtualisation.waydroid.enable = false;
     }
 
     (lib.mkIf cfg.mssql.enable {
       virtualisation.podman.enable = true;
-      # Microsoft's official SQL Server CLI client
-      environment.systemPackages = [ pkgs.sqlcmd ];
       virtualisation.oci-containers = {
         backend = "podman";
         containers.mssql = {
@@ -49,7 +40,6 @@ in
       };
 
       systemd.sockets.docker.wantedBy = lib.mkIf (!cfg.docker.autoStart) (lib.mkForce [ ]);
-      environment.systemPackages = [ pkgs.docker-compose ];
     })
   ];
 }

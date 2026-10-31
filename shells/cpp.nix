@@ -12,8 +12,4 @@ pkgs.mkShell {
     gdb
   ];
 
-  buildInputs = with pkgs; [
-    fmt
-    nlohmann_json
-  ];
 }

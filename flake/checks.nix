@@ -40,6 +40,15 @@ in
     in
     {
       checks = {
+        font-matching = import ../tests/font-matching.nix {
+          inherit pkgs;
+          host = self.nixosConfigurations.snowflake;
+        };
+
+        home-composition = pkgs.writeText "home-composition-check" (
+          builtins.toJSON (import ../tests/home-composition.nix { inherit self inputs; })
+        );
+
         module-evaluation =
           let
             results = import ../tests/module-evaluation.nix { inherit self inputs; };
@@ -193,6 +202,15 @@ in
               touch "$out"
             '';
       }
-      // lib.mapAttrs' (name: home: lib.nameValuePair "home-${name}" home.activationPackage) homeConfigs;
+      // lib.mapAttrs' (
+        name: home:
+        let
+          # Build checks on any CPU; evaluation tests retain the real host flags.
+          portableHome = home.extendModules {
+            modules = [ { my.home.noctalia.optimize_for_arch = lib.mkForce false; } ];
+          };
+        in
+        lib.nameValuePair "home-${name}" portableHome.activationPackage
+      ) homeConfigs;
     };
 }

@@ -21,6 +21,7 @@
   boot.loader.grub.useOSProber = true;
 
   my.packages.optimization.arch = "znver3";
+  my.packages.fonts.shared.enable = true;
 
   my.virtualisation.mssql.enable = true;
 
@@ -41,8 +42,6 @@
   my.desktop = {
     niri.enable = true;
   };
-
-  my.packages.fonts.shared.enable = true;
 
   my.programs = {
     nix-ld.enable = true;

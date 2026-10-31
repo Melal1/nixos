@@ -60,7 +60,6 @@ in
   nonJava = packagesFor (lib.remove "javafx" (builtins.attrNames shells));
   cpp = packagesFor [
     "cpp"
-    "audio"
     "dpp"
     "fmt"
     "ncurses"

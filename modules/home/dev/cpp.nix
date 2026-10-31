@@ -11,7 +11,6 @@ in
 {
   options.my.home.dev.cpp = {
     enable = lib.mkEnableOption "the C++ toolchain and editor tools";
-    audio.enable = lib.mkEnableOption "the C++ audio libraries and their build dependencies";
     dpp.enable = lib.mkEnableOption "DPP and its C++ build dependencies";
     fmt.enable = lib.mkEnableOption "fmt and its C++ build dependencies";
     ncurses.enable = lib.mkEnableOption "ncurses and its C++ build dependencies";

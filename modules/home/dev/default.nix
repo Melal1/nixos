@@ -8,9 +8,9 @@
 let
   cfg = config.my.home.dev;
   anyParent = lib.any (group: group.enable) (builtins.attrValues cfg);
+  ## selections provides  lang = flase / true where cfg have lang = { enbaled = true /false }
   selections = {
     cpp = cfg.cpp.enable;
-    audio = cfg.cpp.audio.enable;
     dpp = cfg.cpp.dpp.enable;
     fmt = cfg.cpp.fmt.enable;
     ncurses = cfg.cpp.ncurses.enable;
@@ -25,6 +25,8 @@ let
     rust = cfg.rust.enable;
     javafx = cfg.java.javafx.enable;
   };
+  #   filterAttrs (n: v: n == "foo") { foo = 1; bar = 2; }
+  # => { foo = 1; }
   selected = builtins.attrNames (lib.filterAttrs (_: enabled: enabled) selections);
   fromSystem = import ../lib/after-home-packages.nix lib;
 in

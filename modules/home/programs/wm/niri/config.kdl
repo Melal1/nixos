@@ -15,6 +15,10 @@ prefer-no-csd
 // Find the full list of options on the wiki:
 
 // https://niri-wm.github.io/niri/Configuration:-Input
+layer-rule {
+    match namespace="^noctalia-backdrop"
+    place-within-backdrop true
+}
 input {
   mod-key "Super"
   workspace-auto-back-and-forth

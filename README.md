@@ -3,96 +3,157 @@
 This repository configures one user, Melal, across Rusty and Snowflake using
 NixOS and standalone Home Manager.
 
+I use LLMs to help configure this setup, prepare commits, explain how things work,
+and handle simple, time-consuming tasks.
+
 ## Ownership and composition
 
 NixOS owns hardware, the Melal account and login shell, permissions, networking,
-firewalls, privileged wrappers and shared services. All active Home Manager
-configuration, personal preferences, package lists, scripts and assets live in
-`modules/home/`.
+firewalls, privileged wrappers, shared services, fonts and fontconfig defaults.
+Home Manager owns personal applications, clients, preferences, scripts and
+configuration. Host choices live together under `hosts/<host>/`; reusable Home
+modules live in `modules/home/`.
 
 ```text
+hosts/<host>/
+├── default.nix                 # NixOS choices and capabilities
+├── home.nix                    # Optional presets, features and package imports
+├── home-packages.nix           # Explicitly imported host package choices
+└── overrides/                  # Optional differences from shared app defaults
+    ├── foot.nix                # Automatically imported Home Manager settings
+    └── noctalia.toml           # Editable partial Noctalia settings
 modules/home/
-├── default.nix                 # Melal’s identity and common defaults
-├── hosts/
-│   ├── noctalia.nix            # Shared personal Noctalia/plugin defaults
-│   ├── rusty/
-│   │   ├── default.nix         # Package choices and host overrides
-│   │   └── noctalia-config.toml
-│   └── snowflake/
-│       ├── default.nix
-│       └── noctalia-config.toml
-├── packages/                   # Unconditional common and host package lists
-├── programs/                   # App configuration and assets
-├── shell/
-├── scripts/
+├── default.nix                 # Identity and reusable module declarations
+├── core.nix                    # Small shell setup, enabled automatically
+├── presets/{desktop,development}.nix
+├── packages/                   # Optional, explicitly imported package bundles
+├── programs/                   # Application configuration and assets
+├── shell/                      # Fish configuration and native init.fish
+├── scripts/                    # Nix wrappers and native script bodies
 ├── dev/
 └── lib/
 ```
 
 The flake discovers `hosts/<host>/default.nix`, builds that NixOS configuration,
-and combines `modules/home/default.nix` with `modules/home/hosts/<host>/default.nix` for Melal.
-Every machine must have both entrypoints. Canonical homes are `melal@rusty` and
-`melal@snowflake`; the `rusty` and `snowflake` aliases remain available. There is
-no user discovery or user-membership metadata. The explicit account module is
-`modules/nixos/system/melal.nix`.
+and combines `modules/home/default.nix` with `hosts/<host>/home.nix` when present.
+Regular `.nix` files directly inside `hosts/<host>/overrides/` are also imported
+automatically; other files and subdirectories are ignored by the Nix loader.
+Neither `home.nix` nor `overrides/` is required. Without either, Melal receives
+only the shell core: Fish and its helpers, Git,
+Starship, Zoxide, Direnv, Fastfetch, Yazi, Lazygit, Nh, `EDITOR` and personal scripts.
+The desktop and development presets are optional imports. Canonical homes are
+`melal@rusty` and `melal@snowflake`; the `rusty` and `snowflake` aliases remain
+available. There is no user discovery or user-membership metadata. The explicit
+account module is `modules/nixos/system/melal.nix`.
 
 `pkgs/`, `overlays/` and project `shells/` remain shared flake infrastructure.
 Home Manager reads `osConfig` for genuine host capabilities and CPU architecture.
-The lock file and NixOS/Home Manager state versions (`24.11`) are unchanged.
+NixOS/Home Manager state versions remain `24.11`.
 
-`modules/home/` is the single active Home Manager tree; there is no top-level
-`home/` directory. Shared assets remain unchanged at their existing paths.
-The distinct old Niri `programs/wm/niri/config.kdl`, Noctalia
-`programs/noctalia/noctalia-config.toml`, and former user TOML are retained for
-live and rollback references. New generations use Niri's `session.kdl` and the
-selected host's Noctalia TOML. Keep the old targets until their references have
-been migrated and checked.
-See [MIGRATION-RESULTS.md](MIGRATION-RESULTS.md) for validation and staged activation.
+`modules/home/hosts/<host>/noctalia-config.toml` paths remain only as compatibility
+symlinks to `hosts/<host>/noctalia-config.toml` for older generations. Those root
+host files are now tiny native include wrappers for the shared defaults and host
+override, not another copy of the settings. New hosts need neither legacy path.
+They are not active module entrypoints. The distinct old Niri `programs/wm/niri/config.kdl`
+remains for live and rollback references; new generations use `session.kdl`.
+Keep the old targets until their references have been migrated and checked.
 
 ## Adding a machine
 
 1. Create `hosts/<host>/default.nix` and its hardware configuration, importing
    `../../modules/nixos`. Select host capabilities there; the shared system
    modules declare Melal’s existing account and grants.
-2. Create `modules/home/hosts/<host>/default.nix`. Import the package lists wanted on that
-   machine and add its application choices, settings and data files.
-3. Track new files before using a Git flake. During uncommitted work,
-   `path:$PWD` includes new files without staging them.
+2. Optionally create `hosts/<host>/home.nix` for desktop/development choices.
+   Omitting it keeps the shell core. For example:
+
+   ```nix
+   { ... }:
+   {
+     imports = [
+       ../../modules/home/presets/desktop.nix
+       ../../modules/home/presets/development.nix
+       ../../modules/home/packages/desktop-apps.nix
+       # ./home-packages.nix # Optional machine-specific package list.
+     ];
+     my.home.dev.java.enable = false;
+   }
+   ```
+
+   The desktop preset sets `BROWSER = "helium"` but does not install a browser.
+   Import `desktop-apps.nix` to install Helium and the usual applications, or
+   install your own browser and set `home.sessionVariables.BROWSER` accordingly.
+   Noctalia and hardware clients remain explicit host choices. Enabling Noctalia
+   uses the shared configuration; no host TOML is required. Add files under
+   `hosts/<host>/overrides/` only when an application needs different settings.
+
+   Font packages and default families are managed in NixOS. Enable
+   `my.packages.fonts.shared.enable` in `hosts/<host>/default.nix` for the shared
+   collection; override `fonts.fontconfig.defaultFonts` there when needed.
+
+   ```nix
+   fonts.fontconfig.defaultFonts.monospace = [ "CaskaydiaCove Nerd Font" ];
+   ```
+3. Track/stage new files before using a Git flake; untracked files are excluded.
+   During uncommitted work, `path:$PWD` includes new files without staging them,
+   for example `nix build "path:$PWD#homeConfigurations.melal@<host>.activationPackage"`.
 
 ## Common defaults and host overrides
 
-Common personal choices use `lib.mkDefault`. A host can use an ordinary assignment
+Core, presets and personal preference modules use `lib.mkDefault` for scalar
+and list defaults. A host can use an ordinary assignment
 to disable a common application or change a preference. Import order does not
 override conflicting Nix definitions; host overrides do not need `mkForce` when
 replacing a common default.
 
-For example, a host can select a different Foot font without changing the other
-machine or losing its remaining terminal settings:
+For example, create `hosts/<host>/overrides/foot.nix` to select a different Foot
+font without changing another machine or losing the remaining terminal settings:
 
 ```nix
-programs.foot.settings.main.font = "CaskaydiaCove Nerd Font:style=SemiBold:size=16";
+{
+  programs.foot.settings.main.font = "CaskaydiaCove Nerd Font:style=SemiBold:size=16";
+}
 ```
 
-Both real hosts retain size 14 and enable Noctalia. Each host selects its editable
-TOML through `my.home.noctalia.configFile`, under
-`modules/home/hosts/<hostname>/noctalia-config.toml`. Rusty starts with Snowflake's
-appearance settings and omits Discord Voice from its plugins and bar. Common
-feature defaults and host choices remain separate from NixOS hardware prerequisites.
+Home Manager picks up that file automatically on the next rebuild. Both
+real hosts retain the shared Foot size 14, so they need no Foot override file.
+Keep preset and feature selections in `home.nix`, and put application differences
+in `overrides/`. These files are ordinary Home Manager modules, so use the usual
+module syntax and keep each setting defined in one host file.
+
+Noctalia reads editable shared defaults from
+`modules/home/programs/noctalia/config.toml`, followed by an optional
+`hosts/<hostname>/overrides/noctalia.toml`. A host file contains only differences:
+
+```toml
+[bar.default]
+thickness = 42
+```
+
+Noctalia merges tables, while a host list replaces the shared list. Each host
+declares its plugin and bar lists; Rusty omits Discord Voice. The Nix loader ignores
+TOML; Noctalia loads this file itself. New files must be tracked for Git flakes,
+or included with `path:$PWD` as shown above.
 
 ## Personal packages and features
 
-Each host explicitly imports its chosen lists from:
+Both current hosts import the desktop and development presets, the shared
+`cli`, `desktop-apps`, `io` and `database-clients` bundles, and their own
+`hosts/<host>/home-packages.nix`. Shared bundles live in
+`modules/home/packages/`; each is an unconditional package-only module. Import
+only the bundles wanted on a machine, or remove an import to remove its
+contribution. There is no package-group enable option or automatic package bundle.
 
-```text
-modules/home/packages/{cli,gui,io,database-clients}.nix
-modules/home/packages/rusty/{cli,gui}.nix
-modules/home/packages/snowflake/{cli,gui}.nix
-```
-
-Every package-only file is unconditional. Remove an import from one host to
-remove that list’s contribution on that machine. There is no package-group enable
-option or default package bundle. Database clients do not require a local server.
-Development environments are selected by language under `my.home.dev`.
+Application modules own their runtime dependencies, so shared lists do not repeat
+feature-owned tools. Fish helpers and personal scripts work without importing the
+CLI bundle. Host package files retain intentional duplicates, variants and
+stable/unstable choices to preserve command priorities; Arduino IDE is currently
+selected only by Snowflake. `database-clients.nix` owns SQL clients including
+`sqlcmd`, without requiring a local database server. `desktop-apps.nix` owns
+Nautilus; its host integrations remain in NixOS. The optional
+`container-clients.nix` bundle supplies Compose and is not automatically imported
+when a container daemon is enabled. Both host package files explicitly retain
+`android-tools` for personal use; Snowflake’s Android webcam capability also owns
+its required copy in NixOS.
 
 | Home Manager option | Responsibility |
 | --- | --- |
@@ -109,8 +170,10 @@ they do not grant host-device access. Fish helpers supply their own dependencies
 including when the general CLI list is omitted. The `h-r` abbreviation selects
 `melal@<host>`.
 
-NixOS retains shared fonts, an administrative package baseline, Rusty’s network
-and power diagnostics, MSSQL/Podman, nix-serve, Steam/GameMode, nix-ld,
+NixOS manages the shared font collection and fontconfig preferences in
+`modules/nixos/packages/fonts.nix`, selected with
+`my.packages.fonts.shared.enable`. NixOS also retains an
+administrative package baseline, Rusty’s network and power diagnostics, MSSQL/Podman, nix-serve, Steam/GameMode, nix-ld,
 PipeWire/WirePlumber, Niri/Ly, portals, keyring, PAM and hardware permissions.
 Their existing storage, secrets, grants and lifecycle policies are preserved.
 
@@ -180,102 +243,51 @@ package without an override. Noctalia uses the shared `pkgs.optimizeForArch`
 helper described below.
 
 Home Manager's `my.home.noctalia.enable` defaults to false and is selected by Melal
-on both Snowflake and Rusty through `modules/home/hosts/noctalia.nix`.
-It links the main TOML directly into this checkout, like Niri, so editing
-`~/.config/noctalia/config.toml` edits
-`modules/home/hosts/<hostname>/noctalia-config.toml` immediately. It also manages
-the separate theme and wallpaper files, `black-mo.json`, and a generated,
-read-only `~/.config/noctalia/plugins.toml`.
+on both Snowflake and Rusty in `hosts/<hostname>/home.nix`.
+It generates a small immutable `~/.config/noctalia/config.toml` with native
+includes for the active theme, editable shared defaults in this checkout, and
+the host TOML when present. Edit the included checkout files for plugin
+selection, widgets, wallpaper and other settings. `my.home.noctalia.configFile`
+selects the optional host TOML automatically; set it to `null` for shared settings
+only, or to another absolute TOML path. Adding or removing an override file, or
+changing that path, requires a Home Manager switch. Editing an already included
+TOML only needs an application reload. The module also provides the fallback
+theme and palette assets used by `theme-switch`.
 Each WM attaches its integration when both it and Noctalia are enabled; the Niri
 fragment supplies startup and the existing `Mod+R/X/N/V` panel bindings. Enabling
 Noctalia alone does not enable a WM. The unused Spicetify import was removed:
 there is no active Spicetify configuration or locked input.
 
-### Noctalia plugins
+### Noctalia settings and plugins
 
-Each `my.home.noctalia.plugins.<name>.enable` defaults to false. Both hosts import
-the shared personal preset in `modules/home/hosts/noctalia.nix`, enabling Bongocat,
-Nix Search, Pomodoro and Timer with matching settings. Snowflake also enables
-Discord Voice; Rusty explicitly disables it and omits its `bar` widget.
-The parent `my.home.noctalia.enable` gates their files, packages and activation.
+Edit `modules/home/programs/noctalia/config.toml` for shared settings or
+`hosts/<host>/overrides/noctalia.toml` for host differences. Both hosts enable
+Bongocat, Nix Search, Pomodoro and Timer; Snowflake also enables Discord Voice.
+Plugin settings and widget definitions live beside the other shell settings.
+There is no generated plugin configuration or Nix plugin option to keep in sync.
 
-| Plugin option | Noctalia plugin ID | Packages selected when enabled |
-| --- | --- | --- |
-| `discord-voice.enable` | `raycursive/discord-voice` | Python newer than 3.10 and Discord |
-| `bongocat.enable` | `noctalia/bongocat` | evtest |
-| `nix-search.enable` | `knyrps/nix-search` | nix-search-tv, fzf and xdg-utils |
-| `pomodoro.enable` | `thepunkoff/pomodoro` | FFmpeg, including ffplay |
-| `timer.enable` | `noctalia/timer` | None |
-
-For example, in a user's host override:
-
-```nix
-my.home.noctalia.plugins = {
-  discord-voice.enable = true;
-  bongocat.enable = true;
-  nix-search.enable = true;
-  pomodoro.enable = true;
-  timer.enable = true;
-};
-```
-
-Apply Home Manager after changing an option. It regenerates `plugins.toml`
-with the enabled IDs, plugin settings and widget definitions.
-The module uses Nixpkgs' standard `pkgs.formats.toml` generator to serialize
-these Nix attribute sets as TOML.
-The main TOML imports this file; keep those generated keys out of the main file
-because Noctalia gives an including file's own values precedence.
-Each plugin has `settings` and `widgets` attribute sets. The shared module
-supplies plugin IDs, dependencies, widget types and dependency executable paths.
-Common Pomodoro durations and Bongocat styling live in the shared personal preset;
-Snowflake keeps its Discord preferences in its own Home Manager configuration.
-Bar layout lives under `[bar.default]` in the editable main
-`modules/home/hosts/<hostname>/noctalia-config.toml`, linked as
-`~/.config/noctalia/config.toml`. Edit its `start`, `center` and `end` lists
-directly; layout changes need no Home Manager switch. These lists are not
-generated or filtered by Nix, so remove a plugin's widget name there when
-disabling that plugin. Saved GUI bar overrides still take precedence over
-the editable TOML until cleared manually in `settings.toml`.
-The shared Bongocat preset selects the Corne keyboard through
-`my.home.noctalia.plugins.bongocat.widgets.cat.input_devices`. A host can override
-that list for a different keyboard and grant the user input-device access.
+The bar's `start`, `center` and `end` lists live under `[bar.default]`. When
+disabling a plugin, remove its widget name from those lists too. Bongocat's
+`input_devices` list selects the Corne keyboard; edit it for a different device.
 The existing user belongs to the `input` group.
 
-Dependencies are installed through Home Manager, including when the shared
-CLI/GUI lists are not imported. Disabling a plugin removes its own package
-additions; packages selected by other features or lists remain available.
-The standalone nix-search-tv, fzf and Discord selections in the shared package
-lists remain independent.
-
-Noctalia downloads missing enabled plugins on startup. If it is already running
-during activation, Home Manager reloads its configuration and refreshes the
-official/community sources that have missing enabled plugin files. Network
-access is needed for those downloads. Disabled plugins may remain cached on disk.
-Plugin updates still use Noctalia's runtime updater.
-
-Before reloading, activation reads saved GUI overrides from
-`~/.local/state/noctalia/settings.toml` and warns about keys that disagree with
-the generated configuration. Warnings are yellow on a terminal and respect
-`NO_COLOR`. It also honors `NOCTALIA_STATE_HOME` and `XDG_STATE_HOME`.
-Equivalent Discord executable symlinks are treated as the same setting.
-The helper never rewrites or deletes the saved settings.
-GUI overrides continue to take precedence until the conflicting entries are
-cleared manually. Other GUI preferences remain available.
-
-After applying Home Manager, inspect these settings anytime with:
+Reload after editing; no Home Manager switch is needed:
 
 ```bash
-noctalia-config-status
+noctalia msg config-reload
 ```
 
-The command reports plugins enabled in the applied Home Manager generation,
-missing downloaded `plugin.toml` files and saved GUI overrides that conflict
-with managed plugin settings or widget values. It uses the same state
-directory resolution and yellow warnings as activation. It only reads files;
-it does not reload Noctalia, download plugins or modify saved settings.
-Apply Home Manager again to include subsequent edits from this checkout in
-the report. The missing-file check covers each plugin's `plugin.toml` manifest;
-complete plugin health requires a separate check.
+The reusable Noctalia module installs the common plugin dependencies when
+enabled: evtest, nix-search-tv, fzf, xdg-utils and FFmpeg. Snowflake's `home.nix`
+adds Python and Discord for Discord Voice. These packages remain installed when a plugin is disabled in TOML; change the Nix
+package lists and apply Home Manager to remove dependencies you no longer use.
+
+Noctalia downloads missing enabled plugins at startup and manages updates with
+its runtime updater. Downloads require network access. Restart Noctalia after
+enabling a new plugin if it has not been downloaded yet; disabled plugins may
+remain cached on disk. Saved GUI overrides in
+`~/.local/state/noctalia/settings.toml` load last and take precedence over the
+editable TOML; clear a conflicting override there if it should follow these files.
 
 ### Hardware and device services
 
@@ -380,6 +392,10 @@ passed to it; it does not rebuild or retune the entire package set.
 
 ## Getting Started
 
+Apply NixOS first, then Home Manager. This restores the system font collection
+before Home Manager removes the previous Home-managed fonts and fontconfig
+settings. A fresh installation also needs NixOS first to create the account.
+
 To build and apply a system configuration:
 
 ```bash
@@ -408,12 +424,11 @@ and language server together. There is no separate LSP switch. Libraries and
 frameworks live under their language:
 
 ```nix
-# modules/home/hosts/<host>/default.nix
+# hosts/<host>/home.nix
 my.home.dev = {
   cpp = {
     enable = true;
     dpp.enable = true;
-    audio.enable = true;
   };
   csharp = {
     enable = true;
@@ -428,8 +443,9 @@ my.home.dev = {
 
 Available parent groups are `cpp`, `csharp`, `python`, `javascript`, `lua`, `go`,
 `rust`, `java`, `nix`, `shell`, `json`, `xml` and `text`. C++ also offers `fmt`,
-`ncurses` and `qksh`; Java offers `javafx`. Every selection defaults off and each
-host explicitly chooses its groups. EditorConfig and the existing tree-sitter
+`ncurses` and `qksh`; Java offers `javafx`. Module selections default off; the
+development preset enables the common groups and C++ libraries. Ordinary host
+assignments can change these defaults. EditorConfig and the existing tree-sitter
 utility accompany enabled parent groups; the C++ group owns its debugger path.
 
 Nested selections work independently of the parent option. For example,
@@ -447,8 +463,9 @@ nix develop .#dpp
 nix develop .#avalonia
 ```
 
-All existing shell names, package definitions and hooks are preserved. The DPP
-shell explicitly selects GCC, Make, CMake, pkg-config, DPP, opusfile, liboggz and
+The former audio shell and `cpp.audio` selection have been removed. The general
+C++ shell contains the compiler and build tools; optional libraries use their
+own selections. The DPP shell explicitly selects GCC, Make, CMake, pkg-config, DPP, opusfile, liboggz and
 fmt; it does not add clangd or GDB. Existing general C++ and .NET shells retain
 their own tooling. Entering a shell does not enable a Home Manager option.
 
@@ -462,7 +479,7 @@ the session. Those environments apply inside `nix develop`.
 Rusty enables C++, C#, Java, Python and Lua, plus Nix/shell/JSON/XML/text tooling.
 Its former standalone Yarn and Watchman selections are removed as requested.
 Snowflake also enables JavaScript, Go and Rust, Avalonia and scientific Python.
-Both keep their existing C++ library selections. The added Rusty SDKs and the
+Both select DPP, fmt, ncurses and Quickshell's C++ dependencies. The added Rusty SDKs and the
 Java SDK on both hosts are deliberate user choices; Go and Rust now bundle their
 language servers on Snowflake.
 
@@ -521,7 +538,8 @@ Matching packages already on Rusty are reused; missing packages are fetched from
 Snowflake first, then internet caches, or built locally. Snowflake does not build
 or download packages in response to cache requests.
 
-For a separate configuration, follow the [revision-matching instructions](NIX-DOWNLOAD-RECOVERY.md#matching-nixpkgs-revisions-for-a-lan-cache) to align its nixpkgs lock entry with Snowflake while keeping its own `flake.nix` input URL.
+For a separate configuration, align its nixpkgs lock entry with Snowflake while
+keeping its own `flake.nix` input URL to reuse matching cache outputs.
 
 Stop serving on Snowflake when finished:
 
@@ -531,12 +549,14 @@ sudo systemctl stop nix-serve
 
 ## Validation
 
-For failed source downloads, see the [step-by-step download recovery guide](NIX-DOWNLOAD-RECOVERY.md), including parallel byte ranges and importing verified files into the Nix store.
-
 ```bash
 nix fmt
 nix flake check
 ```
+
+Home Manager build checks use portable Noctalia binaries so both hosts can be
+checked on either machine. Evaluation checks still verify each host's CPU flags;
+the exported configurations retain their CPU optimizations.
 
 The flake checks formatting, dead code, Nix linting, every development shell's Bash hook syntax, Niri with each home's generated browser/Noctalia fragments, asset bootstrap behavior, theme switching, generated user-script syntax, profile command priorities, module feature combinations, and each canonical Home Manager activation package. Home Manager checks build the generation without activating it. NixOS configurations are evaluated without switching the running system.
 
@@ -570,7 +590,7 @@ This non-interactive, idempotent script:
    - `~/.local/share/assets/videos` → `~/Videos/Wallpapers`
 2. Clones/updates dedicated standalone configuration repos:
    - `git@github.com:Melal1/quickshell.git` → `~/.config/quickshell`
-   - `git@github.com:Melal1/neovim.git` (branch `java`) → `~/.config/nvim`
+   - `git@github.com:Melal1/neovim.git` (branch `unstable`) → `~/.config/nvim`
 3. Seeds the default terminal theme (`vague`) and, for configured applications, Niri's initial colors and Noctalia's `black-mo` theme/palette. Only absent links are seeded, preserving selected themes.
 4. Seeds the theme indirection links (only if absent — never clobbers the current theme):
    - `~/.local/state/theme/wallpaper` → `~/.local/share/assets/wallpapers/default.jpg`
@@ -583,6 +603,20 @@ When replacing an existing asset destination, setup moves it to `.bk`, `.bk.1`, 
 Niri automatically configures outputs until `nwg-displays` creates `~/.config/niri/monitor.kdl`. The include is optional, and existing monitor configurations remain editable. Niri also starts and supervises `xwayland-satellite` on demand.
 
 The selected browser is Helium on both hosts; LibreWolf remains available. Home Manager generates Niri's browser binding and environment from `home.sessionVariables.BROWSER`; `Mod+B` expands `$BROWSER` at launch.
+
+## Configuration files and ownership
+
+| Kind | Examples | How to change it |
+| --- | --- | --- |
+| Editable checkout files | Niri `~/.config/niri/config.kdl` links to `modules/home/programs/wm/niri/session.kdl`; Noctalia includes `modules/home/programs/noctalia/config.toml` and optional `hosts/<hostname>/overrides/noctalia.toml` directly from the checkout | Edit the checkout file; reload the application |
+| Immutable Home Manager configuration | Typed terminal settings, generated Niri fragments and Noctalia include wrapper, fallback themes and palettes | Change Nix settings or source assets and apply Home Manager |
+| Runtime-owned files and links | Active themes and wallpaper links, Niri `monitor.kdl`, Noctalia state overrides | Use `theme-switch`, display tools or the application; activation only seeds missing theme links |
+
+`my.home.dotfilesDir` selects the checkout used by editable links. Large shell
+bodies live in native `.sh` files under `modules/home/scripts/` and Fish startup
+lives in `modules/home/shell/init.fish`. Nix wrappers supply dependencies and
+substitute repository preferences while preserving shell behavior. These script
+sources become immutable generated commands when Home Manager builds them.
 
 ## Themes & wallpapers
 
@@ -605,9 +639,10 @@ Noctalia slots are used only when those applications are configured. For a
 custom Noctalia theme, use `source = "custom"` and
 `custom_palette = "default"` in its `[theme]` section. The initial theme file
 retains the existing `black-mo` settings through that stable palette name.
-The main config sets `[include].autoload = false` to make it the sole entry
-point and includes `default.toml`, `wallpapers/config.toml` and `plugins.toml`.
-It never changes during a theme switch. Noctalia supports `~` in wallpaper paths.
+The generated main config sets `[include].autoload = false` and loads the active
+`default.toml`, shared checkout defaults, then the optional host override. These
+config files never change during a theme switch. Wallpaper defaults live in the
+shared TOML and can be overridden by a host. Noctalia supports `~` in wallpaper paths.
 Noctalia's wallpaper service is disabled with `[wallpaper].enabled = false`;
 `skwd-wall` handles rendering. Default, last and monitor wallpaper paths point
 to `~/.local/state/theme/wallpaper`, with `fill_mode = "stretch"` retained.

@@ -10,34 +10,36 @@ in
 {
   home.packages = fromSystem (
     (with pkgs; [
-
-      ### ──────────────────────
-      ###  CLI Utilities
-      ### ──────────────────────
-      jq
-      lolcat
-      figlet
-      tmux
-      unzip
-      ripgrep
+      # Files and directories
       fd
       tree
-      bat
       eza
-      fzf
-      grc
+
+      # Archives
+      unzip
+
+      # Data processing and shell utilities
+      jq
       moreutils
-      lsd
-      tealdeer
       bc
+
+      # Command reference
+      tealdeer
+
+      # Terminal text
+      lolcat
+      figlet
     ])
     ++ (with unstable; [
-      neovim
-      herdr
+      # Archives
       zip
-      yt-dlp
       rar
-      ffmpeg
+
+      # Media downloads
+      yt-dlp
+
+      # Agent management
+      herdr
     ])
   );
 }

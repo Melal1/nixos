@@ -15,6 +15,8 @@
 
     qt.enable = true;
 
+    fonts.fontDir.enable = true;
+
     xdg.portal = {
       enable = true;
       xdgOpenUsePortal = true;
@@ -32,7 +34,6 @@
     environment.systemPackages = with pkgs; [
       unstable.xwayland-satellite
       xdg-desktop-portal-gtk
-      nautilus
     ];
   };
 }

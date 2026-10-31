@@ -1,0 +1,8 @@
+# Legacy path for existing Home generations; new generations use overrides/noctalia.toml.
+[include]
+autoload = false
+files = [
+    "default.toml",
+    "$HOME/.dotfiles/nixos/modules/home/programs/noctalia/config.toml",
+    "$HOME/.dotfiles/nixos/hosts/rusty/overrides/noctalia.toml",
+]

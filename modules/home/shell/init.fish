@@ -1,0 +1,62 @@
+function fish_title
+    set -q argv[1]; or set argv fish
+
+    if test "$argv[1]" = "fish"
+        echo (prompt_pwd --dir-length=0)
+    else
+        echo "$argv[1]"
+    end
+end
+
+function fzf --wraps=fzf --description="Use fzf-tmux if in tmux session"
+  if set --query TMUX
+    fzf-tmux $argv
+  else
+    command fzf $argv
+  end
+end
+
+function rgn
+  set -l res (rg --color=always --line-number --no-heading --smart-case $argv | fzf --ansi --delimiter : --preview 'bat --color=always {1} --highlight-line {2}' --preview-window 'up,60%,+{2}-10')
+  if test -n "$res"
+    set -l tokens (string split ":" $res)
+    # tokens[1] is the file path, tokens[2] is the line number
+    nvim +$tokens[2] $tokens[1]
+  end
+end
+
+function rgi
+  set -l res (fzf --disabled --ansi \
+    --bind "start:reload(rg --column --line-number --no-heading --color=always --smart-case '')" \
+    --bind "change:reload(rg --column --line-number --no-heading --color=always --smart-case {q} || true)" \
+    --delimiter : \
+    --preview 'bat --color=always {1} --highlight-line {2}' \
+    --preview-window 'up,60%,+{2}-10')
+
+  if test -n "$res"
+    set -l tokens (string split ":" $res)
+    nvim +$tokens[2] $tokens[1]
+  end
+end
+
+set fish_greeting # Disable greeting
+# Only run fastfetch in interactive shells, but skip Neovim and tmux
+if status --is-interactive; and not set -q NVIM; and not set -q TMUX
+    # fastfetch
+end
+
+
+set -g fish_key_bindings fish_vi_key_bindings
+bind \cE edit_command_buffer
+bind \cQ up-or-search
+bind \cA down-or-search
+bind -M insert \cQ up-or-search
+bind -M insert \cA down-or-search
+bind -M insert \cB edit_command_buffer
+bind -M insert \cD nextd-or-forward-word
+bind -M insert \cE accept-autosuggestion
+bind -M insert -m default jk cancel repaint-mode
+set -g fish_sequence_key_delay_ms 60
+
+set -x FZF_ALT_C_OPTS "--preview 'test -d {} && lsd --tree --depth=1 --icon=always --color=always {} || echo {} is not a directory'"
+set -x FZF_DEFAULT_OPTS '--height 70% --tmux bottom,40% --layout reverse --border top'

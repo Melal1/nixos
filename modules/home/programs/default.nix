@@ -1,4 +1,3 @@
-{ config, lib, ... }:
 {
   imports = [
     ./terminals
@@ -18,8 +17,4 @@
     ./skwd.nix
     ./noctalia
   ];
-
-  home.file.".config/tmux/tmux.conf" = lib.mkIf config.my.home.scripts.enable {
-    source = ./config/tmux.conf;
-  };
 }

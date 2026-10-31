@@ -6,6 +6,7 @@
 }:
 let
   inherit (inputs) nixpkgs home-manager;
+  loadOverrides = import ../modules/home/lib/load-overrides.nix nixpkgs.lib;
   system = "x86_64-linux";
   overlays = [ (import ../overlays/default.nix) ];
   pkgs = withSystem system ({ pkgs, ... }: pkgs);
@@ -14,7 +15,6 @@ let
     config.allowUnfree = true;
   };
 
-  # Each host has a NixOS entrypoint and a corresponding Melal home module.
   hosts =
     let
       dirs = builtins.readDir ../hosts;
@@ -49,8 +49,11 @@ let
       };
       modules = [
         ../modules/home
-        (../modules/home + "/hosts/${hostName}")
-      ];
+      ]
+      ++ nixpkgs.lib.optional (builtins.pathExists (../hosts + "/${hostName}/home.nix")) (
+        ../hosts + "/${hostName}/home.nix"
+      )
+      ++ loadOverrides (../hosts + "/${hostName}/overrides");
     };
 
   homeConfigs = builtins.listToAttrs (

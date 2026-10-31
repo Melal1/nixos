@@ -10,9 +10,11 @@ in
   home.packages = fromSystem (
     with pkgs;
     [
+      # Device file access
       jmtpfs
+
+      # Audio controls
       alsa-utils # ALSA, the Advanced Linux Sound Architecture utils
-      android-tools
       pavucontrol
     ]
   );

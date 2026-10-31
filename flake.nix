@@ -9,10 +9,11 @@
       url = "github:cushycush/qml-language-server";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    pi = {
-      url = "github:lukasl-dev/pi.nix";
+    toofan = {
+      url = "github:vyrx-dev/toofan";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
     apple-fonts = {
       url = "github:Lyndeno/apple-fonts.nix";
       inputs.nixpkgs.follows = "nixpkgs-unstable";

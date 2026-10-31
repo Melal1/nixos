@@ -9,7 +9,11 @@ let
 in
 {
   home.packages = fromSystem [
+    # Database clients
     unstable.lazysql
+    pkgs.sqlcmd
+
+    # Schema design
     pkgs.pgmodeler
   ];
 }

@@ -7,6 +7,5 @@ let
 in
 {
   home.packages = packages;
-  # Root only outputs extracted from project shells, including library headers.
   home.extraDependencies = map (package: package.outPath) packages;
 }

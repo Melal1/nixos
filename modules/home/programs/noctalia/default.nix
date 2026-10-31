@@ -3,15 +3,16 @@
   lib,
   inputs,
   pkgs,
+  hostname,
   ...
 }:
 let
   cfg = config.my.home.noctalia;
   noctaliaDir = "${config.xdg.configHome}/noctalia";
+  dotfiles = config.my.home.dotfilesDir;
+  hostFile = "hosts/${hostname}/overrides/noctalia.toml";
 in
 {
-  imports = [ ./plugins.nix ];
-
   options.my.home.noctalia = {
     enable = lib.mkEnableOption "the Noctalia shell, configuration and selected plugins";
     optimize_for_arch = lib.mkOption {
@@ -28,19 +29,41 @@ in
       description = "Noctalia shell package.";
     };
     configFile = lib.mkOption {
-      type = lib.types.str;
-      default = "${config.my.home.dotfilesDir}/modules/home/programs/noctalia/minimal-config.toml";
-      description = "Mutable main TOML file in the user's checkout.";
+      type = lib.types.nullOr lib.types.str;
+      default =
+        if builtins.pathExists (../../../../. + "/${hostFile}") then "${dotfiles}/${hostFile}" else null;
+      description = "Optional editable TOML loaded after the shared defaults; null uses only shared defaults.";
     };
   };
 
   # WM modules attach their own integration only when both features are enabled.
   config = lib.mkIf cfg.enable {
-    home.packages = [ cfg.package ];
+    # Common dependencies for the plugins configured in the host TOML.
+    home.packages = [
+      cfg.package
+    ]
+    ++ (with pkgs; [
+      evtest
+      nix-search-tv
+      fzf
+      xdg-utils
+      ffmpeg
+    ]);
     xdg.configFile = {
-      "noctalia/config.toml".source = config.lib.file.mkOutOfStoreSymlink cfg.configFile;
+      "noctalia/config.toml".text = ''
+        [include]
+        autoload = false
+        files = ${
+          builtins.toJSON (
+            [
+              "default.toml"
+              "${dotfiles}/modules/home/programs/noctalia/config.toml"
+            ]
+            ++ lib.optional (cfg.configFile != null) cfg.configFile
+          )
+        }
+      '';
       "noctalia/themes/black-mo.toml".source = ./themes/black-mo.toml;
-      "noctalia/wallpapers/config.toml".source = ./wallpapers.toml;
       "noctalia/palettes/black-mo.json".source = ./black-mo.json;
     };
 

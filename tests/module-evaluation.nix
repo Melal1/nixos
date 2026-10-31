@@ -32,12 +32,11 @@ let
   packageModules = {
     cli = [
       ../modules/home/packages/cli.nix
-      ../modules/home/packages/snowflake/cli.nix
     ];
     gui = [
-      ../modules/home/packages/gui.nix
-      ../modules/home/packages/snowflake/gui.nix
+      ../modules/home/packages/desktop-apps.nix
     ];
+    hostPackages = [ ../hosts/snowflake/home-packages.nix ];
     io = [ ../modules/home/packages/io.nix ];
     databaseClients = [ ../modules/home/packages/database-clients.nix ];
   };
@@ -58,7 +57,6 @@ let
   ];
   devChildren = {
     cpp = [
-      "audio"
       "dpp"
       "fmt"
       "ncurses"
@@ -105,6 +103,13 @@ let
   noGsrAutostart = homeFor base { my.home.gpu-screen-recorder.autostart = lib.mkForce false; };
   noSkwd = homeFor base { my.home.skwd.enable = false; };
   noMedia = homeFor base { my.home.media.enable = false; };
+  customRgbHost = base.extendModules {
+    modules = [ { services.hardware.openrgb.server.port = lib.mkForce 6743; } ];
+  };
+  customRgb = homeFor customRgbHost { };
+  noRgbServer = homeFor (base.extendModules {
+    modules = [ { my.hardware.rgb.enable = lib.mkForce false; } ];
+  }) { };
   noEasyEffects = homeFor base { services.easyeffects.enable = lib.mkForce false; };
   # Package lists can be selected without importing Melal's common features.
   packageOnly = inputs.home-manager.lib.homeManagerConfiguration {
@@ -155,6 +160,22 @@ let
   rustyNoNoctalia = rustyNoctalia.extendModules {
     modules = [ { my.home.noctalia.enable = lib.mkForce false; } ];
   };
+  noNoctaliaOverride = homeFor base { my.home.noctalia.configFile = null; };
+  noctaliaIncludes =
+    instance:
+    (builtins.fromTOML (
+      builtins.unsafeDiscardStringContext instance.config.xdg.configFile."noctalia/config.toml".text
+    )).include;
+  sharedNoctaliaSettings = builtins.fromTOML (
+    builtins.readFile ../modules/home/programs/noctalia/config.toml
+  );
+  noctaliaSettings =
+    host:
+    lib.recursiveUpdate sharedNoctaliaSettings (
+      builtins.fromTOML (builtins.readFile (../hosts + "/${host}/overrides/noctalia.toml"))
+    );
+  snowflakeNoctaliaSettings = noctaliaSettings "snowflake";
+  rustyNoctaliaSettings = noctaliaSettings "rusty";
   devOnly =
     selection:
     packageOnly.extendModules {
@@ -200,6 +221,17 @@ let
   noBatteryRusty = rustyHost.extendModules {
     modules = [ { my.hardware.battery.present = lib.mkForce false; } ];
   };
+  noPersonalFonts = base.extendModules {
+    modules = [ { my.packages.fonts.shared.enable = lib.mkForce false; } ];
+  };
+  customFontHost = base.extendModules {
+    modules = [
+      {
+        fonts.fontconfig.defaultFonts.monospace = [ "monospace" ];
+        fonts.fontconfig.subpixel.rgba = "none";
+      }
+    ];
+  };
   changedArch = base.extendModules {
     modules = [ { my.packages.optimization.arch = lib.mkForce "x86-64-v3"; } ];
   };
@@ -230,10 +262,12 @@ let
   markers = {
     cli = [
       home.pkgs.tealdeer
-      home.pkgs.btop-rocm
     ];
     gui = [
       home.pkgs.librewolf
+    ];
+    hostPackages = [
+      home.pkgs.btop-rocm
       home.pkgs.prismlauncher
     ];
     io = [
@@ -373,19 +407,28 @@ let
       && rustyNoctalia.config.my.home.noctalia.enable
       &&
         rusty.config.my.home.noctalia.configFile
-        == "${rusty.config.my.home.dotfilesDir}/modules/home/hosts/rusty/noctalia-config.toml"
+        == "${rusty.config.my.home.dotfilesDir}/hosts/rusty/overrides/noctalia.toml"
+      &&
+        home.config.my.home.noctalia.configFile
+        == "${home.config.my.home.dotfilesDir}/hosts/snowflake/overrides/noctalia.toml"
       && rusty.config.my.home.noctalia.configFile != home.config.my.home.noctalia.configFile
       && rustyNoctalia.config.my.home.noctalia.configFile == alternateNoctaliaConfig
       && home.config.my.home.noctalia.configFile != alternateNoctaliaConfig
-      &&
-        toString rustyNoctalia.config.xdg.configFile."noctalia/config.toml".source
-        == toString (rustyNoctalia.config.lib.file.mkOutOfStoreSymlink alternateNoctaliaConfig)
       &&
         lib.all
           (
             instance:
             instance.config.xdg.configFile ? "noctalia/config.toml"
-            && instance.config.xdg.configFile ? "noctalia/plugins.toml"
+            && !(noctaliaIncludes instance).autoload
+            &&
+              (noctaliaIncludes instance).files == [
+                "default.toml"
+                "${instance.config.my.home.dotfilesDir}/modules/home/programs/noctalia/config.toml"
+                instance.config.my.home.noctalia.configFile
+              ]
+            && !(instance.config.xdg.configFile ? "noctalia/plugins.toml")
+            && !(instance.config.xdg.configFile ? "noctalia/wallpapers/config.toml")
+            && !(instance.config.home.activation ? noctaliaPlugins)
             && hasPackage instance.config.my.home.noctalia.package instance.config.home.packages
             && instance.config.xdg.configFile ? "niri/noctalia.kdl"
             && lib.hasInfix ''spawn-at-startup "noctalia"'' (
@@ -402,37 +445,79 @@ let
       && !(rustyNoNoctalia.config.home.activation ? noctaliaTheme)
       && !(rustyNoNoctalia.config.home.activation ? noctaliaPlugins)
       && !hasPackage rustyNoctalia.config.my.home.noctalia.package rustyNoNoctalia.config.home.packages;
-    noctalia-shared-plugin-preferences =
+    noctalia-defaults-without-host-override =
+      noNoctaliaOverride.config.my.home.noctalia.configFile == null
+      && !(noctaliaIncludes noNoctaliaOverride).autoload
+      &&
+        (noctaliaIncludes noNoctaliaOverride).files == [
+          "default.toml"
+          "${noNoctaliaOverride.config.my.home.dotfilesDir}/modules/home/programs/noctalia/config.toml"
+        ];
+    noctalia-editable-plugin-settings =
       lib.all
         (
-          name:
-          rusty.config.my.home.noctalia.plugins.${name}.enable
-          && rusty.config.my.home.noctalia.plugins.${name} == home.config.my.home.noctalia.plugins.${name}
+          settings:
+          builtins.isAttrs settings
+          && !builtins.elem "plugins.toml" (settings.include.files or [ ])
+          && !builtins.elem "wallpapers/config.toml" (settings.include.files or [ ])
         )
         [
-          "bongocat"
-          "nix-search"
-          "timer"
-          "pomodoro"
+          snowflakeNoctaliaSettings
+          rustyNoctaliaSettings
+        ];
+    noctalia-legacy-entrypoints-include-new-defaults =
+      lib.all
+        (
+          host:
+          let
+            inherit (builtins.fromTOML (builtins.readFile (../hosts + "/${host}/noctalia-config.toml")))
+              include
+              ;
+          in
+          !include.autoload
+          &&
+            include.files == [
+              "default.toml"
+              "$HOME/.dotfiles/nixos/modules/home/programs/noctalia/config.toml"
+              "$HOME/.dotfiles/nixos/hosts/${host}/overrides/noctalia.toml"
+            ]
+        )
+        [
+          "snowflake"
+          "rusty"
+        ];
+    noctalia-plugin-dependencies =
+      lib.all
+        (
+          instance:
+          includes instance (
+            with instance.pkgs;
+            [
+              evtest
+              nix-search-tv
+              fzf
+              xdg-utils
+              ffmpeg
+            ]
+          )
+        )
+        [
+          home
+          rusty
         ]
-      && home.config.my.home.noctalia.plugins.discord-voice.enable
-      && !rusty.config.my.home.noctalia.plugins.discord-voice.enable;
+      && includes home (
+        with home.pkgs;
+        [
+          python3
+          discord
+        ]
+      );
     noctalia-appearance-without-discord =
       let
-        snowflakeSettings = builtins.fromTOML (
-          builtins.readFile ../modules/home/hosts/snowflake/noctalia-config.toml
-        );
-        rustySettings = builtins.fromTOML (
-          builtins.readFile ../modules/home/hosts/rusty/noctalia-config.toml
-        );
-        rustyBar = rustySettings.bar.default;
+        rustyBar = rustyNoctaliaSettings.bar.default;
       in
-      builtins.elem "bar" snowflakeSettings.bar.default.end
-      && !builtins.elem "bar" (rustyBar.start ++ (rustyBar.center or [ ]) ++ rustyBar.end)
-      &&
-        rustySettings == lib.recursiveUpdate snowflakeSettings {
-          bar.default.end = lib.remove "bar" snowflakeSettings.bar.default.end;
-        };
+      builtins.elem "bar" snowflakeNoctaliaSettings.bar.default.end
+      && !builtins.elem "bar" (rustyBar.start ++ (rustyBar.center or [ ]) ++ rustyBar.end);
     rusty-noctalia-host-support =
       rustyHost.config.my.packages.optimization.arch == "tigerlake"
       && lib.hasInfix "-march=tigerlake -O3" rusty.config.my.home.noctalia.package.NIX_CFLAGS_COMPILE
@@ -787,7 +872,79 @@ let
       && hasPackage home.pkgs.nil (homeFor nixLdOff { }).config.home.packages;
     filesystem-tools-system-owned =
       base.config.boot.supportedFilesystems.ntfs && hasPackage base.pkgs.ntfs3g (packages base);
-    fonts-remain-system-owned = hasPackage base.pkgs.sf-pro base.config.fonts.packages;
+    openrgb-follows-host-server =
+      lib.any (lib.hasInfix "127.0.0.1:6743") customRgb.config.systemd.user.services.openrgb-client.Service.ExecStart
+      && !(builtins.tryEval noRgbServer.activationPackage.drvPath).success;
+    system-font-infrastructure-preserved =
+      lib.all
+        (
+          host:
+          host.config.fonts.fontDir.enable
+          && host.config.programs.xwayland.defaultFontPath == "/run/current-system/sw/share/X11/fonts"
+        )
+        [
+          base
+          rustyHost
+        ];
+    personal-fonts-owned-by-system =
+      lib.all
+        (
+          name:
+          let
+            host = self.nixosConfigurations.${name};
+            user = self.homeConfigurations."melal@${name}";
+          in
+          host.config.my.packages.fonts.shared.enable
+          && lib.all (package: hasPackage package host.config.fonts.packages) (
+            with host.pkgs;
+            [
+              sf-pro
+              noto-fonts
+              twitter-color-emoji
+            ]
+          )
+          && !lib.any (package: hasPackage package user.config.home.packages) host.config.fonts.packages
+          && !user.config.fonts.fontconfig.enable
+          && noFiles "fontconfig/conf.d/" user.config.xdg.configFile
+          && host.config.fonts.enableDefaultPackages
+          && host.config.fonts.fontconfig.enable
+        )
+        [
+          "snowflake"
+          "rusty"
+        ];
+    system-font-preferences-preserved =
+      lib.all
+        (
+          host:
+          host.config.fonts.fontconfig.defaultFonts == {
+            emoji = [ "Twitter Color Emoji" ];
+            monospace = [
+              "Iosevka Nerd Font"
+              "Noto Naskh Arabic"
+            ];
+            sansSerif = [
+              "Noto Naskh Arabic"
+              "Noto Sans"
+            ];
+            serif = [
+              "Noto Naskh Arabic"
+              "Noto Sans"
+            ];
+          }
+          && host.config.fonts.fontconfig.subpixel.rgba == "rgb"
+        )
+        [
+          base
+          rustyHost
+        ];
+    system-font-collection-is-optional =
+      !hasPackage base.pkgs.sf-pro noPersonalFonts.config.fonts.packages
+      && noPersonalFonts.config.fonts.fontconfig.enable
+      && noPersonalFonts.config.fonts.fontDir.enable;
+    system-font-preferences-allow-host-overrides =
+      customFontHost.config.fonts.fontconfig.defaultFonts.monospace == [ "monospace" ]
+      && customFontHost.config.fonts.fontconfig.subpixel.rgba == "none";
     legacy-host-options-removed =
       lib.all
         (
@@ -884,8 +1041,8 @@ let
       && hasPackage unstable.opencode home.config.home.packages
       && hasPackage home.pkgs.pspp home.config.home.packages
       && !hasPackage unstable.opencode self.homeConfigurations."melal@rusty".config.home.packages
-      && home.config.my.home.noctalia.plugins.pomodoro.widgets.widget.widget-glyph-main == "clock"
-      && home.config.my.home.noctalia.plugins.pomodoro.widgets.widget.widget-glyph-work == "coffee";
+      && snowflakeNoctaliaSettings.widget.widget.widget-glyph-main == "clock"
+      && snowflakeNoctaliaSettings.widget.widget.widget-glyph-work == "coffee";
     obs-plugins-independent-of-receiver =
       map (p: p.outPath) noUxplay.config.programs.obs-studio.plugins
       == map (p: p.outPath) home.config.programs.obs-studio.plugins;

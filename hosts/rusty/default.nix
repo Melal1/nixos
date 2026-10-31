@@ -9,6 +9,7 @@
   networking.hostName = "rusty";
 
   my.packages.optimization.arch = "tigerlake";
+  my.packages.fonts.shared.enable = true;
 
   programs.dconf.enable = true;
 
@@ -29,8 +30,6 @@
   my.desktop = {
     niri.enable = true;
   };
-
-  my.packages.fonts.shared.enable = true;
 
   my.programs = {
     nix-ld.enable = true;

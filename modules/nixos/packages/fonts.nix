@@ -8,26 +8,26 @@
 {
   config = lib.mkIf config.my.packages.fonts.shared.enable {
     nixpkgs.overlays = [ inputs.apple-fonts.overlays.default ];
+
     fonts = {
       fontconfig = {
-        enable = true;
+        enable = lib.mkDefault true;
         defaultFonts = {
-          emoji = [ "Twitter Color Emoji" ];
-          monospace = [
+          emoji = lib.mkDefault [ "Twitter Color Emoji" ];
+          monospace = lib.mkDefault [
             "Iosevka Nerd Font"
             "Noto Naskh Arabic"
           ];
-          sansSerif = [
+          sansSerif = lib.mkDefault [
             "Noto Naskh Arabic"
             "Noto Sans"
           ];
-          serif = [
+          serif = lib.mkDefault [
             "Noto Naskh Arabic"
             "Noto Sans"
           ];
-
         };
-        subpixel.rgba = "rgb";
+        subpixel.rgba = lib.mkDefault "rgb";
       };
 
       fontDir.enable = true;
@@ -51,8 +51,6 @@
         nerd-fonts.fira-code
         (google-fonts.override { fonts = [ "Radio Canada Big" ]; })
       ];
-
     };
-
   };
 }

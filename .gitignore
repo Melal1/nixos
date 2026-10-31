@@ -19,3 +19,11 @@ pkgs/dwmblocks-async/dwmblocks
 
 # nix build output symlinks
 /result
+
+# Local AI planning, audits and troubleshooting notes
+/ARCHITECTURE-AUDIT.md
+/MIGRATION-PLAN.md
+/MIGRATION-PROMPT.md
+/MIGRATION-RESULTS.md
+/NIX-DOWNLOAD-RECOVERY.md
+/docs/superpowers/
