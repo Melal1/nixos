@@ -1197,6 +1197,7 @@ let
       &&
         hasPackage self.homeConfigurations."melal@rusty".pkgs.codex
           self.homeConfigurations."melal@rusty".config.home.packages
+      && hasPackage home.pkgs.kdePackages.kdenlive home.config.home.packages
       && !hasPackage unstable.opencode home.config.home.packages
       && !hasPackage home.pkgs.pspp home.config.home.packages
       && !hasPackage unstable.opencode self.homeConfigurations."melal@rusty".config.home.packages

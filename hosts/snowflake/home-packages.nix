@@ -48,6 +48,7 @@ in
 
       # Media and graphics
       imagemagick
+      kdePackages.kdenlive
       puddletag
 
       # password manager
