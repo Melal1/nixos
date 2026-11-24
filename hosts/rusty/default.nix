@@ -13,7 +13,10 @@
 
   programs.dconf.enable = true;
 
-  my.virtualisation.mssql.enable = true;
+  my.virtualisation = {
+    podman.enable = true;
+    mssql.enable = true;
+  };
 
   my.hardware = {
     bluetooth.enable = true;
@@ -27,14 +30,8 @@
     vial-qmk.enable = true;
   };
 
-  my.desktop = {
-    niri.enable = true;
-  };
-
-  my.programs = {
-    nix-ld.enable = true;
-
-  };
+  my.desktop.niri.enable = true;
+  my.programs.nix-ld.enable = true;
 
   environment.systemPackages = with pkgs; [
     acpi

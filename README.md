@@ -158,6 +158,7 @@ its required copy in NixOS.
 | Home Manager option | Responsibility |
 | --- | --- |
 | `my.home.dev.<language>.enable` | SDK/toolchain, bundled language tools and editor integration |
+| `my.home.dev.r.ide` | RStudio with the R package bundle; defaults to `false` and requires `my.home.dev.r.enable` |
 | `my.home.desktop.enable` | GTK/Qt, cursor and dconf preferences |
 | `my.home.media.enable` | MPD, ncmpcpp, playerctld and playback helpers |
 | `programs.kitty/foot/ghostty.enable` | Terminal installation, configuration and files |
@@ -438,18 +439,28 @@ my.home.dev = {
     enable = true;
     science.enable = true;
   };
+  r = {
+    enable = true;
+    ide = true;
+  };
 };
 ```
 
-Available parent groups are `cpp`, `csharp`, `python`, `javascript`, `lua`, `go`,
+Available parent groups are `cpp`, `csharp`, `python`, `r`, `javascript`, `lua`, `go`,
 `rust`, `java`, `nix`, `shell`, `json`, `xml` and `text`. C++ also offers `fmt`,
 `ncurses` and `qksh`; Java offers `javafx`. Module selections default off; the
 development preset enables the common groups and C++ libraries. Ordinary host
 assignments can change these defaults. EditorConfig and the existing tree-sitter
 utility accompany enabled parent groups; the C++ group owns its debugger path.
 
-Nested selections work independently of the parent option. For example,
-`cpp.dpp.enable = true` supplies DPP and its required compiler/build dependencies;
+`my.home.dev.r.enable` installs R with `nortest`, `ggplot2` and `dplyr`.
+Its boolean `ide` option defaults to `false` and adds RStudio with the same
+libraries when R is enabled. Rusty and Snowflake enable both options.
+The R bundle uses the pinned unstable input to keep RStudio on a supported
+Electron version, with matching R libraries.
+
+The library and framework selections work independently of the parent option.
+For example, `cpp.dpp.enable = true` supplies DPP and its required compiler/build dependencies;
 `cpp.enable = true` adds the full personal C++ setup, including its LSP and debugger.
 Similarly, Avalonia alone supplies its .NET SDK and native libraries; the C#
 parent adds Roslyn and the general C# tools. Python science can also be selected
@@ -476,7 +487,7 @@ headers and development outputs. Installing those packages globally does not
 execute a shell's hooks or export its `LD_LIBRARY_PATH` / `DOTNET_ROOT` throughout
 the session. Those environments apply inside `nix develop`.
 
-Rusty enables C++, C#, Java, Python and Lua, plus Nix/shell/JSON/XML/text tooling.
+Rusty enables C++, C#, Java, Python, R and Lua, plus Nix/shell/JSON/XML/text tooling.
 Its former standalone Yarn and Watchman selections are removed as requested.
 Snowflake also enables JavaScript, Go and Rust, Avalonia and scientific Python.
 Both select DPP, fmt, ncurses and Quickshell's C++ dependencies. The added Rusty SDKs and the

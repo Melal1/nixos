@@ -6,7 +6,7 @@
 }:
 
 let
-  gsrEnabled = config.my.home.gpu-screen-recorder.enable;
+  gsrEnabled = config.my.home.gpu-screen-recorder-ui.enable;
 
   containsMpv =
     packages:

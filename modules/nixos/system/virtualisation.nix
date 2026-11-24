@@ -8,6 +8,7 @@ let
 in
 {
   options.my.virtualisation = {
+    podman.enable = lib.mkEnableOption "Podman container engine";
     mssql.enable = lib.mkEnableOption "Microsoft SQL Server container (podman backend)";
     docker.enable = lib.mkEnableOption "Docker daemon";
     docker.autoStart = lib.mkEnableOption "Start Docker on boot";
@@ -18,8 +19,17 @@ in
       virtualisation.waydroid.enable = false;
     }
 
-    (lib.mkIf cfg.mssql.enable {
+    (lib.mkIf cfg.podman.enable {
       virtualisation.podman.enable = true;
+    })
+
+    (lib.mkIf cfg.mssql.enable {
+      assertions = [
+        {
+          assertion = cfg.podman.enable && config.virtualisation.podman.enable;
+          message = "MSSQL requires Podman; enable my.virtualisation.podman.enable.";
+        }
+      ];
       virtualisation.oci-containers = {
         backend = "podman";
         containers.mssql = {

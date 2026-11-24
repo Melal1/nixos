@@ -26,10 +26,11 @@ pkgs.runCommand "font-matching-check" { nativeBuildInputs = [ pkgs.fontconfig ];
     fi
   }
 
-  expect_family 'Arial:lang=ar:charset=0627' 'Noto Naskh Arabic'
-  expect_family 'Helvetica:lang=ar:charset=0627' 'Noto Naskh Arabic'
-  expect_family 'system-ui:lang=ar:charset=0627' 'Noto Naskh Arabic'
-  expect_family 'sans-serif:lang=ar' 'Noto Naskh Arabic'
+  expect_family 'Arial:lang=ar:charset=0627' 'SF Arabic'
+  expect_family 'Helvetica:lang=ar:charset=0627' 'SF Arabic'
+  expect_family 'system-ui:lang=ar:charset=0627' 'SF Arabic'
+  expect_family 'sans-serif:lang=ar' 'SF Pro Text'
+  expect_family 'sans-serif:lang=ar:charset=0627' 'SF Arabic'
   expect_family 'emoji:charset=1f600' 'Twitter Color Emoji'
   touch "$out"
 ''

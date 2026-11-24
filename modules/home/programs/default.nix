@@ -11,7 +11,8 @@
     ./nh.nix
     ./openrgb.nix
     ./hardware-clients.nix
-    ./gpu-screen-recorder.nix
+    ./gpu-screen-recorder-ui.nix
+    ./winapps.nix
     ./easyeffects.nix
     ./obs.nix
     ./skwd.nix

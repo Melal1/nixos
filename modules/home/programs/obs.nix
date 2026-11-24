@@ -35,6 +35,7 @@ in
           obs-pipewire-audio-capture
           obs-vkcapture
         ]
+
         # VA-API hardware acceleration for AMD GPUs
         ++ lib.optionals (osConfig != null && (osConfig.my.hardware.gpu.amd.enable or false)) [
           obs-vaapi

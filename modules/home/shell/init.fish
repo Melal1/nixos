@@ -21,7 +21,7 @@ function rgn
   if test -n "$res"
     set -l tokens (string split ":" $res)
     # tokens[1] is the file path, tokens[2] is the line number
-    nvim +$tokens[2] $tokens[1]
+    eval "$EDITOR" (string escape -- "+$tokens[2]" "$tokens[1]")
   end
 end
 
@@ -35,7 +35,7 @@ function rgi
 
   if test -n "$res"
     set -l tokens (string split ":" $res)
-    nvim +$tokens[2] $tokens[1]
+    eval "$EDITOR" (string escape -- "+$tokens[2]" "$tokens[1]")
   end
 end
 

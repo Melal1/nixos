@@ -15,16 +15,19 @@
         defaultFonts = {
           emoji = lib.mkDefault [ "Twitter Color Emoji" ];
           monospace = lib.mkDefault [
+            "SF Mono"
             "Iosevka Nerd Font"
             "Noto Naskh Arabic"
           ];
           sansSerif = lib.mkDefault [
-            "Noto Naskh Arabic"
+            "SF Pro Text"
+            "SF Arabic"
             "Noto Sans"
           ];
           serif = lib.mkDefault [
+            "New York"
+            "SF Arabic"
             "Noto Naskh Arabic"
-            "Noto Sans"
           ];
         };
         subpixel.rgba = lib.mkDefault "rgb";
@@ -34,7 +37,8 @@
 
       packages = with pkgs; [
         sf-pro # San Francisco Pro
-        sf-mono # San Francisco Mono (great for terminals)
+        sf-arabic # SF Arabic font package
+        sf-mono # San Francisco Mono
         sf-compact # San Francisco Compact
         ny # New York (Serif)
         noto-fonts

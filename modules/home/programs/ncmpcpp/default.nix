@@ -65,7 +65,7 @@ lib.mkIf config.programs.ncmpcpp.enable {
       locked_screen_width_part = lib.mkDefault "50";
       ask_for_locked_screen_width_part = lib.mkDefault "yes";
       display_bitrate = lib.mkDefault "no";
-      external_editor = lib.mkDefault "nvim";
+      external_editor = lib.mkDefault config.home.sessionVariables.EDITOR;
       main_window_color = lib.mkDefault "default";
       startup_screen = lib.mkDefault "visualizer";
 

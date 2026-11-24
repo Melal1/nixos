@@ -5,13 +5,25 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
-    qmlgolsp = {
-      url = "github:cushycush/qml-language-server";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    discord-tmp.url = "github:NixOS/nixpkgs/nixos-unstable";
     toofan = {
       url = "github:vyrx-dev/toofan";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    rea-flake = {
+      url = "github:Fractal-Tess/rea-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    serein = {
+      url = "github:ViceVerse-cz/Serein";
+      # Serein's locked dependencies require a newer Rust than stable provides.
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
+    };
+    winapps = {
+      url = "github:winapps-org/winapps";
+      inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
     apple-fonts = {
@@ -19,19 +31,8 @@
       inputs.nixpkgs.follows = "nixpkgs-unstable";
     };
 
-    # /home/melal/Dev/projects/cpp/mrem checked out.
-    # music-sep = {
-    #   url = "git+file:/home/melal/Dev/projects/cpp/mrem";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-
     tincan-cli = {
       url = "github:bilalyazicioglu/tincan-cli/develop";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    timr-tui = {
-      url = "github:sectore/timr-tui";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -39,31 +40,9 @@
       url = "github:liixini/skwd-wall/nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # ditto = {
-    #   url = "github:arvingarciabtw/ditto";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
-    quickshell = {
-      url = "git+https://git.outfoxxed.me/outfoxxed/quickshell";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
 
-    quickshell-niri = {
-      url = "github:imiric/qml-niri/main";
-      inputs.quickshell.follows = "quickshell";
-      inputs.nixpkgs.follows = "nixpkgs-unstable";
-    };
-
-    # zen-browser = {
-    #   url = "github:0xc000022070/zen-browser-flake";
-    #   inputs.nixpkgs.follows = "nixpkgs";
-    # };
     helium-flake = {
       url = "github:oxcl/nix-flake-helium-browser";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    antigravity-nix = {
-      url = "github:jacopone/antigravity-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     home-manager = {

@@ -18,9 +18,11 @@
       "uinput"
       "input"
       "adbusers"
+      "dialout"
       # "video" # Grants access to display hardware/video cards
       # "render" # Grants access to DRM render nodes (required for ROCm/AMD GPU compute)
     ]
-    ++ lib.optional config.programs.gamemode.enable "gamemode";
+    ++ lib.optional config.programs.gamemode.enable "gamemode"
+    ++ lib.optional config.my.virtualisation.winapps.enable "kvm";
   };
 }

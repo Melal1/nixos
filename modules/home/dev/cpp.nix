@@ -7,6 +7,16 @@
 let
   cfg = config.my.home.dev.cpp;
   fromSystem = import ../lib/after-home-packages.nix lib;
+  cpptools = pkgs.vscode-extensions.ms-vscode.cpptools.overrideAttrs (oldAttrs: {
+    src = oldAttrs.src.overrideAttrs (srcAttrs: {
+      # Microsoft's GitHub asset has the same hash; Marketplace downloads reset.
+      urls = [
+        "https://github.com/microsoft/vscode-cpptools/releases/download/v1.31.5/cpptools-linux-x64.vsix"
+      ]
+      ++ (srcAttrs.urls or [ ]);
+      curlOptsList = (srcAttrs.curlOptsList or [ ]) ++ [ "--http1.1" ];
+    });
+  });
 in
 {
   options.my.home.dev.cpp = {
@@ -21,11 +31,11 @@ in
     home.packages = fromSystem (
       with pkgs;
       [
-        vscode-extensions.ms-vscode.cpptools
+        cpptools
         bear
         cmake-language-server
       ]
     );
-    home.sessionVariables.CODELLDB_PATH = "${pkgs.vscode-extensions.ms-vscode.cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
+    home.sessionVariables.CODELLDB_PATH = "${cpptools}/share/vscode/extensions/ms-vscode.cpptools/debugAdapters/bin/OpenDebugAD7";
   };
 }

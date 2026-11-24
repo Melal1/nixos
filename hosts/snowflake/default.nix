@@ -23,7 +23,11 @@
   my.packages.optimization.arch = "znver3";
   my.packages.fonts.shared.enable = true;
 
-  my.virtualisation.mssql.enable = true;
+  my.virtualisation = {
+    podman.enable = true;
+    mssql.enable = true;
+    winapps.enable = true;
+  };
 
   my.hardware = {
     bluetooth.enable = true;
@@ -35,21 +39,19 @@
     androidWebcam = {
       enable = true;
       autoStart = false;
-
     };
   };
 
-  my.desktop = {
-    niri.enable = true;
-  };
+  my.desktop.niri.enable = true;
 
   my.programs = {
     nix-ld.enable = true;
     gpu-screen-recorder.enable = true;
     steam.enable = true;
     ipad-screen-mirror.enable = true;
-
   };
+
+  programs.gamescope.enable = true;
 
   # Shared audio/session and shell backends are independent host capabilities.
   programs.dconf.enable = true;

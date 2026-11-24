@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  # pkgs,
   ...
 }:
 {
@@ -17,11 +16,6 @@
 
     # LACT provides AMD GPU monitoring and optional clock/fan control.
     # Its daemon is required for the UI to apply hardware settings.
-    # environment.systemPackages = [ pkgs.lact ];
-    # systemd = {
-    #   packages = [ pkgs.lact ];
-    #   services.lactd.wantedBy = [ "multi-user.target" ];
-    # };
     services.lact.enable = true;
     hardware.amdgpu.overdrive.enable = true;
   };

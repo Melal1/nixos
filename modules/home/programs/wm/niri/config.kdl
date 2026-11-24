@@ -286,19 +286,13 @@ window-rule {
     match app-id="kitty"
     // match app-id="com.mitchellh.ghostty"
     match app-id="foot"
+    match app-id="serien"
     
     draw-border-with-background false
 
     background-effect {
         blur true
     }
-}
-window-rule {
-  match app-id="vesktop" 
-  draw-border-with-background false
-  background-effect {
-    blur true
-  }
 }
 hotkey-overlay {
     // Uncomment this line to disable the "Important Hotkeys" pop-up at startup.
@@ -588,7 +582,10 @@ binds {
     Mod+Ctrl+R { reset-window-height; }
 
     Mod+F { maximize-column; }
-    Mod+Shift+F { fullscreen-window; }
+    // Mod+Shift+F { fullscreen-window; }
+    Mod+Ctrl+F {
+    toggle-windowed-fullscreen;
+}
 
     // While maximize-column leaves gaps and borders around the window,
     // maximize-window-to-edges doesn't: the window expands to the edges of the screen.

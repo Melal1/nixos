@@ -10,7 +10,7 @@ let
   cfg = config.my.home.noctalia;
   noctaliaDir = "${config.xdg.configHome}/noctalia";
   dotfiles = config.my.home.dotfilesDir;
-  hostFile = "hosts/${hostname}/overrides/noctalia.toml";
+  hostFile = "hosts/${hostname}/noctalia-config.toml";
 in
 {
   options.my.home.noctalia = {
@@ -32,7 +32,7 @@ in
       type = lib.types.nullOr lib.types.str;
       default =
         if builtins.pathExists (../../../../. + "/${hostFile}") then "${dotfiles}/${hostFile}" else null;
-      description = "Optional editable TOML loaded after the shared defaults; null uses only shared defaults.";
+      description = "Editable full host TOML loaded after the active theme; null uses the theme and upstream defaults.";
     };
   };
 
@@ -54,13 +54,7 @@ in
         [include]
         autoload = false
         files = ${
-          builtins.toJSON (
-            [
-              "default.toml"
-              "${dotfiles}/modules/home/programs/noctalia/config.toml"
-            ]
-            ++ lib.optional (cfg.configFile != null) cfg.configFile
-          )
+          builtins.toJSON ([ "default.toml" ] ++ lib.optional (cfg.configFile != null) cfg.configFile)
         }
       '';
       "noctalia/themes/black-mo.toml".source = ./themes/black-mo.toml;

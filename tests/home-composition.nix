@@ -94,6 +94,19 @@ let
         "snowflake"
       ];
   checks = {
+    core-defaults-to-nano =
+      !core.config.programs.neovim.enable
+      && core.config.home.sessionVariables.EDITOR == "nano"
+      && builtins.elem core.pkgs.nano core.config.home.packages
+      && !(core.config.programs.fish.shellAliases ? nvi);
+    host-editor-independent-of-fish =
+      let
+        cfg = (realHome.extendModules { modules = [ { programs.fish.enable = false; } ]; }).config;
+      in
+      cfg.programs.neovim.enable
+      && cfg.home.sessionVariables.EDITOR == "nvim"
+      && !(cfg.xdg.configFile."nvim/init.lua".enable or false)
+      && builtins.elem cfg.programs.neovim.finalPackage cfg.home.packages;
     core-keeps-personal-shell = core.config.programs.fish.enable && core.config.programs.git.enable;
     core-has-no-desktop = !core.config.my.home.desktop.enable && !core.config.my.home.wm.niri.enable;
     core-has-no-media = !core.config.my.home.media.enable;
@@ -110,18 +123,13 @@ let
     missing-override-folder-is-optional = loadOverrides ./fixtures/host-overrides/missing == [ ];
     override-loader-imports-only-top-level-nix =
       map builtins.baseNameOf overrideModules == [ "foot.nix" ];
-    missing-noctalia-override-uses-shared-defaults =
+    missing-noctalia-host-config-uses-upstream-defaults =
       let
         inherit (builtins.fromTOML noctaliaDefaults.config.xdg.configFile."noctalia/config.toml".text)
           include
           ;
       in
-      noctaliaDefaults.config.my.home.noctalia.configFile == null
-      &&
-        include.files == [
-          "default.toml"
-          "${noctaliaDefaults.config.my.home.dotfilesDir}/modules/home/programs/noctalia/config.toml"
-        ];
+      noctaliaDefaults.config.my.home.noctalia.configFile == null && include.files == [ "default.toml" ];
     override-folder-changes-only-selected-foot-setting =
       desktop.config.programs.foot.settings.main.font == "CaskaydiaCove Nerd Font:style=SemiBold:size=14"
       && directoryOverrides.config.programs.foot.settings.main.font == "monospace:size=12"

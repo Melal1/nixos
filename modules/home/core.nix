@@ -1,6 +1,14 @@
-{ lib, ... }:
 {
-  home.sessionVariables.EDITOR = lib.mkDefault "nvim";
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+{
+  home.sessionVariables.EDITOR = lib.mkDefault (
+    if config.programs.neovim.enable then "nvim" else "nano"
+  );
+  home.packages = lib.optional (!config.programs.neovim.enable) pkgs.nano;
 
   programs = {
     home-manager.enable = lib.mkDefault true;

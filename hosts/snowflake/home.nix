@@ -2,6 +2,7 @@
   config,
   lib,
   pkgs,
+  osConfig,
   ...
 }:
 {
@@ -23,6 +24,10 @@
     keyboardTools.enable = lib.mkDefault true;
     bluetoothClient.enable = lib.mkDefault true;
     dev = {
+      r = {
+        enable = lib.mkDefault true;
+        ide = lib.mkDefault true;
+      };
       csharp.avalonia.enable = lib.mkDefault true;
       python.science.enable = lib.mkDefault true;
       javascript.enable = lib.mkDefault true;
@@ -30,9 +35,14 @@
       rust.enable = lib.mkDefault true;
     };
     openrgb.enable = lib.mkDefault true;
-    gpu-screen-recorder = {
-      enable = lib.mkDefault true;
+    gpu-screen-recorder-ui = {
+      enable = osConfig.my.programs.gpu-screen-recorder.enable;
       autostart = lib.mkDefault true;
+    };
+    winapps = {
+      launcher.enable = lib.mkDefault true;
+      ramSize = "12G";
+      cpuCores = 8;
     };
     obs.gstreamer.enable = lib.mkDefault true;
   };

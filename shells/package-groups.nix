@@ -18,9 +18,6 @@ let
         # Prefer Lua's generic executable and headers over LuaJIT's compatibility files.
         else if package.outPath == pkgs.luajit.outPath then
           lib.setPrio ((pkgs.lua.meta.priority or lib.meta.defaultPriority) + 1) package
-        # Keep the desktop's QML-enabled Quickshell preferred over the shell build.
-        # else if package.outPath == pkgs.quickshell.outPath then
-        #   lib.lowPrio package
         else
           package
       )

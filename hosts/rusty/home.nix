@@ -14,5 +14,9 @@
     noctalia.enable = lib.mkDefault true;
     keyboardTools.enable = lib.mkDefault true;
     bluetoothClient.enable = lib.mkDefault true;
+    dev.r = {
+      enable = lib.mkDefault true;
+      ide = lib.mkDefault true;
+    };
   };
 }

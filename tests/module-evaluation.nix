@@ -10,6 +10,10 @@ let
     system = "x86_64-linux";
     config.allowUnfree = true;
   };
+  discordPkgs = import inputs.discord-tmp {
+    system = "x86_64-linux";
+    config.allowUnfree = true;
+  };
   hasPackage = package: packages: builtins.elem package.outPath (map (p: p.outPath) packages);
   packages = host: host.config.environment.systemPackages;
   toolchainRoots =
@@ -25,6 +29,7 @@ let
     };
   noFiles = prefix: files: !lib.any (lib.hasPrefix prefix) (builtins.attrNames files);
   passes = instance: lib.all (entry: entry.assertion) instance.config.assertions;
+  rejects = instance: !(builtins.tryEval instance.config).success;
   startupScript = instance: instance.config.home.file.".local/bin/niri-autostart".text;
   precedes =
     first: second: text:
@@ -47,6 +52,7 @@ let
     "javascript"
     "lua"
     "go"
+    "r"
     "rust"
     "java"
     "nix"
@@ -85,7 +91,7 @@ let
       noctalia.enable = lib.mkForce false;
       skwd.enable = false;
       openrgb.enable = lib.mkForce false;
-      gpu-screen-recorder.enable = lib.mkForce false;
+      gpu-screen-recorder-ui.enable = lib.mkForce false;
       keyboardTools.enable = false;
       bluetoothClient.enable = false;
       scripts.enable = false;
@@ -99,8 +105,44 @@ let
   noUserFeatures = homeFor base homeOff;
   noNoctalia = homeFor base { my.home.noctalia.enable = lib.mkForce false; };
   noNiri = homeFor base { my.home.wm.niri.enable = false; };
-  noGsr = homeFor base { my.home.gpu-screen-recorder.enable = lib.mkForce false; };
-  noGsrAutostart = homeFor base { my.home.gpu-screen-recorder.autostart = lib.mkForce false; };
+  noGsr = homeFor base { my.home.gpu-screen-recorder-ui.enable = lib.mkForce false; };
+  noGsrAutostart = homeFor base { my.home.gpu-screen-recorder-ui.autostart = lib.mkForce false; };
+  noGsrHost = base.extendModules {
+    modules = [ { my.programs.gpu-screen-recorder.enable = lib.mkForce false; } ];
+  };
+  noGsrBackend = homeFor noGsrHost { };
+  gsrUiWithoutBackend = homeFor noGsrHost {
+    my.home.gpu-screen-recorder-ui.enable = lib.mkForce true;
+  };
+  gsrFrontends = with unstable; [
+    gpu-screen-recorder-gtk
+    gpu-screen-recorder-ui
+    gpu-screen-recorder-notification
+  ];
+  noWinappsHost = base.extendModules {
+    modules = [ { my.virtualisation.winapps.enable = lib.mkForce false; } ];
+  };
+  noWinapps = homeFor noWinappsHost { };
+  noPodmanHost = base.extendModules {
+    modules = [ { my.virtualisation.podman.enable = lib.mkForce false; } ];
+  };
+  noPodman = homeFor noPodmanHost { };
+  noWinappsLauncher = homeFor base { my.home.winapps.launcher.enable = lib.mkForce false; };
+  customWinapps = homeFor base {
+    my.home.winapps = {
+      windowsVersion = "10";
+      ramSize = lib.mkForce "6G";
+      cpuCores = lib.mkForce 2;
+      diskSize = "96G";
+    };
+  };
+  winappsWithoutHost = packageOnly.extendModules {
+    specialArgs.osConfig = null;
+    modules = [ ../modules/home/programs/winapps.nix ];
+  };
+  winappsSuite = inputs.winapps.packages.x86_64-linux;
+  winappsCompose =
+    instance: builtins.fromJSON instance.config.home.file.".config/winapps/compose.yaml".text;
   noSkwd = homeFor base { my.home.skwd.enable = false; };
   noMedia = homeFor base { my.home.media.enable = false; };
   customRgbHost = base.extendModules {
@@ -160,20 +202,14 @@ let
   rustyNoNoctalia = rustyNoctalia.extendModules {
     modules = [ { my.home.noctalia.enable = lib.mkForce false; } ];
   };
-  noNoctaliaOverride = homeFor base { my.home.noctalia.configFile = null; };
+  noNoctaliaHostConfig = homeFor base { my.home.noctalia.configFile = null; };
   noctaliaIncludes =
     instance:
     (builtins.fromTOML (
       builtins.unsafeDiscardStringContext instance.config.xdg.configFile."noctalia/config.toml".text
     )).include;
-  sharedNoctaliaSettings = builtins.fromTOML (
-    builtins.readFile ../modules/home/programs/noctalia/config.toml
-  );
   noctaliaSettings =
-    host:
-    lib.recursiveUpdate sharedNoctaliaSettings (
-      builtins.fromTOML (builtins.readFile (../hosts + "/${host}/overrides/noctalia.toml"))
-    );
+    host: builtins.fromTOML (builtins.readFile (../hosts + "/${host}/noctalia-config.toml"));
   snowflakeNoctaliaSettings = noctaliaSettings "snowflake";
   rustyNoctaliaSettings = noctaliaSettings "rusty";
   devOnly =
@@ -188,6 +224,14 @@ let
   cppOnly = devOnly { cpp.enable = true; };
   csharpOnly = devOnly { csharp.enable = true; };
   pythonBundleOnly = devOnly { python.enable = true; };
+  rOnly = devOnly { r.enable = true; };
+  rWithIde = devOnly {
+    r = {
+      enable = true;
+      ide = true;
+    };
+  };
+  rIdeOnly = devOnly { r.ide = true; };
   dppOnly = devOnly { cpp.dpp.enable = true; };
   avaloniaOnly = devOnly { csharp.avalonia.enable = true; };
   pythonOnly = homeFor base {
@@ -207,6 +251,17 @@ let
   csharpEditorPackages = with home.pkgs; [
     roslyn-ls
     netcoredbg
+  ];
+  rPkgs = with unstable.rPackages; [
+    nortest
+    ggplot2
+    dplyr
+  ];
+  rRuntime = unstable.rWrapper.override { packages = rPkgs; };
+  rIde = unstable.rstudioWrapper.override { packages = rPkgs; };
+  rPackages = [
+    rRuntime
+    rIde
   ];
   includes = instance: expected: lib.all (p: hasPackage p instance.config.home.packages) expected;
   excludes = instance: forbidden: !lib.any (p: hasPackage p instance.config.home.packages) forbidden;
@@ -346,8 +401,10 @@ let
                 "uinput"
                 "input"
                 "adbusers"
+                "dialout"
               ]
               ++ lib.optional systemHost.config.programs.gamemode.enable "gamemode"
+              ++ lib.optional systemHost.config.my.virtualisation.winapps.enable "kvm"
             && self.homeConfigurations."melal@${host}".config.home.homeDirectory == "/home/melal"
           )
           [
@@ -407,10 +464,10 @@ let
       && rustyNoctalia.config.my.home.noctalia.enable
       &&
         rusty.config.my.home.noctalia.configFile
-        == "${rusty.config.my.home.dotfilesDir}/hosts/rusty/overrides/noctalia.toml"
+        == "${rusty.config.my.home.dotfilesDir}/hosts/rusty/noctalia-config.toml"
       &&
         home.config.my.home.noctalia.configFile
-        == "${home.config.my.home.dotfilesDir}/hosts/snowflake/overrides/noctalia.toml"
+        == "${home.config.my.home.dotfilesDir}/hosts/snowflake/noctalia-config.toml"
       && rusty.config.my.home.noctalia.configFile != home.config.my.home.noctalia.configFile
       && rustyNoctalia.config.my.home.noctalia.configFile == alternateNoctaliaConfig
       && home.config.my.home.noctalia.configFile != alternateNoctaliaConfig
@@ -423,7 +480,6 @@ let
             &&
               (noctaliaIncludes instance).files == [
                 "default.toml"
-                "${instance.config.my.home.dotfilesDir}/modules/home/programs/noctalia/config.toml"
                 instance.config.my.home.noctalia.configFile
               ]
             && !(instance.config.xdg.configFile ? "noctalia/plugins.toml")
@@ -445,42 +501,34 @@ let
       && !(rustyNoNoctalia.config.home.activation ? noctaliaTheme)
       && !(rustyNoNoctalia.config.home.activation ? noctaliaPlugins)
       && !hasPackage rustyNoctalia.config.my.home.noctalia.package rustyNoNoctalia.config.home.packages;
-    noctalia-defaults-without-host-override =
-      noNoctaliaOverride.config.my.home.noctalia.configFile == null
-      && !(noctaliaIncludes noNoctaliaOverride).autoload
-      &&
-        (noctaliaIncludes noNoctaliaOverride).files == [
-          "default.toml"
-          "${noNoctaliaOverride.config.my.home.dotfilesDir}/modules/home/programs/noctalia/config.toml"
-        ];
-    noctalia-editable-plugin-settings =
+    noctalia-defaults-without-host-config =
+      noNoctaliaHostConfig.config.my.home.noctalia.configFile == null
+      && !(noctaliaIncludes noNoctaliaHostConfig).autoload
+      && (noctaliaIncludes noNoctaliaHostConfig).files == [ "default.toml" ];
+    noctalia-host-files-preserve-complete-settings =
       lib.all
         (
           settings:
-          builtins.isAttrs settings
-          && !builtins.elem "plugins.toml" (settings.include.files or [ ])
-          && !builtins.elem "wallpapers/config.toml" (settings.include.files or [ ])
+          !(settings ? include)
+          && lib.all (section: settings ? ${section}) [
+            "audio"
+            "bar"
+            "dock"
+            "shell"
+            "wallpaper"
+            "plugins"
+          ]
         )
         [
           snowflakeNoctaliaSettings
           rustyNoctaliaSettings
         ];
-    noctalia-legacy-entrypoints-include-new-defaults =
+    noctalia-legacy-entrypoints-use-host-copies =
       lib.all
         (
           host:
-          let
-            inherit (builtins.fromTOML (builtins.readFile (../hosts + "/${host}/noctalia-config.toml")))
-              include
-              ;
-          in
-          !include.autoload
-          &&
-            include.files == [
-              "default.toml"
-              "$HOME/.dotfiles/nixos/modules/home/programs/noctalia/config.toml"
-              "$HOME/.dotfiles/nixos/hosts/${host}/overrides/noctalia.toml"
-            ]
+          builtins.fromTOML (builtins.readFile (../modules/home/hosts + "/${host}/noctalia-config.toml"))
+          == noctaliaSettings host
         )
         [
           "snowflake"
@@ -505,19 +553,15 @@ let
           home
           rusty
         ]
-      && includes home (
-        with home.pkgs;
-        [
-          python3
-          discord
-        ]
-      );
+      && includes home [
+        home.pkgs.python3
+        discordPkgs.discord
+      ];
     noctalia-appearance-without-discord =
       let
         rustyBar = rustyNoctaliaSettings.bar.default;
       in
-      builtins.elem "bar" snowflakeNoctaliaSettings.bar.default.end
-      && !builtins.elem "bar" (rustyBar.start ++ (rustyBar.center or [ ]) ++ rustyBar.end);
+      !builtins.elem "bar" (rustyBar.start ++ (rustyBar.center or [ ]) ++ rustyBar.end);
     rusty-noctalia-host-support =
       rustyHost.config.my.packages.optimization.arch == "tigerlake"
       && lib.hasInfix "-march=tigerlake -O3" rusty.config.my.home.noctalia.package.NIX_CFLAGS_COMPILE
@@ -631,7 +675,7 @@ let
       && noNiri.config.my.home.skwd.enable
       && hasPackage unstable.gpu-screen-recorder-ui noNiri.config.home.packages
       && !lib.hasInfix "gsr-ui" (startupScript noGsr)
-      && noGsrAutostart.config.my.home.gpu-screen-recorder.enable
+      && noGsrAutostart.config.my.home.gpu-screen-recorder-ui.enable
       && includes noGsrAutostart (
         with unstable;
         [
@@ -645,6 +689,101 @@ let
       && !lib.hasInfix "skwd-helm apply" (startupScript noSkwd)
       && lib.hasInfix "gsr-ui" (startupScript noSkwd)
       && !(noSkwd.config.systemd.user.services ? skwd-walld);
+    recorder-ui-follows-snowflake-backend =
+      home.config.my.home.gpu-screen-recorder-ui.enable
+      && !noGsrBackend.config.my.home.gpu-screen-recorder-ui.enable
+      && excludes noGsrBackend gsrFrontends
+      && !lib.hasInfix "gsr-ui" (startupScript noGsrBackend)
+      && !(noGsrBackend.config.home.file ? ".local/bin/mpv-mix")
+      && passes noGsrBackend
+      && rejects gsrUiWithoutBackend
+      && !rusty.config.my.home.gpu-screen-recorder-ui.enable;
+    recorder-backend-without-ui =
+      base.config.programs.gpu-screen-recorder.enable && passes noGsr && excludes noGsr gsrFrontends;
+    winapps-follows-host =
+      base.config.my.virtualisation.winapps.enable
+      && includes home [
+        winappsSuite.winapps
+        home.pkgs.podman-compose
+        winappsSuite.winapps-launcher
+      ]
+      && !(home.options.my.home.winapps ? enable)
+      && noWinapps.config.my.home.winapps.launcher.enable
+      &&
+        lib.all
+          (
+            instance:
+            passes instance
+            && noFiles ".config/winapps/" instance.config.home.file
+            && excludes instance [
+              winappsSuite.winapps
+              winappsSuite.winapps-launcher
+            ]
+          )
+          [
+            noWinapps
+            rusty
+            winappsWithoutHost
+          ]
+      && !(builtins.elem "kvm" noWinappsHost.config.users.users.melal.extraGroups);
+    winapps-launcher-and-resources-independent =
+      includes noWinappsLauncher [
+        winappsSuite.winapps
+        home.pkgs.podman-compose
+      ]
+      && excludes noWinappsLauncher [ winappsSuite.winapps-launcher ]
+      && winappsCompose noWinappsLauncher == winappsCompose home
+      &&
+        (winappsCompose customWinapps).services.windows.environment == {
+          VERSION = "10";
+          RAM_SIZE = "6G";
+          CPU_CORES = "2";
+          DISK_SIZE = "96G";
+          HOME = "/home/melal";
+        };
+    winapps-rootless-and-private-state =
+      let
+        compose = winappsCompose home;
+        windows = compose.services.windows;
+      in
+      base.config.virtualisation.containers.containersConf.settings.engine.runtime == "crun"
+      && builtins.elem "kvm" base.config.users.users.melal.extraGroups
+      && lib.all (name: builtins.elem name base.config.boot.kernelModules) [
+        "tun"
+        "ip_tables"
+        "iptable_nat"
+      ]
+      && windows.group_add == [ "keep-groups" ]
+      &&
+        windows.devices == [
+          "/dev/kvm"
+          "/dev/net/tun"
+        ]
+      && lib.all (lib.hasPrefix "127.0.0.1:") windows.ports
+      && windows.restart == "no"
+      && compose.volumes ? data
+      && builtins.elem "data:/storage" windows.volumes
+      && windows.env_file == [ "/home/melal/.config/winapps/windows.env" ]
+      && !(windows.environment ? PASSWORD)
+      && !(home.config.home.file ? ".config/winapps/windows.env")
+      && !(home.config.home.file ? ".config/winapps/winapps.conf")
+      && home.config.home.file ? ".config/winapps/oem"
+      && !(base.config.virtualisation.oci-containers.containers ? windows)
+      && !(home.config.systemd.user.services ? winapps);
+    podman-dependency-is-explicit =
+      base.config.my.virtualisation.podman.enable
+      && rustyHost.config.my.virtualisation.podman.enable
+      &&
+        lib.all
+          (
+            message:
+            lib.any (entry: entry.message == message && !entry.assertion) noPodmanHost.config.assertions
+          )
+          [
+            "WinApps requires Podman; enable my.virtualisation.podman.enable."
+            "MSSQL requires Podman; enable my.virtualisation.podman.enable."
+          ]
+      && rejects noPodman;
     uxplay-host-policy =
       base.config.services.avahi.enable
       && base.config.services.avahi.publish.enable
@@ -725,6 +864,7 @@ let
           devChildren.${name} or [ ]
         )
       ) devParents
+      && !devDefaults.config.my.home.dev.r.ide
       && toolchainRoots devDefaults == [ ]
       && !(devDefaults.config.home.file ? ".editorconfig")
       && !(devDefaults.options.my.home.dev ? lsp)
@@ -758,6 +898,19 @@ let
         csharpOnly
         pythonBundleOnly
       ];
+    development-r-package-bundle =
+      includes rOnly [ rRuntime ]
+      && excludes rOnly [ rIde ]
+      && includes rWithIde rPackages
+      && lib.all (host: !lib.any (package: hasPackage package (packages host)) rPackages) [
+        base
+        rustyHost
+      ];
+    development-r-disabled = lib.all (instance: excludes instance rPackages) [
+      devDefaults
+      rIdeOnly
+      noUserFeatures
+    ];
     development-dpp-without-parent =
       !dppOnly.config.my.home.dev.cpp.enable
       && dppOnly.config.my.home.dev.cpp.dpp.enable
@@ -827,6 +980,7 @@ let
             "cpp"
             "csharp"
             "python"
+            "r"
             "lua"
             "java"
             "nix"
@@ -835,6 +989,8 @@ let
             "xml"
             "text"
           ]
+          && instance.config.my.home.dev.r.ide
+          && includes instance rPackages
           && lib.all (name: instance.config.my.home.dev.cpp.${name}.enable) devChildren.cpp
           && !instance.config.my.home.dev.java.javafx.enable
         )
@@ -920,16 +1076,19 @@ let
           host.config.fonts.fontconfig.defaultFonts == {
             emoji = [ "Twitter Color Emoji" ];
             monospace = [
+              "SF Mono"
               "Iosevka Nerd Font"
               "Noto Naskh Arabic"
             ];
             sansSerif = [
-              "Noto Naskh Arabic"
+              "SF Pro Text"
+              "SF Arabic"
               "Noto Sans"
             ];
             serif = [
+              "New York"
+              "SF Arabic"
               "Noto Naskh Arabic"
-              "Noto Sans"
             ];
           }
           && host.config.fonts.fontconfig.subpixel.rgba == "rgb"
@@ -1038,8 +1197,8 @@ let
       &&
         hasPackage self.homeConfigurations."melal@rusty".pkgs.codex
           self.homeConfigurations."melal@rusty".config.home.packages
-      && hasPackage unstable.opencode home.config.home.packages
-      && hasPackage home.pkgs.pspp home.config.home.packages
+      && !hasPackage unstable.opencode home.config.home.packages
+      && !hasPackage home.pkgs.pspp home.config.home.packages
       && !hasPackage unstable.opencode self.homeConfigurations."melal@rusty".config.home.packages
       && snowflakeNoctaliaSettings.widget.widget.widget-glyph-main == "clock"
       && snowflakeNoctaliaSettings.widget.widget.widget-glyph-work == "coffee";

@@ -6,10 +6,10 @@
   ...
 }:
 let
-  cfg = config.my.home.gpu-screen-recorder;
+  cfg = config.my.home.gpu-screen-recorder-ui;
 in
 {
-  options.my.home.gpu-screen-recorder = {
+  options.my.home.gpu-screen-recorder-ui = {
     enable = lib.mkEnableOption "GPU Screen Recorder frontends";
     autostart = lib.mkEnableOption "the GPU Screen Recorder UI overlay at Niri login";
   };

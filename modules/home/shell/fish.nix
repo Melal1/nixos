@@ -3,7 +3,6 @@
   lib,
   config,
   hostname,
-  unstable,
   ...
 }:
 {
@@ -15,7 +14,6 @@
       ripgrep
       bat
       lsd
-      unstable.neovim
     ];
     programs = {
       fish = {
@@ -35,15 +33,17 @@
 
         preferAbbrs = lib.mkDefault true;
         shellAbbrs = {
-          vnx = lib.mkDefault "nvim ~/.dotfiles/nixos/";
-          xpkg = lib.mkDefault "nvim ~/.dotfiles/nixos/modules/home/packages/";
-          vhm = lib.mkDefault "nvim ~/.dotfiles/nixos/modules/home/";
           qa = lib.mkDefault "exit";
           x-r = lib.mkDefault "sudo nixos-rebuild switch --flake ~/.dotfiles/nixos/.#";
           h-r = lib.mkDefault "home-manager switch --flake ${config.my.home.dotfilesDir}/#${config.home.username}@${hostname}";
+        }
+        // lib.optionalAttrs config.programs.neovim.enable {
+          vnx = lib.mkDefault "nvim ~/.dotfiles/nixos/";
+          xpkg = lib.mkDefault "nvim ~/.dotfiles/nixos/modules/home/packages/";
+          vhm = lib.mkDefault "nvim ~/.dotfiles/nixos/modules/home/";
         };
 
-        shellAliases = {
+        shellAliases = lib.mkIf config.programs.neovim.enable {
           nvi = lib.mkDefault "nvim $(fzf --preview 'bat --color=always {}')";
           v = lib.mkDefault "nvim";
           vim = lib.mkDefault "nvim";
