@@ -15,10 +15,10 @@ touch "$assets/themes/partial/kitty"
 mock_bin="$TMPDIR/theme-mocks"
 mkdir -p "$mock_bin"
 for cmd in pkill systemctl; do
-    printf '#!%s\nexit 1\n' "$BASH" > "$mock_bin/$cmd"
+    printf '#!%s\nexit 1\n' "$BASH" >"$mock_bin/$cmd"
 done
-printf '#!%s\n' "$BASH" > "$mock_bin/noctalia"
-cat >> "$mock_bin/noctalia" <<'EOF'
+printf '#!%s\n' "$BASH" >"$mock_bin/noctalia"
+cat >>"$mock_bin/noctalia" <<'EOF'
 printf '%s\n' "$*" >> "$THEME_RELOAD_LOG"
 EOF
 chmod +x "$mock_bin/"*
@@ -41,7 +41,7 @@ test "$(readlink "$task_home/.config/kitty/current.conf")" = "$assets/themes/par
 test "$(readlink "$task_home/.config/niri/default.kdl")" = "$theme/niri"
 test "$(readlink "$task_home/.config/noctalia/default.toml")" = "$theme/noctalia"
 test "$(readlink "$task_home/.config/noctalia/palettes/default.json")" = "$theme/noctalia-palette"
-test "$(wc -l < "$THEME_RELOAD_LOG")" -eq 1
+test "$(wc -l <"$THEME_RELOAD_LOG")" -eq 1
 test -z "$(find "$task_home/.config" -name '.theme-link.*' -print -quit)"
 
 # A palette-only slot still triggers reload with the stable palette name.
@@ -49,7 +49,7 @@ mkdir -p "$assets/themes/palette-only"
 touch "$assets/themes/palette-only/noctalia-palette"
 env HOME="$task_home" theme-switch palette-only
 test "$(readlink "$task_home/.config/noctalia/palettes/default.json")" = "$assets/themes/palette-only/noctalia-palette"
-test "$(wc -l < "$THEME_RELOAD_LOG")" -eq 2
+test "$(wc -l <"$THEME_RELOAD_LOG")" -eq 2
 
 # A disabled WM/shell must not acquire integration files from theme switching.
 rm -rf "$task_home/.config/niri" "$task_home/.config/noctalia"

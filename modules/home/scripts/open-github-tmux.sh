@@ -4,14 +4,14 @@ OPEN_CMD="xdg-open"
 
 get_github_url() {
     local dir="$1"
-    [[ -d "$dir/.git" ]] || return 1  # Not a git repo
+    [[ -d "$dir/.git" ]] || return 1 # Not a git repo
     local url
     url=$(git -C "$dir" remote get-url origin 2>/dev/null) || return 1
-    [[ $url == *github.com* ]] || return 1  # Not GitHub
+    [[ $url == *github.com* ]] || return 1 # Not GitHub
     if [[ $url == git@* ]]; then
-        url="${url#git@}"        # remove git@
-        url="${url/:/\/}"        # convert ":" to "/"
-        url="https://$url"       # prefix with https://
+        url="${url#git@}"  # remove git@
+        url="${url/:/\/}"  # convert ":" to "/"
+        url="https://$url" # prefix with https://
     fi
     echo "$url"
 }
@@ -30,8 +30,7 @@ elif [[ "$url_start" == "$url_current" || -z "$url_start" || -z "$url_current" ]
 else
     echo "Select which GitHub repository to open:" >&2
     url=$(printf "%s\n%s\n" "$url_start" "$url_current" | fzf --prompt="Choose repo > ")
-    [[ -z "$url" ]] && exit 0  # user canceled
+    [[ -z "$url" ]] && exit 0 # user canceled
 fi
 
 $OPEN_CMD "$url"
-

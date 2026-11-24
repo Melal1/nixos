@@ -2,7 +2,7 @@
 
 tmpfile="$(mktemp)"
 
-cat > "$tmpfile" <<'EOF'
+cat >"$tmpfile" <<'EOF'
 Write me and make :
 
 1- commit title (short brief)
@@ -13,16 +13,15 @@ Write me and make :
 
 EOF
 
-git diff --cached >> "$tmpfile"
+git diff --cached >>"$tmpfile"
 
 if command -v wl-copy >/dev/null && [ -n "$WAYLAND_DISPLAY" ]; then
-    wl-copy < "$tmpfile"
+    wl-copy <"$tmpfile"
 elif command -v xclip >/dev/null; then
-    xclip -selection clipboard < "$tmpfile"
+    xclip -selection clipboard <"$tmpfile"
 else
     echo "No clipboard tool found (wl-copy or xclip)" >&2
     exit 1
 fi
 
 rm "$tmpfile"
-

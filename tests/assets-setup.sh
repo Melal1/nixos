@@ -23,11 +23,11 @@ task_home="$TMPDIR/assets-home"
 seed_home "$task_home"
 seed_theme_configs "$task_home"
 mkdir -p "$task_home/Pictures/Wallpapers" "$task_home/Pictures/Wallpapers.bk"
-printf 'original\n' > "$task_home/Pictures/Wallpapers/personal.txt"
-printf 'earlier backup\n' > "$task_home/Pictures/Wallpapers.bk/earlier.txt"
+printf 'original\n' >"$task_home/Pictures/Wallpapers/personal.txt"
+printf 'earlier backup\n' >"$task_home/Pictures/Wallpapers.bk/earlier.txt"
 touch "$TMPDIR/chosen-kitty.conf"
 ln -s "$TMPDIR/chosen-kitty.conf" "$task_home/.config/kitty/current.conf"
-printf 'custom ghostty theme\n' > "$task_home/.config/ghostty/theme"
+printf 'custom ghostty theme\n' >"$task_home/.config/ghostty/theme"
 mkdir -p "$task_home/.local/state/theme"
 ln -s "$task_home/.local/share/assets/videos/rain2k.webm" "$task_home/.local/state/theme/media"
 
@@ -67,7 +67,7 @@ test ! -e "$plain_home/.config/niri"
 failure_home="$TMPDIR/assets-failure-home"
 seed_home "$failure_home"
 mkdir -p "$failure_home/Pictures/Wallpapers"
-printf 'keep me\n' > "$failure_home/Pictures/Wallpapers/personal.txt"
+printf 'keep me\n' >"$failure_home/Pictures/Wallpapers/personal.txt"
 # Exported into the child script to exercise its backup failure handling.
 # shellcheck disable=SC2329
 mv() { return 1; }

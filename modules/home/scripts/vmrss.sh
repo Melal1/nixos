@@ -15,9 +15,9 @@ function print_vmrss() {
     while [ ${#arr[@]} -gt 0 ]; do
 
         # remove last element
-        space=${arr[${#arr[@]}-1]}
+        space=${arr[${#arr[@]} - 1]}
         unset arr[${#arr[@]}-1]
-        pid=${arr[${#arr[@]}-1]}
+        pid=${arr[${#arr[@]} - 1]}
         unset arr[${#arr[@]}-1]
 
         [ -d "/proc/$pid" ] || continue
@@ -26,9 +26,9 @@ function print_vmrss() {
           --color=auto
           --exclude-dir={.bzr,CVS,.git,.hg,.svn,.idea,.tox}
           "}
-        mem=$(grep $GREP_OPTS VmRSS /proc/$pid/status \
-          | grep $GREP_OPTS -o '[0-9]\+' \
-          | awk '{print $1/1024}')
+        mem=$(grep $GREP_OPTS VmRSS /proc/$pid/status |
+            grep $GREP_OPTS -o '[0-9]\+' |
+            awk '{print $1/1024}')
         #Add decimals to total
         total=$(echo $mem+$total | bc)
 
@@ -42,7 +42,7 @@ function print_vmrss() {
 
         # add children to array
         for child in $children; do
-            arr+=("$child" $((space+2)))
+            arr+=("$child" $((space + 2)))
         done
     done
     printf "Total: $total MB\n"
@@ -51,8 +51,7 @@ function print_vmrss() {
 # check VMRSS_MONITOR = 1
 if [ ! -z "$VMRSS_MONITOR" ]; then
     while true; do
-        if ps -p $1 > /dev/null
-        then
+        if ps -p $1 >/dev/null; then
             print_vmrss $1
             sleep 0.5
         else
