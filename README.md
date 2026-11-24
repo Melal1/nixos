@@ -3,6 +3,8 @@
 This repository configures one user, Melal, across Rusty and Snowflake using
 NixOS and standalone Home Manager.
 
+For option names, defaults, and which Home features follow a NixOS setting, see the [option reference](option.md).
+
 I use LLMs to help configure this setup, prepare commits, explain how things work,
 and handle simple, time-consuming tasks.
 
@@ -19,9 +21,9 @@ hosts/<host>/
 ├── default.nix                 # NixOS choices and capabilities
 ├── home.nix                    # Optional presets, features and package imports
 ├── home-packages.nix           # Explicitly imported host package choices
+├── noctalia-config.toml        # Complete, independent Noctalia settings
 └── overrides/                  # Optional differences from shared app defaults
-    ├── foot.nix                # Automatically imported Home Manager settings
-    └── noctalia.toml           # Editable partial Noctalia settings
+    └── foot.nix                # Automatically imported Home Manager settings
 modules/home/
 ├── default.nix                 # Identity and reusable module declarations
 ├── core.nix                    # Small shell setup, enabled automatically
@@ -47,15 +49,15 @@ available. There is no user discovery or user-membership metadata. The explicit
 account module is `modules/nixos/system/melal.nix`.
 
 `pkgs/`, `overlays/` and project `shells/` remain shared flake infrastructure.
+Manual repository maintenance utilities live in the top-level `scripts/` directory.
 Home Manager reads `osConfig` for genuine host capabilities and CPU architecture.
 NixOS/Home Manager state versions remain `24.11`.
 
 `modules/home/hosts/<host>/noctalia-config.toml` paths remain only as compatibility
-symlinks to `hosts/<host>/noctalia-config.toml` for older generations. Those root
-host files are now tiny native include wrappers for the shared defaults and host
-override, not another copy of the settings. New hosts need neither legacy path.
-They are not active module entrypoints. The distinct old Niri `programs/wm/niri/config.kdl`
-remains for live and rollback references; new generations use `session.kdl`.
+symlinks to the full `hosts/<host>/noctalia-config.toml` files for older generations.
+New hosts do not need the legacy symlinks. The distinct old Niri
+`programs/wm/niri/config.kdl` remains for live and rollback references; new
+generations use `session.kdl`.
 Keep the old targets until their references have been migrated and checked.
 
 ## Adding a machine
@@ -83,8 +85,9 @@ Keep the old targets until their references have been migrated and checked.
    Import `desktop-apps.nix` to install Helium and the usual applications, or
    install your own browser and set `home.sessionVariables.BROWSER` accordingly.
    Noctalia and hardware clients remain explicit host choices. Enabling Noctalia
-   uses the shared configuration; no host TOML is required. Add files under
-   `hosts/<host>/overrides/` only when an application needs different settings.
+   loads `hosts/<host>/noctalia-config.toml` when present; copy an existing host's
+   full file to customize it, or omit it for upstream defaults and the active theme.
+   Add files under `hosts/<host>/overrides/` only when an application needs different settings.
 
    Font packages and default families are managed in NixOS. Enable
    `my.packages.fonts.shared.enable` in `hosts/<host>/default.nix` for the shared
@@ -120,18 +123,16 @@ Keep preset and feature selections in `home.nix`, and put application difference
 in `overrides/`. These files are ordinary Home Manager modules, so use the usual
 module syntax and keep each setting defined in one host file.
 
-Noctalia reads editable shared defaults from
-`modules/home/programs/noctalia/config.toml`, followed by an optional
-`hosts/<hostname>/overrides/noctalia.toml`. A host file contains only differences:
+Each host's `hosts/<hostname>/noctalia-config.toml` contains its full, independent
+Noctalia settings. Edit that file directly, for example:
 
 ```toml
 [bar.default]
 thickness = 42
 ```
 
-Noctalia merges tables, while a host list replaces the shared list. Each host
-declares its plugin and bar lists; Rusty omits Discord Voice. The Nix loader ignores
-TOML; Noctalia loads this file itself. New files must be tracked for Git flakes,
+Each file contains its own plugin and bar lists; both hosts omit Discord Voice.
+The Nix loader ignores TOML; Noctalia loads this file itself. New files must be tracked for Git flakes,
 or included with `path:$PWD` as shown above.
 
 ## Personal packages and features
@@ -185,7 +186,8 @@ Their existing storage, secrets, grants and lifecycle policies are preserved.
 | UXPlay | `my.programs.ipad-screen-mirror.enable`: manual `uxplay` launcher, system Avahi publishing, mDNS and receiver firewall | No separate HM option; receiver startup remains manual |
 | EasyEffects | PipeWire and `programs.dconf.enable` | `services.easyeffects.enable`: graphical-session unit; replaces the Niri launch |
 | OBS | Existing audio/graphics/device support | `programs.obs-studio.enable`: same plugins; `my.home.obs.gstreamer.enable` selects the GStreamer wrapper |
-| GPU Screen Recorder | `my.programs.gpu-screen-recorder.enable`: recorder and KMS capability wrapper | `my.home.gpu-screen-recorder.enable`, optional `.autostart`: frontends and Niri launch |
+| GPU Screen Recorder | `my.programs.gpu-screen-recorder.enable`: recorder and KMS capability wrapper | `my.home.gpu-screen-recorder-ui.enable`, optional `.autostart`: frontends and Niri launch |
+| WinApps | `my.virtualisation.winapps.enable`: host support; requires `my.virtualisation.podman.enable` | Automatically follows the NixOS switch through `osConfig`; optional `my.home.winapps.launcher.enable` adds the tray launcher |
 | OpenRGB | Hardware server and permissions | `my.home.openrgb.enable`: tray-client unit |
 | Noctalia | Explicit NetworkManager, Bluetooth, UPower and power-profiles-daemon backends | `my.home.noctalia.enable`: shell/config/plugins; starts through Niri |
 | Skwd | Graphical-session prerequisites | `my.home.skwd.enable`: graphical-session daemon plus its own Niri wallpaper-restoration fragment |
@@ -201,10 +203,96 @@ order. Skwd's daemon uses its graphical-session service, while the recorder UI
 starts at Niri login when both its feature and `autostart` are enabled. Disabling
 Niri omits the generated startup script.
 
+The recorder's Home Manager options were renamed from
+`my.home.gpu-screen-recorder` to `my.home.gpu-screen-recorder-ui`. Its backend
+remains independently usable. Snowflake chooses to sync the UI in
+`hosts/snowflake/home.nix`:
+
+```nix
+my.home.gpu-screen-recorder-ui = {
+  enable = osConfig.my.programs.gpu-screen-recorder.enable;
+  autostart = lib.mkDefault true;
+};
+```
+
+Other hosts can enable the backend without selecting the UI. On Snowflake, change
+the assignment above to `false` to keep only the backend.
+
 Snowflake keeps its automatic graphical applications; Rusty does not inherit
 Snowflake's shell, recording or audio-effects selections. EasyEffects now receives
 HM's service supervision and graphical-session stop behavior. Noctalia still has
 no enabled systemd unit. `mpd-mpris` remains installed without an automatic launcher.
+
+### WinApps
+
+Snowflake enables WinApps; Rusty leaves it off. The NixOS selection is:
+
+```nix
+my.virtualisation = {
+  podman.enable = true;
+  winapps.enable = true;
+};
+```
+
+`modules/nixos/system/winapps.nix` configures the host prerequisites, and Melal's
+account gains the `kvm` group. `modules/home/programs/winapps.nix` reads the same
+switch through `osConfig` and installs WinApps, Podman Compose, the upstream OEM
+setup files and `~/.config/winapps/compose.yaml`. There is no Home Manager WinApps
+enable option. Both hosts explicitly enable the reusable Podman option for MSSQL,
+which also requires it.
+
+Optional Home Manager settings customize an enabled WinApps installation:
+
+```nix
+my.home.winapps = {
+  launcher.enable = true; # Optional tray launcher; selected on Snowflake.
+  windowsVersion = "11";
+  ramSize = "8G";
+  cpuCores = 4;
+  diskSize = "128G"; # Initial virtual disk capacity.
+};
+```
+
+The Windows VM runs under rootless Podman with `crun` and supplementary KVM group
+access. Its web console and RDP ports bind to localhost. The Compose file shares
+the user's home with Windows and stores its disk in the persistent `winapps_data`
+volume. No VM or tray autostart is configured. The Windows container image is
+downloaded at runtime from `ghcr.io/dockur/windows:latest`; it is separate from the
+WinApps scripts pinned in `flake.lock`.
+
+First-time setup, after applying **both NixOS and Home Manager** and logging in
+again for the KVM group membership:
+
+```bash
+cd ~/.config/winapps
+test -e windows.env || install -m 600 windows.env.example windows.env
+test -e winapps.conf || install -m 600 winapps.conf.example winapps.conf
+nvim windows.env winapps.conf
+```
+
+Replace the placeholders with the same Windows username and password in both
+files. These private files are user-managed and stay outside the Nix store and
+repository. Keep `WAFLAVOR="podman"`. Choose the account before installing
+Windows; editing these files later does not change an existing Windows account.
+
+When ready to download and install Windows, run as your normal user:
+
+```bash
+podman-compose --file ~/.config/winapps/compose.yaml up -d
+```
+
+Open `http://127.0.0.1:8006` to watch installation and finish any Windows setup.
+The included OEM files configure Windows for WinApps. Once Windows is ready, run
+`winapps-setup` and select a user installation to discover applications and create
+their desktop entries. `winapps windows` opens a full desktop session. RemoteApp
+behavior under Niri/Xwayland still needs a runtime test.
+
+Stop the VM with `podman-compose --file ~/.config/winapps/compose.yaml stop`.
+To disable integration, stop it first, turn off `my.virtualisation.winapps.enable`
+and apply both configurations. This leaves the VM disk and private files intact;
+shortcuts created by `winapps-setup` are also managed by that tool, not Home Manager.
+See the [upstream Podman guide](https://github.com/winapps-org/winapps/blob/main/docs/docker.md#podman)
+for VM maintenance.
 
 ### Private media resources
 
@@ -246,11 +334,11 @@ helper described below.
 Home Manager's `my.home.noctalia.enable` defaults to false and is selected by Melal
 on both Snowflake and Rusty in `hosts/<hostname>/home.nix`.
 It generates a small immutable `~/.config/noctalia/config.toml` with native
-includes for the active theme, editable shared defaults in this checkout, and
-the host TOML when present. Edit the included checkout files for plugin
-selection, widgets, wallpaper and other settings. `my.home.noctalia.configFile`
-selects the optional host TOML automatically; set it to `null` for shared settings
-only, or to another absolute TOML path. Adding or removing an override file, or
+includes for the active theme and the full host TOML when present.
+Edit `hosts/<host>/noctalia-config.toml` for plugin selection, widgets, wallpaper
+and other settings. `my.home.noctalia.configFile`
+selects that file automatically; set it to `null` for upstream defaults plus the
+active theme, or to another absolute TOML path. Adding or removing the host file, or
 changing that path, requires a Home Manager switch. Editing an already included
 TOML only needs an application reload. The module also provides the fallback
 theme and palette assets used by `theme-switch`.
@@ -261,9 +349,9 @@ there is no active Spicetify configuration or locked input.
 
 ### Noctalia settings and plugins
 
-Edit `modules/home/programs/noctalia/config.toml` for shared settings or
-`hosts/<host>/overrides/noctalia.toml` for host differences. Both hosts enable
-Bongocat, Nix Search, Pomodoro and Timer; Snowflake also enables Discord Voice.
+Edit `hosts/<host>/noctalia-config.toml`; each host has its own full copy.
+Both hosts enable Bongocat, Nix Search, Pomodoro and Timer; Snowflake also enables Performance Plus.
+Neither host enables Discord Voice.
 Plugin settings and widget definitions live beside the other shell settings.
 There is no generated plugin configuration or Nix plugin option to keep in sync.
 
@@ -558,6 +646,23 @@ Stop serving on Snowflake when finished:
 sudo systemctl stop nix-serve
 ```
 
+## Download recovery
+
+If the cpptools VSIX download keeps resetting, run this from the repository root:
+
+```bash
+python3 scripts/download-cpptools.py
+```
+
+The script requires Python 3, curl and Nix. It downloads three resumable ranges
+into `~/Downloads/cpptools-1.31.5-linux-x64/`, verifies the expected SHA-256, and
+imports the completed file into Nix's store. Rerun the command to resume an
+interrupted download. After it succeeds, run `nh home switch` from this directory.
+
+This helper is pinned to cpptools 1.31.5 for Linux x64. When the extension version
+changes, update its URL, size, SHA-256 and expected store path together to match
+the source used by `modules/home/dev/cpp.nix`.
+
 ## Validation
 
 ```bash
@@ -574,6 +679,7 @@ The flake checks formatting, dead code, Nix linting, every development shell's B
 The `module-evaluation` check covers canonical homes and aliases, package/feature
 disablement, independent host capabilities, manual service policies, per-host overrides,
 UXPlay dependencies/ports, private media paths, package provenance and overrides,
+recorder UI synchronization, WinApps host synchronization and Podman requirements,
 and development output rooting. It evaluates configuration without compiling
 the selected applications. Run those assertions directly with:
 
@@ -619,7 +725,7 @@ The selected browser is Helium on both hosts; LibreWolf remains available. Home 
 
 | Kind | Examples | How to change it |
 | --- | --- | --- |
-| Editable checkout files | Niri `~/.config/niri/config.kdl` links to `modules/home/programs/wm/niri/session.kdl`; Noctalia includes `modules/home/programs/noctalia/config.toml` and optional `hosts/<hostname>/overrides/noctalia.toml` directly from the checkout | Edit the checkout file; reload the application |
+| Editable checkout files | Niri `~/.config/niri/config.kdl` links to `modules/home/programs/wm/niri/session.kdl`; Noctalia includes the full `hosts/<hostname>/noctalia-config.toml` directly from the checkout | Edit the checkout file; reload the application |
 | Immutable Home Manager configuration | Typed terminal settings, generated Niri fragments and Noctalia include wrapper, fallback themes and palettes | Change Nix settings or source assets and apply Home Manager |
 | Runtime-owned files and links | Active themes and wallpaper links, Niri `monitor.kdl`, Noctalia state overrides | Use `theme-switch`, display tools or the application; activation only seeds missing theme links |
 
@@ -651,9 +757,9 @@ custom Noctalia theme, use `source = "custom"` and
 `custom_palette = "default"` in its `[theme]` section. The initial theme file
 retains the existing `black-mo` settings through that stable palette name.
 The generated main config sets `[include].autoload = false` and loads the active
-`default.toml`, shared checkout defaults, then the optional host override. These
-config files never change during a theme switch. Wallpaper defaults live in the
-shared TOML and can be overridden by a host. Noctalia supports `~` in wallpaper paths.
+`default.toml`, then the full host configuration. These config files never change
+during a theme switch. Wallpaper settings live in each host's TOML.
+Noctalia supports `~` in wallpaper paths.
 Noctalia's wallpaper service is disabled with `[wallpaper].enabled = false`;
 `skwd-wall` handles rendering. Default, last and monitor wallpaper paths point
 to `~/.local/state/theme/wallpaper`, with `fill_mode = "stretch"` retained.

@@ -21,6 +21,7 @@ pkgs/dwmblocks-async/dwmblocks
 /result
 
 # Local AI planning, audits and troubleshooting notes
+/FIX-LATER.md
 /ARCHITECTURE-AUDIT.md
 /MIGRATION-PLAN.md
 /MIGRATION-PROMPT.md
