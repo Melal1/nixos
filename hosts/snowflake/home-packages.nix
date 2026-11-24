@@ -1,9 +1,8 @@
-{
-  inputs,
-  lib,
-  pkgs,
-  unstable,
-  ...
+{ inputs
+, lib
+, pkgs
+, unstable
+, ...
 }:
 let
   fromSystem = import ../../modules/home/lib/after-home-packages.nix lib;
@@ -50,6 +49,7 @@ in
       imagemagick
       kdePackages.kdenlive
       puddletag
+      exiftool
 
       # password manager
       keepassxc
